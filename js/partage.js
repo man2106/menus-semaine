@@ -170,7 +170,11 @@
       else showGate();
     } catch (e) {
       console.error(e);
-      showGate("Le partage n'est pas joignable pour le moment. Réessayez, ou continuez sans partage.");
+      const m = ((e && (e.message || e.msg)) || "") + " " + ((e && e.code) || "");
+      let txt = "Le partage n'est pas joignable pour le moment. Réessayez, ou continuez sans partage.";
+      if (/anonymous/i.test(m)) txt = "Réglage à faire dans Supabase : activez « Allow anonymous sign-ins » (Authentication, Sign In / Providers).";
+      else if (/PGRST202|mon_acces|function|schema cache/i.test(m)) txt = "Réglage à faire dans Supabase : la base n'est pas encore installée (script SQL à exécuter dans SQL Editor).";
+      showGate(txt + " [" + m.trim().slice(0, 120) + "]");
     }
   }
 
