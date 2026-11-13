@@ -679,6 +679,23 @@ body.notowner .owner-only{display:none!important}
 .comptehaut.urgent{background:var(--warm-soft);color:var(--warm)}
 .comptehaut.fini{background:var(--line);color:var(--muted)}
 @media (max-width:560px){ .comptehaut{justify-items:start;text-align:left;width:100%;box-sizing:border-box} }
+/* ---- Ajout manuel de produits ---- */
+.addprod{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px;margin-bottom:14px;display:grid;gap:8px}
+.aprow{display:grid;grid-template-columns:1fr 64px auto;gap:6px}
+.aprow input{min-width:0;font-size:16px;padding:9px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:inherit}
+.aprow input:focus{outline:2px solid var(--accent);outline-offset:0;border-color:transparent}
+.aprow .btn{padding:9px 14px;font-size:15px;border-radius:10px}
+.apsugg{display:grid;gap:2px;border-top:1px solid var(--line);padding-top:6px}
+.apitem{display:grid;text-align:left;border:0;background:transparent;border-radius:10px;padding:9px 10px;cursor:pointer;color:inherit;font:inherit}
+.apitem:hover,.apitem:focus-visible{background:var(--accent-soft)}
+.apitem b{font-weight:600;font-size:15px}
+.apitem small{font-size:12px;color:var(--muted)}
+.aphint{margin:2px 4px;font-size:13px;color:var(--muted)}
+.aprays{display:flex;flex-wrap:wrap;gap:6px;padding:4px 2px}
+.aptrip{display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:13px;color:var(--muted)}
+.aptrip .chip.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.xdel{margin-left:8px;width:30px;height:30px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--muted);font-size:18px;line-height:1;cursor:pointer;vertical-align:middle}
+@media (max-width:699px){ .aprow{grid-template-columns:1fr 58px} .aprow .btn{grid-column:1/-1} .aptrip{display:none} }
 /* ---- Liste de courses sur téléphone ---- */
 .ptag.off{opacity:.6}
 .tripsel{display:none}
@@ -774,6 +791,16 @@ body.notowner .owner-only{display:none!important}
     </div>
     <textarea class="copybox" id="copybox" hidden readonly aria-label="Liste de courses à copier"></textarea>
     <details class="panel sum" id="planbox"><summary id="plansum"></summary><div id="plan"></div></details>
+    <div class="tripsel" id="tripsel" role="tablist" aria-label="Choisir la course"></div>
+    <form class="addprod edit-only" id="addprod" autocomplete="off">
+      <div class="aprow">
+        <input id="apname" type="text" placeholder="Ajouter un produit…" aria-label="Produit à ajouter" enterkeyhint="done" autocapitalize="sentences" autocorrect="off" spellcheck="false" maxlength="60">
+        <input id="apqty" type="text" placeholder="Qté" aria-label="Quantité (facultatif)" maxlength="20" enterkeyhint="done">
+        <button class="btn primary" type="submit">Ajouter</button>
+      </div>
+      <div class="apsugg" id="apsugg" role="listbox" aria-label="Suggestions" hidden></div>
+      <div class="aptrip" id="aptrip"></div>
+    </form>
     <div id="aisles"></div>
     <p class="pantry"><b>À vérifier au placard :</b> huile, sel, poivre, ail, vinaigrette, sauce soja.</p>
     </div>
@@ -933,10 +960,10 @@ body.notowner .owner-only{display:none!important}
   <div class="sfoot" id="sfoot"></div>
 </div>
 
-<script src="vendor/jspdf-2.5.1.umd.min.js?v=27"></script>
-<script src="vendor/supabase-js-2.45.4.js?v=27"></script>
-<script src="js/partage.js?v=27"></script>
-<script src="js/app.js?v=27"></script>
+<script src="vendor/jspdf-2.5.1.umd.min.js?v=28"></script>
+<script src="vendor/supabase-js-2.45.4.js?v=28"></script>
+<script src="js/partage.js?v=28"></script>
+<script src="js/app.js?v=28"></script>
 
 </body>
 </html>

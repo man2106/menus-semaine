@@ -3,8 +3,8 @@ window.addEventListener("error",e=>{ const t=e.target; if(t&&t.tagName==="IMG"){
 
 // Nettoie un texte venu de la base partagée ou d'un fichier : jamais de balise ni de caractère dangereux à l'affichage
 function propre(v,max){ return typeof v==="string" ? v.replace(/[<>&"'`]/g,"").replace(/[\u0000-\u001f]/g," ").trim().slice(0,max||200) : ""; }
-const RAYONS = {bou:"Boucherie & charcuterie", cre:"Crèmerie", fl:"Fruits & légumes", bl:"Boulangerie", epi:"Épicerie", sur:"Surgelés"};
-const ORDRE = ["fl","bou","cre","bl","epi","sur"];
+const RAYONS = {bou:"Boucherie & charcuterie", cre:"Crèmerie", fl:"Fruits & légumes", bl:"Boulangerie", epi:"Épicerie", sur:"Surgelés", dro:"Droguerie & hygiène"};
+const ORDRE = ["fl","bou","cre","bl","epi","sur","dro"];
 // Quantités pour 5 personnes : [nom, quantité, unité, rayon]
 const RECETTES = [
  {id:"carbo",nom:"Pâtes carbonara",acc:"Salade verte",t:20,astuce:"Prenez un grand paquet de lardons : la moitié sert pour la quiche.",ing:[["Spaghetti",600,"g","epi"],["Lardons",200,"g","bou"],["Œufs",4,"","cre"],["Crème fraîche",20,"cl","cre"],["Fromage râpé",100,"g","cre"],["Laitue",1,"","fl"]]},
@@ -374,7 +374,7 @@ const JOURS = ["Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi","Dimanche"
 const DEFAUT = ["carbo","omelette","wraps","cantonais","croque","chili","quiche"];
 const KEY = "menus-semaine-v1";
 
-let state = {week:[...DEFAUT], persons:5, checked:{}, tab:"menu", picking:null, family:[], cooks:Array(7).fill(null), prices:{}, trip1:"sam", trip2:3, tripStore:[null,null], gamme:"eco", maxStores:1, seuil:2, weekOffset:0, weeks:{}, statut:"proposition", journal:[], approbations:{}, limite:null, exterieur:null, outDefault:[5], absents:{}, invites:[0,0,0,0,0,0,0], emails:{}, perso:[], avis:{}, exclus:{}, storePref:null, onboarded:false};
+let state = {week:[...DEFAUT], persons:5, checked:{}, tab:"menu", picking:null, family:[], cooks:Array(7).fill(null), prices:{}, trip1:"sam", trip2:3, tripStore:[null,null], gamme:"eco", maxStores:1, seuil:2, weekOffset:0, weeks:{}, statut:"proposition", journal:[], approbations:{}, limite:null, exterieur:null, outDefault:[5], absents:{}, invites:[0,0,0,0,0,0,0], extras:[], emails:{}, perso:[], avis:{}, exclus:{}, storePref:null, onboarded:false};
 try{const s=JSON.parse(localStorage.getItem(KEY)||"null"); if(s&&Array.isArray(s.perso)) s.perso.forEach(registerRecipe); if(s&&Array.isArray(s.week)&&s.week.every(id=>BYID[id])) state={...state,...s,picking:null};}catch(e){}
 if(!Array.isArray(state.family)) state.family=[];
 if(!state.prices||typeof state.prices!=="object") state.prices={};
@@ -425,13 +425,13 @@ if(!Array.isArray(state.invites)||state.invites.length!==7) state.invites=[0,0,0
 // semaine affichée au démarrage
 function setMonday(off){ MONDAY=new Date(BASE_MONDAY); MONDAY.setDate(BASE_MONDAY.getDate()+7*off); }
 setMonday(state.weekOffset);
-function stashWeek(){ state.weeks[curIso()]={menu:[...state.week],cooks:[...state.cooks],checked:{...state.checked},statut:state.statut,journal:state.journal.slice(0,15),approbations:JSON.parse(JSON.stringify(state.approbations)),limite:state.limite,exterieur:state.exterieur,absents:JSON.parse(JSON.stringify(state.absents)),invites:[...state.invites]};
+function stashWeek(){ state.weeks[curIso()]={menu:[...state.week],cooks:[...state.cooks],checked:{...state.checked},statut:state.statut,journal:state.journal.slice(0,15),approbations:JSON.parse(JSON.stringify(state.approbations)),limite:state.limite,exterieur:state.exterieur,absents:JSON.parse(JSON.stringify(state.absents)),invites:[...state.invites],extras:JSON.parse(JSON.stringify(state.extras||[]))};
   // ne garder que les semaines récentes
   const limit=new Date(BASE_MONDAY); limit.setDate(limit.getDate()-14); Object.keys(state.weeks).forEach(k=>{ if(isoDate(k)<limit) delete state.weeks[k]; }); }
 function applyValidation(){ if(DB){ state.statut = VALID[curIso()]==="valide" ? "valide" : "proposition"; state.limite = LIMITES[curIso()]||null; } }
 function applyWeekData(w){ state.week=[...w.menu]; state.cooks=(Array.isArray(w.cooks)&&w.cooks.length===7)?w.cooks.map(x=>propre(x,30)||null):Array(7).fill(null); state.checked={...(w.checked||{})}; state.statut=w.statut||"proposition"; state.journal=Array.isArray(w.journal)?w.journal:[];
   state.approbations=(w.approbations&&typeof w.approbations==="object")?JSON.parse(JSON.stringify(w.approbations)):{}; state.limite=typeof w.limite==="string"?w.limite:null; state.exterieur=cleanDays(w.exterieur);
-  state.absents=(w.absents&&typeof w.absents==="object")?JSON.parse(JSON.stringify(w.absents)):{}; if(window.__dbReady) applyValidation(); state.invites=(Array.isArray(w.invites)&&w.invites.length===7)?w.invites.map(x=>Math.max(0,Math.min(20,+x||0))):[0,0,0,0,0,0,0]; }
+  state.absents=(w.absents&&typeof w.absents==="object")?JSON.parse(JSON.stringify(w.absents)):{}; if(window.__dbReady) applyValidation(); state.invites=(Array.isArray(w.invites)&&w.invites.length===7)?w.invites.map(x=>Math.max(0,Math.min(20,+x||0))):[0,0,0,0,0,0,0]; state.extras=cleanExtras(w.extras); }
 { const w=state.weeks[curIso()]; if(w&&Array.isArray(w.menu)&&w.menu.length===7&&w.menu.every(id=>BYID[id])) applyWeekData(w); }
 if(!Array.isArray(state.cooks)||state.cooks.length!==7) state.cooks=Array(7).fill(null);
 function save(){ saveLocal(); if(typeof shareSync==="function"){ shareSync(); familySync(); goutsSync(); } }
@@ -445,6 +445,7 @@ function cookSelect(d,extra=""){
 
 const nf = new Intl.NumberFormat("fr-BE",{maximumFractionDigits:2});
 function plural(u,c){ if(!u||c<=1) return u; if(u.endsWith("s")) return u; if(u.endsWith("eau")) return u+"x"; return u+"s"; }
+const qtyOf = i => i.x ? (i.qt||"") : fmt(i.q,i.u);
 function fmt(q,u){
   if(u==="g"){ q=Math.max(50,Math.round(q/50)*50); return q>=1000? nf.format(q/1000)+" kg" : q+" g"; }
   if(u==="cl"){ q=Math.max(5,Math.round(q/5)*5); return q>=100? nf.format(q/100)+" L" : q+" cl"; }
@@ -591,8 +592,11 @@ function coursesTrips(){
     const it=m.get(k); it.q+=scale(q,d); it.pour.add(JOURS[d]);
     const buy=t===0?trip1Day():state.trip2; if(ray==="bou"&&d-buy>=3) it.freeze=true;
   }));
+  (state.extras||[]).forEach(x=>{ const t=x.t===1?1:0, k="x|"+x.id;
+    trips[t].set(k,{k,ck:t+"|"+k,n:x.n,u:"",ray:RAYONS[x.ray]?x.ray:"epi",q:0,qt:x.qt||"",pour:new Set(),freeze:false,x:true,id:x.id,par:x.par||""}); });
   return trips.map(m=>[...m.values()].sort((a,b)=>ORDRE.indexOf(a.ray)-ORDRE.indexOf(b.ray)||a.n.localeCompare(b.n,"fr")));
 }
+function cleanExtras(a){ return Array.isArray(a)? a.filter(x=>x&&typeof x.n==="string"&&x.n.trim()&&x.id).slice(0,200).map(x=>({id:String(x.id).slice(0,40),n:String(x.n).trim().slice(0,60),qt:String(x.qt||"").slice(0,20),ray:RAYONS[x.ray]?x.ray:"epi",t:x.t===1?1:0,par:String(x.par||"").slice(0,30)})) : []; }
 function suggestStore(items,date){
   const c={}; items.forEach(i=>promosFor(i.n).filter(p=>validOn(p,date)).forEach(p=>c[p.mag]=(c[p.mag]||0)+1));
   const best=Object.keys(c).sort((a,b)=>c[b]-c[a])[0]; return best||"colruyt";
@@ -666,15 +670,16 @@ function renderCourses(){
         const tags=promosFor(i.n).map(p=>{const ok=validOn(p,date);
           const when= ok ? `jusqu'au ${fmtShort(isoDate(p.au))}` : (isoDate(p.du)>date ? `dès le ${fmtShort(isoDate(p.du))}, pas encore valable ce jour-là` : `terminée le ${fmtShort(isoDate(p.au))}`);
           return `<span class="ptag${ok&&p.mag===ensOf(mag)?"":" off"}">· Promo ${ENS[p.mag]} ${eur(p.prix)} ${when}</span>`}).join("");
-        return `<label class="item${c?" checked":""}"><input type="checkbox" data-k="${esc(i.ck)}"${c?" checked":""}><span class="iname"><b>${esc(i.n)}</b><small>${[...i.pour].join(", ")}${i.freeze?'<span class="ptag" style="color:var(--accent)">· à congeler à l\'achat</span>':""}${tags}</small></span><span class="qty">${fmt(i.q,i.u)}</span></label>`}).join("");
+        return `<label class="item${c?" checked":""}"><input type="checkbox" data-k="${esc(i.ck)}"${c?" checked":""}><span class="iname"><b>${esc(i.n)}</b><small>${i.x?(i.par?"Ajouté par "+esc(i.par):"Ajouté à la main"):[...i.pour].join(", ")}${i.freeze?'<span class="ptag" style="color:var(--accent)">· à congeler à l\'achat</span>':""}${tags}</small></span><span class="qty">${esc(qtyOf(i))}${i.x?`<button type="button" class="xdel edit-only" data-xdel="${esc(i.id)}" aria-label="Retirer ${esc(i.n)} de la liste">×</button>`:""}</span></label>`}).join("");
       return `<div class="aisle"><h2><span>${RAYONS[ray]}</span><span>${its.length}</span></h2><div class="list">${rows}</div></div>`}).join("");
       return `<div class="stop"><div class="stophead"><span class="stopno">Arrêt ${si+1}</span><b>${esc(m.nom)}</b><small>${esc(m.lieu)} · ${sitems.length} article${sitems.length>1?"s":""}${nP?` · ${nP} en promo`:""} · ≈ ${eur(sitems.reduce((s,i)=>s+itemCost(i.n,i.u,i.q,i.ray),0))}</small></div>${groups}</div>`}).join("");
     return `<div class="trip${t===tripVue?" on":""}" id="trip-${t}"><div class="triphead"><div><div class="tripno">Course ${t+1} · ${fmtD(date)}</div><p class="note">${cover}</p></div>
       <button class="btn primary" data-shop="${t}" data-tip="Liste plein écran, rayon par rayon : cochez en avançant dans le magasin">Mode magasin</button>
       <label class="tripstore">Magasin principal <select data-store="${t}" aria-label="Magasin principal de la course ${t+1}"><option value="">Automatique</option>${orderedStores().map(m=>`<option value="${m.id}"${m.id===state.tripStore[t]?" selected":""}>${m.nom} · ${kmTxt(km(HOME,m))}</option>`).join("")}</select></label></div>
       <p class="note">${items.length} articles · ≈ ${eur(items.reduce((s,i)=>s+itemCost(i.n,i.u,i.q,i.ray),0))} (gamme ${GAMMES[state.gamme].nom.toLowerCase()}) · trajet ≈ ${kmTxt(plan.route)}</p>${stopsHtml}</div>`}).join("");
-  $("aisles").insertAdjacentHTML("afterbegin",`<div class="tripsel" role="tablist" aria-label="Choisir la course">${trips.map((items,t)=>`<button role="tab" data-tripvue="${t}" aria-selected="${t===tripVue}"><b>Course ${t+1}</b><small>${fmtShort(tripDate(t))} · ${tdone[t]}/${items.length}</small></button>`).join("")}</div>`);
+  $("tripsel").innerHTML=(`${trips.map((items,t)=>`<button role="tab" data-tripvue="${t}" aria-selected="${t===tripVue}"><b>Course ${t+1}</b><small>${fmtShort(tripDate(t))} · ${tdone[t]}/${items.length}</small></button>`).join("")}`);
   $("ptext").textContent=`${done} sur ${total} dans le caddie`;
+  if(typeof renderApTrip==="function") renderApTrip();
   $("pbar").style.width=(total?done/total*100:0)+"%";
   $("ccount").textContent=total-done?String(total-done):"";
   renderNext();
@@ -755,7 +760,7 @@ function renderPromos(){
   $("planinfo").textContent=mags.length? `${mags.length} enseigne${mags.length>1?"s":""} ont des promos sur votre liste. Économie connue : environ ${eur(gain)} par paquet acheté en promo.` : "Aucun article de votre liste n'est en promo cette semaine.";
   $("pcount").textContent=String(items.filter(i=>promosFor(i.n).length).length||"");
   $("deals").innerHTML=mags.map(m=>{const mine=orderedStores().filter(x=>x.ens===m);
-    return `<div class="store">${ENS[m]}${mine.length?" · "+mine.map(x=>x.lieu.split(", ").pop()).join(", "):" · pas dans vos magasins"}</div>`+byMag[m].map(({p,i})=>`<div class="deal"><span>${esc(p.produit)}</span><span class="p">${p.avant?`<s>${eur(p.avant)}</s>`:""}${eur(p.prix)}</span><small>Pour : ${i.n.toLowerCase()} (${fmt(i.q,i.u)}) · du ${fmtD(isoDate(p.du))} au ${fmtD(isoDate(p.au))} <span class="st ${promoStatus(p).cls}">${promoStatus(p).txt}</span></small></div>`).join("")}).join("");
+    return `<div class="store">${ENS[m]}${mine.length?" · "+mine.map(x=>x.lieu.split(", ").pop()).join(", "):" · pas dans vos magasins"}</div>`+byMag[m].map(({p,i})=>`<div class="deal"><span>${esc(p.produit)}</span><span class="p">${p.avant?`<s>${eur(p.avant)}</s>`:""}${eur(p.prix)}</span><small>Pour : ${i.n.toLowerCase()} (${qtyOf(i)}) · du ${fmtD(isoDate(p.du))} au ${fmtD(isoDate(p.au))} <span class="st ${promoStatus(p).cls}">${promoStatus(p).txt}</span></small></div>`).join("")}).join("");
   // validité par magasin
   const parMag={}; PROMOS.forEach(p=>(parMag[p.mag]=parMag[p.mag]||[]).push(p));
   const seen=new Set();
@@ -783,7 +788,7 @@ function renderCmp(onlyTotals){
   const tot={}, cnt={};
   orderedStores().forEach(m=>{tot[m.id]=0;cnt[m.id]=0;});
   const rows=items.map(i=>{const pr=state.prices[i.k]||{};
-    return `<tr><td>${i.n}<small>${fmt(i.q,i.u)}</small></td>${orderedStores().map(m=>{const v=pr[m.id]; if(typeof v==="number"){tot[m.id]+=v;cnt[m.id]++;}
+    return `<tr><td>${i.n}<small>${qtyOf(i)}</small></td>${orderedStores().map(m=>{const v=pr[m.id]; if(typeof v==="number"){tot[m.id]+=v;cnt[m.id]++;}
       return `<td><input type="number" inputmode="decimal" min="0" step="0.01" id="px-${i.k.replace(/[^a-zA-Z0-9]/g,"_")}-${m.id}" data-pk="${esc(i.k)}" data-mag="${m.id}" value="${typeof v==="number"?v:""}" aria-label="Prix ${esc(i.n)} chez ${m.nom}"></td>`}).join("")}</tr>`}).join("");
   const full=orderedStores().filter(m=>cnt[m.id]===items.length&&items.length);
   const best=full.length?Math.min(...full.map(m=>tot[m.id])):null;
@@ -856,7 +861,7 @@ function renderModal(){
       const tags = promosFor(i.n).map(p=>{const ok = date ? validOn(p,date) : true;
         return `<span class="ptag"${ok?"":' style="opacity:.6"'}>· Promo ${ENS[p.mag]} ${eur(p.prix)}${ok?"":" (pas valable ce jour-là)"}</span>`}).join("");
       const box = i.ck ? `<input type="checkbox" data-mk="${esc(i.ck)}"${c?" checked":""} aria-label="${esc(i.n)} acheté">` : `<span></span>`;
-      return `<label class="item${c?" checked":""}">${box}<span class="iname"><b>${esc(i.n)}</b><small>${plan?`<b style="color:var(--accent);font-weight:700">${MAGNOM[plan.assign[i.n+"|"+i.u]||plan.primary]}</b> · `:""}${RAYONS[i.ray]} · ≈ ${eur(i.cost)}${tags}</small></span><span class="qty">${fmt(i.q,i.u)}</span></label>`}).join("");
+      return `<label class="item${c?" checked":""}">${box}<span class="iname"><b>${esc(i.n)}</b><small>${plan?`<b style="color:var(--accent);font-weight:700">${MAGNOM[plan.assign[i.n+"|"+i.u]||plan.primary]}</b> · `:""}${RAYONS[i.ray]} · ≈ ${eur(i.cost)}${tags}</small></span><span class="qty">${qtyOf(i)}</span></label>`}).join("");
     return head+`<div class="list">${rows}</div>`}).join("");
   const steps = getSteps(id).map(s=>`<li><span>${esc(s)}</span></li>`).join("");
   const w=dislikesFor(r,d), pp=photoPage(id);
@@ -901,7 +906,7 @@ $("mbody").addEventListener("change",e=>{const k=e.target.dataset&&e.target.data
   if(e.target.checked) state.checked[k]=true; else delete state.checked[k]; save(); renderCourses(); renderModal();});
 $("mbody").addEventListener("click",e=>{ if(e.target.id!=="mcopy") return;
   const {id,d}=modalCtx, items=mealItems(id,d);
-  const txt=BYID[id].nom+(d!==null?" ("+JOURS[d]+")":"")+" · "+headcount(d)+" pers.\n"+items.map(i=>"- "+i.n+" : "+fmt(i.q,i.u)).join("\n");
+  const txt=BYID[id].nom+(d!==null?" ("+JOURS[d]+")":"")+" · "+headcount(d)+" pers.\n"+items.map(i=>"- "+i.n+" : "+qtyOf(i)).join("\n");
   try{ navigator.clipboard.writeText(txt).then(()=>toast("Ingrédients copiés"),()=>toast("Copie impossible ici")); }catch(err){ toast("Copie impossible ici"); }
 });
 $("recipes").addEventListener("click",e=>{const b=e.target.closest("[data-openrec]"); if(b) openMeal(b.dataset.openrec,null);});
@@ -976,7 +981,7 @@ $("copy").onclick=()=>{
   const txt="Courses de la semaine ("+totalCouverts()+" couverts)\n"+trips.map((all,t)=>{const items=all.filter(i=>!state.checked[i.ck]); if(!items.length) return "";
     const plan=planTrip(t,all);
     return "\n== Course "+(t+1)+" · "+tripName(t)+" ==\n"+[plan.primary,plan.secondary].filter(Boolean).map(mag=>{const si=items.filter(i=>plan.assign[i.k]===mag); if(!si.length) return "";
-      return "\n>> "+MAGNOM[mag]+"\n"+ORDRE.map(ray=>{const its=si.filter(i=>i.ray===ray); return its.length? RAYONS[ray]+"\n"+its.map(i=>"- "+i.n+" : "+fmt(i.q,i.u)).join("\n")+"\n":""}).join("");}).join("");}).join("");
+      return "\n>> "+MAGNOM[mag]+"\n"+ORDRE.map(ray=>{const its=si.filter(i=>i.ray===ray); return its.length? RAYONS[ray]+"\n"+its.map(i=>"- "+i.n+" : "+qtyOf(i)).join("\n")+"\n":""}).join("");}).join("");}).join("");
   const box=$("copybox");
   const fallback=()=>{box.value=txt;box.hidden=false;box.focus();box.select();toast("Sélectionnez le texte puis copiez-le");};
   try{ navigator.clipboard.writeText(txt).then(()=>{box.hidden=true;toast("Liste copiée");},fallback);}catch(err){fallback();}
@@ -1045,7 +1050,7 @@ function goWeek(off){ if(off<0||off>3||off===state.weekOffset) return;
 // --- partage via la base de données de la page ---
 let DB=null, USER=null, ME=null, CAN_WRITE=null, unsubWeek=null, unsubFam=null, IS_OWNER=true, VALID={}, LIMITES={};
 let shareOpen=false, shareReady=false, lastShared=null, lastFamily=null, writing=false, dirty=false, syncState="local";
-const sharedPayload=()=>({menu:state.week,cuisiniers:state.cooks,coches:state.checked,absents:state.absents,invites:state.invites,approbations:state.approbations,exterieur:state.exterieur});
+const sharedPayload=()=>({menu:state.week,cuisiniers:state.cooks,coches:state.checked,absents:state.absents,invites:state.invites,approbations:state.approbations,exterieur:state.exterieur,ajouts:state.extras});
 function describeChange(prev,next){
   if(!prev) return "a proposé le menu de la semaine";
   const out=[];
@@ -1056,6 +1061,8 @@ function describeChange(prev,next){
   JOURS.forEach((j,d)=>{ const a=outList(prev.exterieur).includes(d), b=outList(next.exterieur).includes(d); if(a!==b) out.push(`${j} : ${b?"repas à l'extérieur":"on mange à la maison"}`); });
   state.family.forEach(n=>{ const a=(prev.approbations||{})[n], b=(next.approbations||{})[n]; if(!a&&b) out.push(`${n} a validé le menu`); if(a&&!b) out.push(`${n} a retiré sa validation`); });
   (next.invites||[]).forEach((v,d)=>{ const o=(prev.invites||[])[d]||0; if(o!==v) out.push(`${JOURS[d]} : ${v} invité${v>1?"s":""}`); });
+  const pa=new Set((prev.ajouts||[]).map(x=>x.id)), na=(next.ajouts||[]).filter(x=>!pa.has(x.id));
+  if(na.length) out.push(`a ajouté ${na.map(x=>x.n.toLowerCase()).join(", ")} aux courses`);
   if(!out.length && JSON.stringify(prev.coches)!==JSON.stringify(next.coches)) return null; // cocher ne pollue pas le journal
   return out.slice(0,3).join(" · ")+(out.length>3?` (+${out.length-3})`:"");
 }
@@ -1084,7 +1091,7 @@ function subscribeWeek(){
       const d=snap.data();
       if(Array.isArray(d.menu)&&d.menu.length===7&&!d.menu.every(id=>BYID[id])) pendingWeek={iso,d};
       if(!snap.metadata.hasPendingWrites && Array.isArray(d.menu) && d.menu.length===7 && d.menu.every(id=>BYID[id])){
-        applyWeekData({menu:d.menu,cooks:d.cuisiniers,checked:d.coches,statut:d.statut,journal:d.journal,absents:d.absents,invites:d.invites,approbations:d.approbations,exterieur:d.exterieur});
+        applyWeekData({menu:d.menu,cooks:d.cuisiniers,checked:d.coches,statut:d.statut,journal:d.journal,absents:d.absents,invites:d.invites,approbations:d.approbations,exterieur:d.exterieur,extras:d.ajouts});
         lastShared=JSON.stringify(sharedPayload()); saveLocal(); render(); if(modalCtx) renderModal();
       }
     }
@@ -1314,7 +1321,7 @@ function subscribeRecettes(){ if(!DB) return; if(unsubRec) unsubRec();
       else { const r=registerRecipe(x); if(r){ state.perso=[...state.perso.filter(p=>p.id!==r.id),r]; changed=true; } } });
     if(changed){ saveLocal();
       if(pendingWeek&&pendingWeek.iso===curIso()&&pendingWeek.d.menu.every(id=>BYID[id])){ const d=pendingWeek.d; pendingWeek=null;
-        applyWeekData({menu:d.menu,cooks:d.cuisiniers,checked:d.coches,statut:d.statut,journal:d.journal,absents:d.absents,invites:d.invites,approbations:d.approbations,exterieur:d.exterieur}); lastShared=JSON.stringify(sharedPayload()); }
+        applyWeekData({menu:d.menu,cooks:d.cuisiniers,checked:d.coches,statut:d.statut,journal:d.journal,absents:d.absents,invites:d.invites,approbations:d.approbations,exterieur:d.exterieur,extras:d.ajouts}); lastShared=JSON.stringify(sharedPayload()); }
       render(); if(modalCtx&&BYID[modalCtx.id]) renderModal(); }
   },()=>{}); }
 async function saveRecipeShared(r){ if(!DB||CAN_WRITE===false) return; try{ await DB.collection("recettes").doc(r.id).set({...r}); }catch(e){ toast("La recette est gardée sur cet appareil, le partage a échoué"); } }
@@ -1364,7 +1371,7 @@ function renderShop(){ const c=sheetCtx, t=c.t, items=coursesTrips()[t], plan=pl
   $("sbody").innerHTML=(stores.length>1?`<div class="gfilters">${stores.map((m,i)=>`<button class="chip${i===c.stop?" on":""}" data-stop="${i}">Arrêt ${i+1} · ${MAGNOM[m]}</button>`).join("")}</div>`:"")+
     (sitems.length?ORDRE.map(ray=>{const its=sitems.filter(i=>i.ray===ray); if(!its.length) return "";
       return `<h3 class="shopray">${RAYONS[ray]}</h3>`+its.map(i=>{const ck=!!state.checked[i.ck], pr=promosFor(i.n).find(p=>p.mag===ensOf(mag)&&validOn(p,tripDate(t)));
-        return `<button class="shopitem${ck?" done":""}" data-shopk="${esc(i.ck)}" aria-pressed="${ck}"><span class="sbox" aria-hidden="true">${ck?"✓":""}</span><span class="sname">${esc(i.n)}${pr?`<small>Promo ${eur(pr.prix)}</small>`:""}</span><span class="sqty">${fmt(i.q,i.u)}</span></button>`}).join("")}).join("")
+        return `<button class="shopitem${ck?" done":""}" data-shopk="${esc(i.ck)}" aria-pressed="${ck}"><span class="sbox" aria-hidden="true">${ck?"✓":""}</span><span class="sname">${esc(i.n)}${pr?`<small>Promo ${eur(pr.prix)}</small>`:""}</span><span class="sqty">${esc(qtyOf(i))}</span></button>`}).join("")}).join("")
      :`<p class="note">Rien à acheter ici.</p>`)+
     (done===sitems.length&&sitems.length?`<div class="shopdone">Tout est dans le caddie.</div>`:"");
   $("sfoot").innerHTML=`<div class="track big"><i style="width:${sitems.length?done/sitems.length*100:0}%"></i></div><button class="btn primary" data-shopend="1">${done===sitems.length?"Terminer":"Fermer"}</button>`; }
@@ -1535,7 +1542,7 @@ $("mbody").addEventListener("click",e=>{ const b=e.target.closest("button"); if(
 });
 
 // --- Divers boutons ---
-$("aisles").addEventListener("click",e=>{ const v=e.target.closest("[data-tripvue]"); if(v){ tripVue=+v.dataset.tripvue; renderCourses(); return; } });
+$("tripsel").addEventListener("click",e=>{ const v=e.target.closest("[data-tripvue]"); if(v){ tripVue=+v.dataset.tripvue; renderCourses(); if(typeof renderApSugg==="function") renderApSugg(); return; } });
 $("aisles").addEventListener("click",e=>{ const b=e.target.closest("[data-shop]"); if(b) openSheet({type:"shop",t:+b.dataset.shop,stop:0,wake:true}); });
 $("members").addEventListener("click",e=>{ const b=e.target.closest("[data-gouts]"); if(b) openSheet({type:"gouts",i:+b.dataset.gouts}); });
 let ensFilter="";
@@ -1780,7 +1787,7 @@ function exportText(){
   exportTrips().forEach(t=>{ const all=trips[t], plan=planTrip(t,all), items=exportItems(t,all); if(!items.length) return;
     txt+=`\n== Course ${t+1} · ${fmtD(tripDate(t))} ==\n`;
     [plan.primary,plan.secondary].filter(Boolean).forEach(mag=>{ const si=items.filter(i=>plan.assign[i.k]===mag); if(!si.length) return;
-      txt+=`\n>> ${MAGNOM[mag]}\n`+ORDRE.map(ray=>{const its=si.filter(i=>i.ray===ray); return its.length? RAYONS[ray]+"\n"+its.map(i=>`- ${i.n} : ${fmt(i.q,i.u)}${state.checked[i.ck]?" (acheté)":""}`).join("\n")+"\n":""}).join(""); }); });
+      txt+=`\n>> ${MAGNOM[mag]}\n`+ORDRE.map(ray=>{const its=si.filter(i=>i.ray===ray); return its.length? RAYONS[ray]+"\n"+its.map(i=>`- ${i.n} : ${qtyOf(i)}${state.checked[i.ck]?" (acheté)":""}`).join("\n")+"\n":""}).join(""); }); });
   return txt+`\nÀ vérifier au placard : huile, sel, poivre, ail, vinaigrette, sauce soja.\n${APP_URL}`;
 }
 function buildPdf(){
@@ -1810,7 +1817,7 @@ function buildPdf(){
           doc.setDrawColor(...INK); doc.setLineWidth(0.3); doc.rect(M,y-3.4,4,4);
           if(done){ doc.setDrawColor(...ACC); doc.setLineWidth(0.7); doc.line(M+0.8,y-1.4,M+1.8,y-0.4); doc.line(M+1.8,y-0.4,M+3.4,y-2.8); }
           doc.setFont("helvetica",done?"normal":"normal"); doc.setFontSize(11); doc.setTextColor(...(done?MUT:INK)); doc.text(T(i.n),M+7,y);
-          doc.setFont("helvetica","bold"); doc.text(T(fmt(i.q,i.u)),W-M,y,{align:"right"});
+          doc.setFont("helvetica","bold"); doc.text(T(qtyOf(i)),W-M,y,{align:"right"});
           if(done){ const w=doc.getTextWidth(T(i.n)); doc.setDrawColor(...MUT); doc.setLineWidth(0.2); doc.line(M+7,y-1.3,M+7+w,y-1.3); }
           if(pr){ doc.setFont("helvetica","normal"); doc.setFontSize(8.5); doc.setTextColor(...WARM); doc.text(T(`Promo ${eur(pr.prix)}${pr.avant?" au lieu de "+eur(pr.avant):""} jusqu'au ${fmtShort(isoDate(pr.au))}`),M+7,y+3.6); }
           y+=h; });
@@ -2428,6 +2435,85 @@ setTimeout(peutEtreVisite,2500);
   }catch(e){ setSync("local"); setTimeout(maybeWizard,300); }
 })();
 $("reset").onclick=()=>{state.week=state.weekOffset===0?[...DEFAUT]:proposeMenu();state.persons=state.family.length||5;state.checked={};state.cooks=Array(7).fill(null);state.picking=null;save();render();toast("Menu proposé rétabli");};
+
+// ---- Ajout manuel de produits à la liste de courses, avec aide à la saisie ----
+const CATALOGUE = {
+ fl:["Pommes","Poires","Bananes","Oranges","Clémentines","Citrons","Kiwis","Raisins","Fraises","Avocats","Concombre","Salade","Tomates cerises","Ail","Échalotes","Persil","Ciboulette","Basilic","Radis","Brocoli","Chou-fleur","Melon","Ananas","Mangues","Myrtilles"],
+ bou:["Jambon","Saucisson","Salami","Pâté","Filet de dinde","Filet de poulet","Haché","Américain","Boulettes","Poulet entier","Côtelettes de porc","Steaks"],
+ cre:["Lait","Beurre","Margarine","Yaourts","Yaourts aux fruits","Fromage blanc","Skyr","Crème fraîche","Œufs","Gouda","Emmental râpé","Brie","Fromage à tartiner","Desserts lactés","Lait d'avoine","Crème soja"],
+ bl:["Pain","Pain gris","Pain blanc","Baguette","Pistolets","Croissants","Couques","Pain de mie","Cramique","Sandwichs"],
+ epi:["Café","Café en grains","Dosettes de café","Thé","Sucre","Farine","Sel","Poivre","Huile d'olive","Huile de tournesol","Vinaigre","Moutarde","Mayonnaise","Ketchup","Confiture","Choco","Miel","Céréales","Flocons d'avoine","Biscuits","Speculoos","Gaufres","Chocolat","Chips","Cacahuètes","Riz","Pâtes","Sauce tomate","Thon","Maïs","Compote","Bouillon","Épices","Levure","Cacao","Eau plate","Eau pétillante","Jus d'orange","Jus de pomme","Sirop","Soda","Bière","Vin","Lait UHT","Croquettes pour chat","Croquettes pour chien"],
+ sur:["Frites surgelées","Glace","Légumes surgelés","Pizza surgelée","Poisson pané","Épinards surgelés","Croquettes de pommes de terre","Fruits rouges surgelés"],
+ dro:["Papier toilette","Essuie-tout","Mouchoirs","Liquide vaisselle","Tablettes lave-vaisselle","Sel lave-vaisselle","Lessive","Adoucissant","Sacs poubelle","Éponges","Papier aluminium","Film alimentaire","Sacs congélation","Dentifrice","Brosses à dents","Shampoing","Après-shampoing","Gel douche","Savon","Déodorant","Coton-tiges","Cotons démaquillants","Rasoirs","Serviettes hygiéniques","Couches","Lingettes","Produit WC","Nettoyant multi-usage","Eau de Javel","Piles","Ampoules"]
+};
+const HKEY="menus-courses-historique";
+let HISTO={}; try{ HISTO=JSON.parse(localStorage.getItem(HKEY)||"{}")||{}; }catch(e){ HISTO={}; }
+function noteHisto(n,ray,qt){ const k=norm(n); const h=HISTO[k]||{n,c:0}; h.n=n; h.ray=ray; h.c=(h.c||0)+1; if(qt) h.qt=qt; HISTO[k]=h;
+  const keys=Object.keys(HISTO); if(keys.length>300) keys.sort((a,b)=>(HISTO[a].c||0)-(HISTO[b].c||0)).slice(0,keys.length-300).forEach(k=>delete HISTO[k]);
+  try{ localStorage.setItem(HKEY,JSON.stringify(HISTO)); }catch(e){} }
+// tous les produits connus : historique, ajouts de la famille, ingrédients des recettes, catalogue de base
+function produitsConnus(){ const m=new Map(), put=(n,ray,c)=>{ const k=norm(n); if(!k) return; const o=m.get(k); if(o){ o.c=Math.max(o.c,c); return; } m.set(k,{n,ray:RAYONS[ray]?ray:"epi",c}); };
+  Object.values(HISTO).forEach(h=>put(h.n,h.ray,10+(h.c||0)));
+  Object.values(state.weeks||{}).forEach(w=>(w.extras||[]).forEach(x=>put(x.n,x.ray,8)));
+  (state.extras||[]).forEach(x=>put(x.n,x.ray,8));
+  RECETTES.forEach(r=>r.ing.forEach(([n,,,ray])=>put(n,ray,2)));
+  Object.entries(CATALOGUE).forEach(([ray,l])=>l.forEach(n=>put(n,ray,1)));
+  return [...m.values()]; }
+// « 2 kg pommes », « pommes 2 kg », « café x2 » : sépare la quantité du nom
+const UNITES="kg|g|gr|l|cl|ml|x|pc|pcs|pièces?|paquets?|boîtes?|boites?|bouteilles?|pots?|sachets?|barquettes?|tranches?|rouleaux?|packs?|bacs?|filets?";
+function lireSaisie(txt){ let t=String(txt||"").replace(/\s+/g," ").trim(), qt="", m;
+  if((m=t.match(new RegExp("^(\\d+(?:[.,]\\d+)?)\\s*("+UNITES+")?\\.?\\s+(?:de |d')?(.+)$","i")))){ qt=(m[1]+(m[2]?" "+m[2]:"")).trim(); t=m[3]; }
+  else if((m=t.match(new RegExp("^(.+?)\\s+(?:x\\s*)?(\\d+(?:[.,]\\d+)?)\\s*("+UNITES+")?$","i")))){ qt=(m[2]+(m[3]?" "+m[3]:"")).trim(); t=m[1]; }
+  t=t.charAt(0).toUpperCase()+t.slice(1); return {n:t,qt}; }
+function chercherProduits(q){ const k=norm(q); if(!k) return [];
+  return produitsConnus().map(p=>{ const pn=norm(p.n); let sc=-1;
+      if(pn===k) sc=100; else if(pn.startsWith(k)) sc=60; else if(pn.split(" ").some(w=>w.startsWith(k))) sc=40; else if(pn.includes(k)) sc=20;
+      return {...p,sc:sc<0?-1:sc+p.c}; }).filter(p=>p.sc>=0).sort((a,b)=>b.sc-a.sc||a.n.localeCompare(b.n,"fr")).slice(0,6); }
+let apRayon=null; // saisie en attente du choix d'un rayon
+function dejaPrevu(n,t){ const k=norm(n); return coursesTrips()[t].find(i=>norm(i.n)===k); }
+function renderApTrip(){ const box=$("aptrip"); if(!box) return; const t=tripVue===null?tripAuto():tripVue;
+  const sb=$("addprod").querySelector("button[type=submit]"); if(sb) sb.textContent=innerWidth<700?`Ajouter à la Course ${t+1}`:"Ajouter";
+  box.innerHTML=`<span>Ajouter dans</span>`+[0,1].map(x=>`<button type="button" class="chip${x===t?" on":""}" data-aptrip="${x}" aria-pressed="${x===t}">Course ${x+1} · ${fmtShort(tripDate(x))}</button>`).join(""); }
+function renderApSugg(){ const box=$("apsugg"), inp=$("apname"); if(!box||!inp) return;
+  const t=tripVue===null?tripAuto():tripVue;
+  if(apRayon){ box.hidden=false;
+    box.innerHTML=`<p class="aphint">Dans quel rayon ranger <b>${esc(apRayon.n)}</b> ?</p><div class="aprays">${ORDRE.map(r=>`<button type="button" class="chip" data-apray="${r}">${RAYONS[r]}</button>`).join("")}</div>`; return; }
+  const {n}=lireSaisie(inp.value), res=chercherProduits(n);
+  if(!n||!res.length){ box.hidden=!n; box.innerHTML=n?`<p class="aphint">Nouveau produit : touchez « Ajouter » puis choisissez son rayon.</p>`:""; return; }
+  box.hidden=false;
+  box.innerHTML=res.map((p,i)=>{ const d=dejaPrevu(p.n,t);
+    return `<button type="button" class="apitem" role="option" data-apick="${i}"><b>${esc(p.n)}</b><small>${RAYONS[p.ray]}${d?` · déjà dans la liste${d.x?"":" pour les repas ("+esc(qtyOf(d))+")"}`:""}</small></button>`; }).join("");
+  box._res=res; }
+function ajouterProduit(n,ray,qt){
+  const t=tripVue===null?tripAuto():tripVue, k=norm(n);
+  const dbl=(state.extras||[]).find(x=>x.t===t&&norm(x.n)===k);
+  if(dbl){ if(qt){ dbl.qt=qt; save(); renderCourses(); toast(`${dbl.n} : quantité mise à jour`); } else toast(`${dbl.n} est déjà dans la Course ${t+1}`); viderSaisie(); return; }
+  const prevu=dejaPrevu(n,t);
+  state.extras=[...(state.extras||[]),{id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),n,qt:qt||"",ray,t,par:ME||""}];
+  noteHisto(n,ray,qt); save(); renderCourses(); viderSaisie();
+  toast(prevu?`${n} ajouté : il était déjà prévu pour les repas (${qtyOf(prevu)}), vérifiez la quantité`:`${n} ajouté à la Course ${t+1}`); }
+function viderSaisie(){ apRayon=null; $("apname").value=""; $("apqty").value=""; renderApSugg(); }
+function validerSaisie(){ const inp=$("apname"), lu=lireSaisie(inp.value); if(!lu.n) return;
+  const qt=$("apqty").value.trim()||lu.qt, connu=produitsConnus().find(p=>norm(p.n)===norm(lu.n));
+  if(connu){ ajouterProduit(connu.n,connu.ray,qt); return; }
+  const res=chercherProduits(lu.n);
+  apRayon={n:lu.n,qt}; renderApSugg(); }
+if($("addprod")){
+  $("addprod").addEventListener("submit",e=>{ e.preventDefault(); validerSaisie(); });
+  $("apname").addEventListener("input",()=>{ apRayon=null; renderApSugg(); });
+  $("apname").addEventListener("focus",renderApSugg);
+  $("apsugg").addEventListener("click",e=>{
+    const p=e.target.closest("[data-apick]"); if(p){ const it=$("apsugg")._res[+p.dataset.apick], lu=lireSaisie($("apname").value); ajouterProduit(it.n,it.ray,$("apqty").value.trim()||lu.qt); $("apname").focus(); return; }
+    const r=e.target.closest("[data-apray]"); if(r&&apRayon){ ajouterProduit(apRayon.n,r.dataset.apray,apRayon.qt); $("apname").focus(); } });
+  $("aptrip").addEventListener("click",e=>{ const b=e.target.closest("[data-aptrip]"); if(!b) return; tripVue=+b.dataset.aptrip; renderCourses(); renderApSugg(); });
+  document.addEventListener("click",e=>{ if(!e.target.closest("#addprod")&&!$("apsugg").hidden&&!apRayon){ $("apsugg").hidden=true; } });
+}
+// retirer un produit ajouté à la main
+$("aisles").addEventListener("click",e=>{ const b=e.target.closest("[data-xdel]"); if(!b) return; e.preventDefault(); e.stopPropagation();
+  const id=b.dataset.xdel, x=(state.extras||[]).find(y=>y.id===id); if(!x) return;
+  state.extras=state.extras.filter(y=>y.id!==id); Object.keys(state.checked).forEach(k=>{ if(k.endsWith("|x|"+id)) delete state.checked[k]; });
+  save(); renderCourses();
+  toast(`${x.n} retiré de la liste`,()=>{ state.extras=[...state.extras,x]; save(); renderCourses(); },"Annuler"); });
 
 { const h=location.hash.slice(1); if(VUES.includes(h)) state.tab=h; }
 render(); setTab(state.tab);
