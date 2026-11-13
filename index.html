@@ -43,6 +43,17 @@
 .rtpeople{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px}
 .rtpers{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 12px;display:grid;gap:2px}.rtpers small{color:var(--muted);font-size:12px}
 .rtcom{margin:8px 0;padding:8px 12px;border-left:3px solid var(--accent);background:var(--surface);border-radius:0 10px 10px 0;display:grid;gap:2px}.rtcom small{color:var(--muted);font-size:12px}
+
+.hp{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:6px}
+.hprow{display:grid;grid-template-columns:34px 52px 1fr auto;gap:10px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:6px 10px 6px 6px}
+.hp.compact .hprow{grid-template-columns:34px 1fr auto;background:var(--bg)}
+.hprow:nth-child(1){border-color:var(--warm)}
+.hprank{font-family:var(--display);font-weight:800;font-size:20px;text-align:center}
+.hprow img{width:52px;height:40px;object-fit:cover;border-radius:9px}
+.hpinfo{display:grid;min-width:0}.hpinfo small{color:var(--muted);font-size:12px}
+.hpmv{font-size:12px;font-weight:700;padding:3px 8px;border-radius:999px;white-space:nowrap}
+.hpmv.up{background:var(--accent-soft);color:var(--accent)}.hpmv.down{background:var(--warm-soft);color:var(--warm)}
+.hpmv.same{color:var(--muted)}.hpmv.new{background:var(--warm-soft);color:var(--warm)}
 </style>
 <title>Menus de la semaine</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -2344,6 +2355,21 @@ function analyse(){
   const refTot=all.filter(r=>r.refaire), pctOui=refTot.length?refTot.filter(r=>r.refaire==="oui").length/refTot.length:null;
   return {all,G,plats,tendance,part:attendus?recus/attendus:null,recus,attendus,personnes,coms,pctOui};
 }
+// ---- Hit-parade : chaque avis compte comme un vote ----
+function classement(avant){ const lim=avant?Date.now()-7*864e5:Infinity;
+  const all=Object.values(RETOURS).filter(r=>r&&r.note&&BYID[r.plat]&&(!avant||(r.quand&&new Date(r.quand).getTime()<lim)));
+  if(!all.length) return []; const G=moy(all.map(r=>r.note)), K=2, by={};
+  all.forEach(r=>{ (by[r.plat]=by[r.plat]||[]).push(r); });
+  return Object.entries(by).map(([id,l])=>{ const m=moy(l.map(r=>r.note)), ref=l.filter(r=>r.refaire);
+    return {id,nom:BYID[id].nom,votes:l.length,m,score:(l.length*m+K*G)/(l.length+K),fans:[...new Set(l.filter(r=>r.note>=4).map(r=>r.nom))],
+      pctOui:ref.length?ref.filter(r=>r.refaire==="oui").length/ref.length:null}; })
+    .sort((a,b)=>b.score-a.score||b.votes-a.votes).map((x,i)=>({...x,rang:i+1}));
+}
+function hitParade(max=10){ const now=classement(false), prev=classement(true), pr={}; prev.forEach(x=>{ pr[x.id]=x.rang; });
+  return now.slice(0,max).map(x=>({...x,avant:pr[x.id]||null})); }
+function htmlHitParade(l,compact){ const med=["🥇","🥈","🥉"], aHisto=l.some(x=>x.avant!=null);
+  return `<ol class="hp${compact?" compact":""}">${l.map(x=>{ const mv=!aHisto?"":x.avant==null?`<span class="hpmv new">nouveau</span>`:x.avant>x.rang?`<span class="hpmv up" title="${x.avant-x.rang} place${x.avant-x.rang>1?"s":""} gagnée${x.avant-x.rang>1?"s":""}">▲ ${x.avant-x.rang}</span>`:x.avant<x.rang?`<span class="hpmv down" title="${x.rang-x.avant} place${x.rang-x.avant>1?"s":""} perdue${x.rang-x.avant>1?"s":""}">▼ ${x.rang-x.avant}</span>`:`<span class="hpmv same" title="Même place que la semaine dernière">=</span>`;
+    return `<li class="hprow"><span class="hprank">${x.rang<=3?med[x.rang-1]:x.rang}</span>${compact?"":`<img src="${photoSrc(x.id)}" alt="" onerror="this.style.visibility='hidden'">`}<span class="hpinfo"><b>${esc(x.nom)}</b><small>${n1(x.m)}/5 · ${x.votes} vote${x.votes>1?"s":""}${!compact&&x.pctOui!=null?` · ${Math.round(x.pctOui*100)} % à refaire`:""}${!compact&&x.fans.length?` · fans : ${x.fans.map(esc).join(", ")}`:""}</small></span>${mv}</li>`; }).join("")}</ol>`; }
 // Influence sur les propositions de menus : bonus aux valeurs sûres, pause d'un mois pour les plats à retirer
 function bonusRetours(r){ const l=Object.values(RETOURS).filter(x=>x.plat===r.id&&x.note); if(!l.length) return 0;
   const G=3.5, K=2, s=(l.length*moy(l.map(x=>x.note))+K*G)/(l.length+K);
@@ -2361,6 +2387,7 @@ function renderRetours(){
   fam.innerHTML=`<div class="phead"><h2>Retours sur les repas</h2><button class="btn primary" data-bilan="1">Voir le bilan</button></div>
     ${A.all.length?`<div class="rtkpis"><div><b>${n1(A.G)}</b><small>note moyenne sur 5</small></div><div><b>${A.all.length}</b><small>avis donnés</small></div><div><b>${A.part==null?"–":Math.round(A.part*100)+" %"}</b><small>de participation (4 semaines)</small></div></div>`
       :`<p>Après chaque souper, chacun note le plat en un geste. Le bilan montre les valeurs sûres, les plats à ajuster et ceux qui divisent la famille.</p>`}
+    ${A.all.length?`<h3 class="shopray">Le podium</h3>${htmlHitParade(hitParade(3),true)}`:""}
     <div class="actions"><button class="btn" data-retourslist="1">Noter un repas</button></div>`;
 }
 // ---- Fenêtre : noter un repas ----
@@ -2408,6 +2435,7 @@ function renderBilan(){ const A=analyse();
   const bonPasCher=A.plats.filter(p=>p.cout&&p.n>=2&&p.score>=3.6).sort((a,b)=>(b.score/b.cout)-(a.score/a.cout)).slice(0,3);
   $("sbody").innerHTML=`
     <div class="rtkpis"><div><b>${n1(A.G)}</b><small>note moyenne sur 5</small></div><div><b>${A.pctOui==null?"–":Math.round(A.pctOui*100)+" %"}</b><small>« à refaire »</small></div><div><b>${A.part==null?"–":Math.round(A.part*100)+" %"}</b><small>participation (4 semaines)</small></div><div><b>${A.all.length}</b><small>avis</small></div></div>
+    <section class="rtsec"><h3>Hit-parade des plats</h3><p class="note">Chaque avis compte comme un vote. Le classement tient compte du nombre de votes ; les flèches comparent à la semaine dernière.</p>${htmlHitParade(hitParade(10),false)}</section>
     ${reco.length?`<section class="rtsec"><h3>Ce que je vous conseille</h3><ul class="rtreco">${reco.map(t=>`<li>${t}</li>`).join("")}</ul></section>`:""}
     ${A.tendance.length>1?`<section class="rtsec"><h3>Évolution par semaine</h3><div class="rttrend">${A.tendance.map(t=>`<div class="rtbar"><i style="height:${Math.round(t.m/maxM*100)}%"></i><b>${n1(t.m)}</b><small>${fmtShort(isoDate(t.iso))}</small></div>`).join("")}</div></section>`:""}
     ${CATS.map(([k,t,d])=>{ const l=A.plats.filter(p=>p.cat===k).sort((a,b)=>b.score-a.score); if(!l.length) return "";

@@ -1,5 +1,5 @@
 // Mise en cache simple : le réseau d'abord, la copie locale si l'appareil est hors ligne.
-const CACHE = "menus-v5";
+const CACHE = "menus-v6";
 self.addEventListener("install", e => { self.skipWaiting(); e.waitUntil(caches.open(CACHE).then(c => c.addAll(["./", "index.html", "js/partage.js", "manifest.webmanifest", "icons/icon-192.png"]).catch(() => {}))); });
 self.addEventListener("activate", e => e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim())));
 self.addEventListener("fetch", e => {
