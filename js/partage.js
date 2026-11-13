@@ -218,7 +218,7 @@
   document.addEventListener("click", async e => {
     const t = e.target.closest("button"); if (!t) return;
     const toastFn = window.toast || (m => alert(m));
-    if (t.id === "g-go") { e.preventDefault(); enter(); }
+    if (t.id === "g-go") { /* géré par l'envoi du formulaire */ }
     if (t.id === "g-local") { $("gate").hidden = true; resolveReady(false); }
     if (t.id === "acc-nom-ok") { const n = $("acc-nom").value.trim(); if (!n) return; await sb.rpc("definir_nom", { nom: n }); ACCES.nom = n; PROFILS.set(UID, n); toastFn("Prénom enregistré"); renderAcces(); }
     if (t.id === "acc-copy") { try { await navigator.clipboard.writeText(window.INVITE_URL); toastFn("Lien d'invitation copié"); } catch(err){ toastFn(window.INVITE_URL); } }
@@ -226,6 +226,7 @@
       if (error) toastFn(/court/.test(error.message) ? "Code trop court : 6 caractères minimum" : "Le code n'a pas pu être changé"); else { toastFn("Nouveau code enregistré : envoyez le nouveau lien"); renderAcces(); } }
     if (t.dataset.retirer) { const { error } = await sb.rpc("retirer_acces", { cible: t.dataset.retirer }); toastFn(error ? "Impossible de retirer cet appareil" : "Accès retiré"); renderAcces(); }
   });
+  document.addEventListener("submit", e => { if (e.target && e.target.id === "gateform") { e.preventDefault(); enter(); } });
   document.addEventListener("keydown", e => { if (e.key === "Enter" && !$("gate").hidden && (e.target.id === "g-code" || e.target.id === "g-nom")) { e.preventDefault(); enter(); } });
 
   // Géolocalisation (disponible sur un vrai site)
