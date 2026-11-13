@@ -456,6 +456,33 @@ function isOut(d){ return d!==undefined && d!==null && outList(state.exterieur).
 function toggleOut(d){ const cur=new Set(outList(state.exterieur)); cur.has(d)?cur.delete(d):cur.add(d); state.exterieur=[...cur].sort(); save(); render(); if(modalCtx) renderModal();
   toast(isOut(d)?`${JOURS[d]} : repas à l'extérieur, pas de courses`:`${JOURS[d]} : on mange à la maison`); }
 const homeDays = () => JOURS.map((_,d)=>d).filter(d=>!isOut(d));
+// ---- Ce qui manque pour valider : un plat et un cuisinier pour chaque soir où quelqu'un mange à la maison ----
+function manques(){ const l=[];
+  homeDays().filter(d=>headcount(d)>0).forEach(d=>{ const j=JOURS[d].toLowerCase();
+    if(!BYID[state.week[d]]) l.push({d,court:"pas de plat le "+j}); else if(!state.cooks[d]) l.push({d,court:"pas de cuisinier le "+j}); });
+  return l; }
+// ---- Bulles d'aide : au survol (souris) ou au clavier, sur tout élément portant data-tip ----
+(function(){ let bulle=null, minuteur=null, cible=null;
+  const montrer=el=>{ const t=el.getAttribute("data-tip"); if(!t) return; if(!bulle){ bulle=document.createElement("div"); bulle.className="tip"; bulle.setAttribute("role","tooltip"); document.body.appendChild(bulle); }
+    bulle.textContent=t; bulle.hidden=false; const r=el.getBoundingClientRect(), w=Math.min(280,innerWidth-24); bulle.style.maxWidth=w+"px";
+    const bw=bulle.offsetWidth, bh=bulle.offsetHeight; let x=Math.max(12,Math.min(innerWidth-bw-12,r.left+r.width/2-bw/2)), y=r.bottom+8; if(y+bh>innerHeight-8) y=r.top-bh-8;
+    bulle.style.left=x+"px"; bulle.style.top=y+"px"; };
+  const cacher=()=>{ clearTimeout(minuteur); cible=null; if(bulle) bulle.hidden=true; };
+  document.addEventListener("pointerover",e=>{ if(e.pointerType!=="mouse") return; const el=e.target.closest("[data-tip]"); if(el===cible) return; cacher(); if(!el) return; cible=el; minuteur=setTimeout(()=>montrer(el),350); });
+  document.addEventListener("focusin",e=>{ const el=e.target.closest&&e.target.closest("[data-tip]"); cacher(); if(el&&el.matches(":focus-visible")){ cible=el; montrer(el); } });
+  // sur téléphone : appui long sur un bouton pour voir son aide (l'action n'est alors pas déclenchée)
+  let appui=null, bloquerClic=false;
+  document.addEventListener("pointerdown",e=>{ if(e.pointerType==="mouse") return; const el=e.target.closest("[data-tip]"); if(!el) return;
+    appui=setTimeout(()=>{ cible=el; montrer(el); bloquerClic=true; setTimeout(cacher,3500); },550); },true);
+  ["pointerup","pointercancel","pointermove"].forEach(ev=>document.addEventListener(ev,e=>{ if(ev==="pointermove"&&Math.abs(e.movementX||0)+Math.abs(e.movementY||0)<6) return; clearTimeout(appui); },true));
+  document.addEventListener("click",e=>{ if(bloquerClic){ bloquerClic=false; e.preventDefault(); e.stopPropagation(); } },true);
+  document.addEventListener("contextmenu",e=>{ if(e.target.closest&&e.target.closest("[data-tip]")) e.preventDefault(); });
+  ["focusout","scroll","keydown"].forEach(ev=>document.addEventListener(ev,cacher,true));
+  document.addEventListener("click",()=>{ if(!bloquerClic) cacher(); },true);
+})();
+function manquesTexte(m){ const liste=l=>l.length>1?l.slice(0,-1).join(", ")+" et "+l[l.length-1]:l[0];
+  const j=x=>JOURS[x.d].toLowerCase(), pc=m.filter(x=>x.court.startsWith("pas de cuisinier")).map(j), pp=m.filter(x=>x.court.startsWith("pas de plat")).map(j);
+  return [pp.length?"il manque un plat "+liste(pp):"",pc.length?"il manque un cuisinier "+liste(pc):""].filter(Boolean).join(" ; "); }
 // ---- Page principale : les soirs sans repas prévu ou sans cuisinier ----
 function renderACompleter(){ const box=$("acompleter"); if(!box) return;
   const sansCuisinier=homeDays().filter(d=>headcount(d)>0&&!state.cooks[d]);
@@ -466,7 +493,7 @@ function renderACompleter(){ const box=$("acompleter"); if(!box) return;
   const lignes=[...sansCuisinier.map(d=>({d,html:`<span class="acday">${jour(d)}</span><span class="acinfo"><b>${esc(BYID[state.week[d]].nom)}</b><small>Pas encore de cuisinier · ${headcount(d)} à table</small></span><span class="edit-only">${state.family.length?cookSelect(d):""}</span>`})),
     ...personne.map(d=>({d,html:`<span class="acday">${jour(d)}</span><span class="acinfo"><b>Personne à table</b><small>Tout le monde est absent : pas de repas prévu</small></span><span></span>`})),
     ...dehors.map(d=>({d,html:`<span class="acday">${jour(d)}</span><span class="acinfo"><b>Pas de repas prévu à la maison</b><small>Soir marqué « à l'extérieur »</small></span><button class="chip edit-only" data-acout="${d}" type="button">Prévoir un repas</button>`}))].sort((x,y)=>x.d-y.d);
-  box.innerHTML=`<div class="phead"><h2>À compléter cette semaine</h2>${sansCuisinier.length>1&&state.family.length?`<button class="btn edit-only" id="acrepartir" type="button">Répartir ces soirs</button>`:""}</div>
+  box.innerHTML=`<div class="phead"><h2>À compléter cette semaine</h2>${sansCuisinier.length>1&&state.family.length?`<button class="btn edit-only" id="acrepartir" type="button" data-tip="Attribue ces soirs aux personnes présentes, en commençant par celles qui cuisinent le moins">Répartir ces soirs</button>`:""}</div>
     ${!state.family.length?`<p class="note">Ajoutez les membres de la famille pour choisir qui cuisine.</p>`:""}
     ${lignes.map(l=>`<div class="acrow">${l.html}</div>`).join("")}`; }
 document.addEventListener("click",e=>{ const o=e.target.closest("[data-acout]"); if(o){ toggleOut(+o.dataset.acout); return; }
@@ -614,7 +641,7 @@ function renderCourses(){
       return `<div class="aisle"><h2><span>${RAYONS[ray]}</span><span>${its.length}</span></h2><div class="list">${rows}</div></div>`}).join("");
       return `<div class="stop"><div class="stophead"><span class="stopno">Arrêt ${si+1}</span><b>${esc(m.nom)}</b><small>${esc(m.lieu)} · ${sitems.length} article${sitems.length>1?"s":""}${nP?` · ${nP} en promo`:""} · ≈ ${eur(sitems.reduce((s,i)=>s+itemCost(i.n,i.u,i.q,i.ray),0))}</small></div>${groups}</div>`}).join("");
     return `<div class="trip" id="trip-${t}"><div class="triphead"><div><div class="tripno">Course ${t+1} · ${fmtD(date)}</div><p class="note">${cover}</p></div>
-      <button class="btn primary" data-shop="${t}">Mode magasin</button>
+      <button class="btn primary" data-shop="${t}" data-tip="Liste plein écran, rayon par rayon : cochez en avançant dans le magasin">Mode magasin</button>
       <label class="tripstore">Magasin principal <select data-store="${t}" aria-label="Magasin principal de la course ${t+1}"><option value="">Automatique</option>${orderedStores().map(m=>`<option value="${m.id}"${m.id===state.tripStore[t]?" selected":""}>${m.nom} · ${kmTxt(km(HOME,m))}</option>`).join("")}</select></label></div>
       <p class="note">${items.length} articles · ≈ ${eur(items.reduce((s,i)=>s+itemCost(i.n,i.u,i.q,i.ray),0))} (gamme ${GAMMES[state.gamme].nom.toLowerCase()}) · trajet ≈ ${kmTxt(plan.route)}</p>${stopsHtml}</div>`}).join("");
   $("ptext").textContent=`${done} sur ${total} dans le caddie`;
@@ -1076,13 +1103,13 @@ function renderWeekbar(){
     </div>
     <div class="wstate"><span class="st ${valide?"on":"soon"}">${valide?"Menu validé":"Proposition à discuter"}</span><span class="sync ${syncState}" id="sync"></span></div>
     <div class="actions wact">
-      <button class="btn primary" id="share">Envoyer à la famille</button>
-      <button class="btn edit-only owner-only" id="valider">${valide?"Rouvrir aux modifications":"Valider le menu"}</button>
-      <button class="btn edit-only" id="propose">Nouvelle proposition</button>
-      ${state.weekOffset===0?`<button class="btn" data-week="1">Préparer la semaine suivante →</button>`:""}
+      <button class="btn primary" id="share" data-tip="Prépare un message avec le menu et le lien de l'application, à envoyer par WhatsApp ou SMS">Envoyer à la famille</button>
+      <button class="btn edit-only owner-only${!valide&&manques().length?" incomplet":""}" id="valider" data-tip="${valide?"Permet à nouveau de changer les plats et les cuisiniers":manques().length?"Impossible pour l'instant : "+esc(manquesTexte(manques()))+". Complétez d'abord ces soirs.":"Fige le menu de la semaine : il devient le menu officiel"}">${valide?"Rouvrir aux modifications":"Valider le menu"}</button>
+      <button class="btn edit-only" id="propose" data-tip="Tire un nouveau menu selon la répartition des budgets, la variété et les goûts de chacun">Nouvelle proposition</button>
+      ${state.weekOffset===0?`<button class="btn" data-week="1" data-tip="Passe à la semaine prochaine pour préparer son menu à l'avance">Préparer la semaine suivante →</button>`:""}
     </div>
     ${renderApprovals()}
-    <div class="actions wact"><button class="btn" id="exportmenu">Exporter le menu</button></div>
+    <div class="actions wact"><button class="btn" id="exportmenu" data-tip="Calendrier de la semaine en PDF ou en texte, avec les cuisiniers et les couverts">Exporter le menu</button></div>
     <div class="sharebox" id="sharebox"${shareOpen?"":" hidden"}>
       <ol class="sharesteps">
         <li>${window.INVITE_URL?`Envoyez ce lien d'invitation à chaque membre de la famille. En l'ouvrant, chacun indique son prénom et peut tout de suite modifier les menus.<div class="invite"><code>${esc(window.INVITE_URL)}</code><button class="btn" id="copyinvite" type="button">Copier le lien</button></div>`:`Demandez le lien d'invitation au propriétaire de l'application (Réglages, Accès de la famille).`}</li>
@@ -1140,6 +1167,7 @@ $("weekbar").addEventListener("click",e=>{
   if(e.target.id==="copymsg"){ const txt=shareMessage(), box=$("sharemsg"); box.value=txt;
     try{ navigator.clipboard.writeText(txt).then(()=>toast("Message copié"),()=>{box.focus();box.select();toast("Sélectionnez le texte puis copiez-le");}); }catch(err){box.focus();box.select();} return; }
   if(e.target.id==="valider"){ if(DB&&!IS_OWNER){ toast("Seul le propriétaire valide le menu"); return; }
+    if(state.statut!=="valide"){ const m=manques(); if(m.length){ toast(`Validation impossible : ${manquesTexte(m)}.`); const b=$("acompleter"); if(b){ b.scrollIntoView({behavior:"smooth",block:"center"}); b.classList.remove("pulse"); void b.offsetWidth; b.classList.add("pulse"); } return; } }
     state.statut=state.statut==="valide"?"proposition":"valide";
     if(DB){ VALID={...VALID,[curIso()]:state.statut}; DB.doc("validations/menus").set({semaines:VALID,limites:LIMITES}).catch(()=>toast("La validation n'a pas pu être enregistrée"));
       state.journal=[{par:ME,quand:new Date().toISOString(),texte:state.statut==="valide"?"a validé le menu":"a rouvert le menu aux modifications"},...state.journal].slice(0,15); if(shareReady) queueWrite(); }
@@ -1176,7 +1204,7 @@ function renderPresences(){
     <div class="prwrap"><table class="prtable"><thead><tr><th></th>${head}</tr></thead><tbody>${rows}${inv}</tbody><tfoot>${tot}</tfoot></table></div>
     <p class="note">${totalCouverts()} couverts cette semaine${JOURS.some((_,d)=>!headcount(d))?" · les soirs sans personne n'entrent pas dans les courses":""}.</p>
     <div class="actions">
-      <button class="btn primary" id="sharecal">Partager le calendrier</button>
+      <button class="btn primary" id="sharecal" data-tip="Envoie les soirs et les présences à la famille">Partager le calendrier</button>
       <button class="btn edit-ctl" id="allhere">Tout le monde présent</button>
     </div>
     <div class="sharebox" id="calbox"${calOpen?"":" hidden"}>
@@ -2002,7 +2030,7 @@ function renderRetours(){
     <div class="rtlist">${aNoter.map(p=>{ const nb=retoursDu(p.iso,p.d).filter(r=>r.note).length;
       return `<button class="rtitem" data-retour="${p.iso}|${p.d}"><img src="${photoSrc(p.plat)}" alt="" data-cache-err="1"><span><small>${JOURS[(p.date.getDay()+6)%7]} ${fmtShort(p.date)}</small><b>${esc(BYID[p.plat].nom)}</b><small>${nb?`${nb} avis sur ${p.pres.length}`:"Pas encore noté"}</small></span><span class="rtgo">Noter</span></button>`; }).join("")}</div>`; }
   const A=analyse();
-  fam.innerHTML=`<div class="phead"><h2>Retours sur les repas</h2><button class="btn primary" data-bilan="1">Voir le bilan</button></div>
+  fam.innerHTML=`<div class="phead"><h2>Retours sur les repas</h2><button class="btn primary" data-bilan="1" data-tip="Classement des plats, goûts de chacun et conseils tirés des avis">Voir le bilan</button></div>
     ${A.all.length?`<div class="rtkpis"><div><b>${n1(A.G)}</b><small>note moyenne sur 5</small></div><div><b>${A.all.length}</b><small>avis donnés</small></div><div><b>${A.part==null?"–":Math.round(A.part*100)+" %"}</b><small>de participation (4 semaines)</small></div></div>`
       :`<p>Après chaque souper, chacun note le plat en un geste. Le bilan montre les valeurs sûres, les plats à ajuster et ceux qui divisent la famille.</p>`}
     ${A.all.length?`<h3 class="shopray">Le podium</h3>${htmlHitParade(hitParade(3),true)}`:""}
@@ -2186,7 +2214,7 @@ function renderEnvies(){ const box=$("view-envies"); if(!box) return;
       ${bas.length?`<small class="rtwarn">À éviter : ${bas.map(x=>esc(x.r.nom)).join(", ")}</small>`:""}
       ${P.sd.prefs.vege!=null?`<small>Sans viande : ${PREF_VEGE.find(x=>x[0]===P.sd.prefs.vege)[1].toLowerCase()} par semaine</small>`:""}</div>`; }).join("")}</div></div>`;
   // --- 3. Plannings suggérés ---
-  html+=`<div class="panel"><div class="phead"><h2>Plannings suggérés</h2><button class="btn" id="envregen">Autres suggestions</button></div>
+  html+=`<div class="panel"><div class="phead"><h2>Plannings suggérés</h2><button class="btn" id="envregen" data-tip="Calcule trois nouveaux plannings">Autres suggestions</button></div>
     <div class="gfilters">${[1,2,3].map(o=>`<button class="chip${envCible===o?" on":""}" data-envweek="${o}">Semaine du ${fmtShort(lundi(o))}</button>`).join("")}</div>
     <p class="note">Trois façons d'organiser la semaine, selon les goûts connus aujourd'hui. Chaque planning respecte les règles de budget et de variété.</p>
     <div class="plans">${PLANS[key].map((pl,i)=>{ const E=evalPlan(pl.menu);
@@ -2240,6 +2268,47 @@ async function chargerDonnees(){
   if(ch){ render(); if(state.tab==="envies"&&typeof renderEnvies==="function") renderEnvies(); }
 }
 chargerDonnees();
+
+// ===================== Visite guidée (première ouverture sur un appareil) =====================
+const VISITE=[
+ {sel:null,t:"Bienvenue !",p:"Voici une visite rapide de l'application des menus de la famille. Elle dure une minute. Vous pourrez la revoir dans Réglages, rubrique Aide."},
+ {sel:"#acompleter",t:"Ce qu'il reste à faire",p:"Les soirs sans cuisinier ou sans repas prévu s'affichent ici. Choisissez qui cuisine directement dans la liste. Tant qu'il manque quelque chose, le menu ne peut pas être validé."},
+ {sel:"#weekbar .wtop",t:"La semaine",p:"Les flèches passent d'une semaine à l'autre. Vous pouvez préparer jusqu'à trois semaines à l'avance."},
+ {sel:"#share",t:"Prévenir la famille",p:"Prépare un message avec le menu et le lien de l'application, à envoyer par WhatsApp ou SMS."},
+ {sel:"#weekbar .appr",t:"Chacun valide",p:"Chaque membre indique qu'il est d'accord avec le menu. Le propriétaire peut fixer une date limite de réponse, puis valider le menu final."},
+ {sel:"#days .day",t:"Les repas",p:"Touchez un jour pour voir la recette, les courses du plat, changer de plat, choisir qui cuisine ou noter une absence. Les étiquettes Éco, Moyen et Plaisir indiquent le budget."},
+ {sel:"#tab-courses",t:"Les courses",p:"La liste se fait toute seule, groupée par magasin et par rayon, en deux passages par semaine. Le mode magasin permet de cocher en avançant dans les rayons."},
+ {sel:"#tab-famille",t:"La famille",p:"Qui est là chaque soir, qui cuisine, les goûts de chacun, et les avis donnés après les repas."},
+ {sel:"#tab-envies",t:"Vos envies",p:"Répondez au sondage : dites quels plats vous font envie. Les menus proposés en tiennent compte, et des plannings sont suggérés pour les semaines suivantes."},
+ {sel:"#tab-reglages",t:"Les réglages",p:"Votre adresse et vos magasins, les jours de courses, les recettes de la famille et l'accès des membres."},
+ {sel:null,t:"C'est parti !",p:"Passez la souris sur un bouton (ou gardez le doigt appuyé sur mobile) pour savoir à quoi il sert. Bon appétit !"}];
+let visite=null;
+function visiteFin(){ if(!visite) return; visite.els.forEach(e=>e.remove()); visite=null; try{ localStorage.setItem(KEY+"-visite","1"); }catch(e){} document.removeEventListener("keydown",visiteClavier,true); window.removeEventListener("resize",visitePlacer); }
+function visiteClavier(e){ if(!visite) return; if(e.key==="Escape"){ e.stopPropagation(); visiteFin(); } if(e.key==="ArrowRight"||e.key==="Enter"){ e.preventDefault(); visiteAller(visite.i+1); } if(e.key==="ArrowLeft") visiteAller(visite.i-1); }
+function visiteEtapes(){ return VISITE.filter(x=>{ if(!x.sel) return true; const el=document.querySelector(x.sel); return el&&el.offsetParent!==null&&el.getClientRects().length; }); }
+function visitePlacer(){ if(!visite) return; const x=visite.etapes[visite.i], [voile,trou,bulle]=visite.els; const el=x.sel&&document.querySelector(x.sel);
+  if(el){ const r=el.getBoundingClientRect(), m=6; Object.assign(trou.style,{left:(r.left-m)+"px",top:(r.top-m)+"px",width:(r.width+2*m)+"px",height:(r.height+2*m)+"px",opacity:1});
+    const bh=bulle.offsetHeight, bw=bulle.offsetWidth; let y=r.bottom+14; if(y+bh>innerHeight-10) y=Math.max(10,r.top-bh-14); if(y<10) y=10;
+    bulle.style.left=Math.max(12,Math.min(innerWidth-bw-12,r.left+r.width/2-bw/2))+"px"; bulle.style.top=y+"px"; }
+  else { Object.assign(trou.style,{left:(innerWidth/2)+"px",top:(innerHeight/2)+"px",width:"0px",height:"0px"}); bulle.style.left=Math.max(12,(innerWidth-bulle.offsetWidth)/2)+"px"; bulle.style.top=Math.max(20,(innerHeight-bulle.offsetHeight)/2)+"px"; } }
+function visiteAller(i){ if(!visite) return; if(i<0) return; if(i>=visite.etapes.length){ visiteFin(); return; } visite.i=i; const x=visite.etapes[i], bulle=visite.els[2], n=visite.etapes.length;
+  bulle.innerHTML=`<h3>${x.t}</h3><p>${x.p}</p><div class="tour-pied"><small>${i+1} / ${n}</small><span class="actions">${i>0?`<button class="btn" data-tour="prev" type="button">Précédent</button>`:`<button class="btn" data-tour="fin" type="button">Passer</button>`}<button class="btn primary" data-tour="next" type="button">${i===n-1?"Terminer":"Suivant"}</button></span></div>`;
+  const el=x.sel&&document.querySelector(x.sel); if(el){ const r=el.getBoundingClientRect(); if(r.top<70||r.bottom>innerHeight-90) window.scrollBy({top:r.top-innerHeight/3,behavior:"instant"}); }
+  requestAnimationFrame(visitePlacer); setTimeout(()=>{ const b=bulle.querySelector('[data-tour="next"]'); if(b) b.focus(); },50); }
+function lancerVisite(){ if(visite) return; if(sheetCtx) closeSheet(); if(modalCtx) closeMeal(); setTab("menu"); window.scrollTo(0,0);
+  const voile=document.createElement("div"), trou=document.createElement("div"), bulle=document.createElement("div");
+  voile.className="tour-voile"; trou.className="tour-trou"; bulle.className="tour-bulle"; bulle.setAttribute("role","dialog"); bulle.setAttribute("aria-label","Visite guidée");
+  document.body.append(voile,trou,bulle); visite={i:0,els:[voile,trou,bulle],etapes:visiteEtapes()};
+  voile.addEventListener("click",()=>visiteAller(visite.i+1));
+  bulle.addEventListener("click",e=>{ const b=e.target.closest("[data-tour]"); if(!b) return; const a=b.dataset.tour; if(a==="next") visiteAller(visite.i+1); else if(a==="prev") visiteAller(visite.i-1); else visiteFin(); });
+  document.addEventListener("keydown",visiteClavier,true); window.addEventListener("resize",visitePlacer); visiteAller(0); }
+let visiteEssais=0;
+function peutEtreVisite(){ let fait=null; try{ fait=localStorage.getItem(KEY+"-visite"); }catch(e){ return; } if(fait) return;
+  const g=document.getElementById("gate"); if((g&&!g.hidden)||sheetCtx||modalCtx||!state.family.length){ if(++visiteEssais<40) setTimeout(peutEtreVisite,3000); return; }
+  lancerVisite(); }
+$("retour-visite").onclick=()=>lancerVisite();
+setTimeout(peutEtreVisite,2500);
+
 // démarrage du partage (silencieux si la page n'est pas partagée)
 (async()=>{
   try{

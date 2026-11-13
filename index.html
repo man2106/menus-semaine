@@ -628,6 +628,17 @@ body.notowner .owner-only{display:none!important}
 .acomp.ok{padding:10px 16px}.acomp.ok p{margin:0;color:var(--accent);font-weight:600}
 .dnocook{font-size:12px;color:var(--warm);font-weight:600}
 @media (max-width:480px){ .acomp .acrow{gap:8px;padding:6px 0}.acomp .acday{min-width:42px;font-size:12px}.acomp .acinfo b{font-size:13px}.acomp .acinfo small{display:none}.acomp select{max-width:110px} }
+
+.tip{position:fixed;z-index:90;background:var(--ink);color:var(--bg);font-size:12.5px;line-height:1.35;padding:7px 10px;border-radius:10px;pointer-events:none;box-shadow:0 6px 20px rgba(0,0,0,.25)}
+#valider.incomplet{opacity:.75;border-style:dashed}
+.acomp.pulse{animation:pulse 1.2s ease 2}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 transparent}50%{box-shadow:0 0 0 4px var(--warm)}}
+/* Visite guidée */
+.tour-voile{position:fixed;inset:0;z-index:80;pointer-events:auto}
+.tour-trou{position:fixed;z-index:81;border-radius:14px;box-shadow:0 0 0 4px var(--accent),0 0 0 9999px rgba(10,16,12,.62);transition:all .25s ease;pointer-events:none}
+.tour-bulle{position:fixed;z-index:82;width:min(340px,calc(100vw - 24px));background:var(--surface);color:var(--ink);border-radius:16px;padding:16px;box-shadow:0 12px 40px rgba(0,0,0,.35);display:grid;gap:10px}
+.tour-bulle h3{margin:0;font-family:var(--display);font-size:18px}.tour-bulle p{margin:0;color:var(--ink);line-height:1.45}
+.tour-pied{display:flex;justify-content:space-between;align-items:center;gap:8px}.tour-pied small{color:var(--muted)}
 </style>
 </head>
 <body>
@@ -650,11 +661,11 @@ body.notowner .owner-only{display:none!important}
   </header>
 
   <nav role="tablist">
-    <button role="tab" id="tab-menu" data-tab="menu" aria-selected="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16M4 12h16M4 19h10"/></svg><span>Menu</span></button>
-    <button role="tab" id="tab-courses" data-tab="courses" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h2l2.4 11h10.2L20 8H6.2"/><circle cx="9" cy="19.5" r="1.4"/><circle cx="17" cy="19.5" r="1.4"/></svg><span>Courses</span><span class="badge" id="ccount"></span></button>
-    <button role="tab" id="tab-famille" data-tab="famille" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M14.5 14.6c.8-.4 1.6-.6 2.5-.6 2.8 0 4.5 2.2 4.5 5"/></svg><span>Famille</span><span class="badge" id="fcount"></span></button>
-    <button role="tab" id="tab-envies" data-tab="envies" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg><span>Envies</span></button>
-    <button role="tab" id="tab-reglages" data-tab="reglages" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg><span>Réglages</span></button>
+    <button role="tab" id="tab-menu" data-tab="menu" data-tip="Le menu du soir de la semaine, qui cuisine et la validation" aria-selected="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16M4 12h16M4 19h10"/></svg><span>Menu</span></button>
+    <button role="tab" id="tab-courses" data-tab="courses" data-tip="La liste des courses, groupée par magasin et par rayon, avec les promos" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h2l2.4 11h10.2L20 8H6.2"/><circle cx="9" cy="19.5" r="1.4"/><circle cx="17" cy="19.5" r="1.4"/></svg><span>Courses</span><span class="badge" id="ccount"></span></button>
+    <button role="tab" id="tab-famille" data-tab="famille" data-tip="Les présences, qui cuisine, les goûts de chacun et les avis sur les repas" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M14.5 14.6c.8-.4 1.6-.6 2.5-.6 2.8 0 4.5 2.2 4.5 5"/></svg><span>Famille</span><span class="badge" id="fcount"></span></button>
+    <button role="tab" id="tab-envies" data-tab="envies" data-tip="Le sondage des envies et les plannings suggérés pour les semaines à venir" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg><span>Envies</span></button>
+    <button role="tab" id="tab-reglages" data-tab="reglages" data-tip="Jours de courses, magasins, recettes, accès de la famille" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg><span>Réglages</span></button>
   </nav>
 
   <!-- ===== MENU ===== -->
@@ -668,7 +679,7 @@ body.notowner .owner-only{display:none!important}
     </div>
     <div class="col-b">
     <div class="days" id="days"></div>
-    <footer><button class="link edit-only" id="reset">Revenir au menu proposé</button></footer>
+    <footer><button class="link edit-only" id="reset" data-tip="Remet le menu proposé au départ">Revenir au menu proposé</button></footer>
     </div>
   </section>
 
@@ -678,9 +689,9 @@ body.notowner .owner-only{display:none!important}
     <div class="toolbar">
       <div class="progress"><span id="ptext"></span><div class="track"><i id="pbar"></i></div></div>
       <div class="actions">
-        <button class="btn" id="uncheck">Tout décocher</button>
-        <button class="btn" id="copy">Copier</button>
-        <button class="btn primary" id="export">Envoyer la liste</button>
+        <button class="btn" id="uncheck" data-tip="Décoche tous les articles de la liste">Tout décocher</button>
+        <button class="btn" id="copy" data-tip="Copie la liste en texte pour la coller dans un message">Copier</button>
+        <button class="btn primary" id="export" data-tip="Envoie la liste en PDF ou en texte">Envoyer la liste</button>
       </div>
     </div>
     <textarea class="copybox" id="copybox" hidden readonly aria-label="Liste de courses à copier"></textarea>
@@ -714,7 +725,7 @@ body.notowner .owner-only{display:none!important}
       <h2>Qui cuisine ?</h2>
       <div class="planning" id="planning"></div>
       <div class="actions">
-        <button class="btn edit-only" id="autoassign">Répartir à tour de rôle</button>
+        <button class="btn edit-only" id="autoassign" data-tip="Attribue chaque soir à une personne différente">Répartir à tour de rôle</button>
         <button class="btn edit-only" id="clearassign">Tout effacer</button>
       </div>
     </div>
@@ -773,8 +784,8 @@ body.notowner .owner-only{display:none!important}
         </details>
         <p class="note" id="homenote"></p>
         <div class="gkey" id="gkeybox"></div>
-        <button class="btn primary" type="button" id="osmstores">Trouver les vrais magasins autour de mon adresse</button>
-        <button class="btn" type="button" id="nearest">Choisir les magasins les plus proches de mon adresse</button>
+        <button class="btn primary" type="button" id="osmstores" data-tip="Cherche sur la carte les supermarchés autour de votre adresse">Trouver les vrais magasins autour de mon adresse</button>
+        <button class="btn" type="button" id="nearest" data-tip="Garde le magasin le plus proche de chaque enseigne">Choisir les magasins les plus proches de mon adresse</button>
       </div>
       <p>Choisissez les magasins où vous faites vos courses et classez-les du préféré au moins aimé. Le premier est votre magasin habituel.</p>
       <label class="wfield">Comment choisir le magasin de chaque course
@@ -798,14 +809,14 @@ body.notowner .owner-only{display:none!important}
       </details>
     </div>
     <div class="panel">
-      <div class="phead"><h2>Les recettes</h2><button class="btn primary edit-only" id="newrecipe">Ajouter une recette</button></div>
+      <div class="phead"><h2>Les recettes</h2><button class="btn primary edit-only" id="newrecipe" data-tip="Ajoutez une recette de la famille, avec sa photo">Ajouter une recette</button></div>
       <p>Les recettes de l'application et celles de la famille. Touchez une recette pour la voir.</p>
       <div class="recipes" id="recipes"></div>
     </div>
     <div class="panel" id="accesbox" hidden></div>
     <div class="panel">
       <h2>Aide</h2>
-      <div class="actions"><button class="btn" id="rewizard">Relancer le guide de démarrage</button></div>
+      <div class="actions"><button class="btn" id="retour-visite" data-tip="Refait le tour des écrans de l'application">Revoir la visite guidée</button><button class="btn" id="rewizard">Relancer le guide de démarrage</button></div>
     </div>
   </section>
 </div>
@@ -844,10 +855,10 @@ body.notowner .owner-only{display:none!important}
   <div class="sfoot" id="sfoot"></div>
 </div>
 
-<script src="vendor/jspdf-2.5.1.umd.min.js?v=20"></script>
-<script src="vendor/supabase-js-2.45.4.js?v=20"></script>
-<script src="js/partage.js?v=20"></script>
-<script src="js/app.js?v=20"></script>
+<script src="vendor/jspdf-2.5.1.umd.min.js?v=21"></script>
+<script src="vendor/supabase-js-2.45.4.js?v=21"></script>
+<script src="js/partage.js?v=21"></script>
+<script src="js/app.js?v=21"></script>
 
 </body>
 </html>
