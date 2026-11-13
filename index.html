@@ -10,7 +10,40 @@
 <link rel="apple-touch-icon" href="icons/icon-180.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Menus">
-<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}
+.rthead{display:grid;gap:2px;margin-bottom:10px}.rthead h2{margin:0}
+.rtlist{display:grid;gap:8px}
+.rtitem{display:grid;grid-template-columns:56px 1fr auto;gap:12px;align-items:center;width:100%;text-align:left;background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:6px;color:var(--ink);font:inherit;cursor:pointer}
+.rtitem img{width:56px;height:42px;object-fit:cover;border-radius:10px}
+.rtitem span{display:grid;min-width:0}.rtitem small{color:var(--muted);font-size:12px}
+.rtgo{background:var(--accent);color:var(--accent-ink);border-radius:999px;padding:6px 12px;font-weight:600;font-size:13px}
+.rtperson{border:1px solid var(--line);border-radius:16px;padding:12px;margin:10px 0;background:var(--surface);display:grid;gap:10px}
+.rtperson.done{border-color:var(--accent)}
+.rtname{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}.rtname span{color:var(--muted);font-size:13px}
+.rtfaces{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.rtface{display:grid;justify-items:center;gap:2px;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:8px 2px;cursor:pointer;color:var(--ink);font:inherit}
+.rtface span{font-size:26px;line-height:1}.rtface small{font-size:10.5px;color:var(--muted);text-align:center;line-height:1.15}
+.rtface.on{background:var(--accent-soft);border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.rtmore{display:grid;gap:8px}
+.rtkpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin:6px 0 10px}
+.rtkpis div{background:var(--accent-soft);border-radius:14px;padding:10px 12px;display:grid}
+.rtkpis b{font-family:var(--display);font-size:24px}.rtkpis small{color:var(--muted);font-size:12px}
+.rtsec{margin:18px 0}.rtsec h3{margin:0 0 4px;font-size:16px;display:flex;gap:8px;align-items:center}
+.rtreco{margin:6px 0;padding-left:20px;display:grid;gap:6px}
+.rttrend{display:flex;gap:8px;align-items:flex-end;height:120px;padding-top:6px;overflow-x:auto}
+.rtbar{flex:1 0 40px;display:grid;grid-template-rows:1fr auto auto;justify-items:center;height:100%;gap:2px}
+.rtbar i{align-self:end;width:70%;background:var(--accent);border-radius:6px 6px 2px 2px;min-height:4px}
+.rtbar b{font-size:12px}.rtbar small{font-size:11px;color:var(--muted)}
+.rtplats{display:grid;gap:8px;margin-top:8px}
+.rtplat{display:grid;grid-template-columns:52px 1fr auto;gap:10px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:6px}
+.rtplat img{width:52px;height:40px;object-fit:cover;border-radius:9px}.rtplat span{display:grid;min-width:0}.rtplat small{color:var(--muted);font-size:12px}
+.rtwarn{color:var(--warm)!important;font-weight:600}
+.rtscore{font-weight:700;font-size:13px;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--accent) var(--p),var(--line) 0);position:relative}
+.rtscore::before{content:"";position:absolute;inset:4px;border-radius:50%;background:var(--surface)}.rtscore{isolation:isolate}.rtscore::before{z-index:-1}
+.rtpeople{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px}
+.rtpers{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 12px;display:grid;gap:2px}.rtpers small{color:var(--muted);font-size:12px}
+.rtcom{margin:8px 0;padding:8px 12px;border-left:3px solid var(--accent);background:var(--surface);border-radius:0 10px 10px 0;display:grid;gap:2px}.rtcom small{color:var(--muted);font-size:12px}
+</style>
 <title>Menus de la semaine</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -554,6 +587,7 @@ body.notowner .owner-only{display:none!important}
   <section id="view-menu">
     <div class="panel weekbar" id="weekbar"></div>
     <div class="next" id="next"></div>
+    <div class="panel retours" id="retoursbox" hidden></div>
     <details class="panel sum" id="budgetbox"><summary id="budgetsum"></summary><div id="budget"></div></details>
     <div class="days" id="days"></div>
     <footer><button class="link edit-only" id="reset">Revenir au menu proposé</button></footer>
@@ -591,6 +625,7 @@ body.notowner .owner-only{display:none!important}
 
   <!-- ===== FAMILLE ===== -->
   <section id="view-famille" hidden>
+    <div class="panel" id="retoursfam"></div>
     <div class="panel" id="presences"></div>
     <div class="panel">
       <h2>Qui cuisine ?</h2>
@@ -856,7 +891,7 @@ const PROMOS = [
 // ---- Dates : semaine planifiée et validité des promos ----
 const isoDate = s => { const [y,m,d]=s.split("-").map(Number); return new Date(y,m-1,d); };
 const TODAY = (()=>{const t=new Date(); t.setHours(0,0,0,0); return t;})();
-let MONDAY = (()=>{const dow=(TODAY.getDay()+6)%7; const m=new Date(TODAY); m.setDate(TODAY.getDate()+(dow===0?0:7-dow)); return m;})();
+let MONDAY = (()=>{const dow=(TODAY.getDay()+6)%7; const m=new Date(TODAY); m.setDate(TODAY.getDate()-dow+(dow>=4?7:0)); return m;})();
 const BASE_MONDAY = new Date(MONDAY);
 const isoOf = d => d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
 const curIso = () => isoOf(MONDAY);
@@ -1316,7 +1351,7 @@ $("mbody").addEventListener("click",e=>{ if(e.target.id!=="mcopy") return;
 $("recipes").addEventListener("click",e=>{const b=e.target.closest("[data-openrec]"); if(b) openMeal(b.dataset.openrec,null);});
 $("trip1").onchange=e=>{state.trip1=e.target.value;state.checked={};save();render();toast("Course 1 : "+tripName(0));};
 $("trip2").onchange=e=>{state.trip2=+e.target.value;state.checked={};save();render();toast("Course 2 : "+tripName(1));};
-function render(){if(!$("view-menu")) return; $("trip1").value=state.trip1;$("trip2").value=String(state.trip2);renderWeekbar();renderPresences();renderBudget();renderStats();renderDays();renderCourses();renderPromos();renderRecettes();renderReglages();}
+function render(){if(!$("view-menu")) return; $("trip1").value=state.trip1;$("trip2").value=String(state.trip2);renderWeekbar();renderPresences();renderBudget();renderStats();renderDays();renderCourses();renderPromos();renderRecettes();renderReglages();if(typeof renderRetours==="function")renderRetours();}
 $("sugg").addEventListener("change",e=>{const s=e.target.closest("select[data-add]"); if(!s||s.value==="") return;
   replaceDay(+s.value,s.dataset.add);});
 $("cmp").addEventListener("change",e=>{const inp=e.target.closest("input[data-pk]"); if(!inp) return;
@@ -1395,7 +1430,7 @@ function proposeMenu(){
   const prevIso=isoOf(new Date(MONDAY.getFullYear(),MONDAY.getMonth(),MONDAY.getDate()-7));
   const prev=(state.weeks[prevIso]&&state.weeks[prevIso].menu)||[];
   const rnd=()=>Math.random()*0.8;
-  const score=r=>promoCount(r)+rnd()+likeScore(r)*0.6-dislikesFor(r,null).length*1.5;
+  const score=r=>promoCount(r)+rnd()+likeScore(r)*0.6-dislikesFor(r,null).length*1.5+(typeof bonusRetours==="function"?bonusRetours(r):0);
   let pool=RECETTES.filter(r=>!prev.includes(r.id)).map(r=>({r,s:score(r)})).sort((a,b)=>b.s-a.s).map(x=>x.r);
   if(pool.length<7) pool=pool.concat(RECETTES.filter(r=>!pool.includes(r)).sort(()=>Math.random()-.5));
   const pick=pool.slice(0,7);
@@ -1680,7 +1715,7 @@ function openSheet(ctx){ sheetCtx=ctx; $("sheet").hidden=false; document.body.st
 function closeSheet(){ const c=sheetCtx; if(c&&c.type==="wizard"&&!state.onboarded){ state.onboarded=true; saveLocal(); }
   sheetCtx=null; $("sheet").hidden=true; if(!modalCtx) document.body.style.overflow=""; keepAwake(false); if(c&&c.after) c.after(); }
 function renderSheet(){ const c=sheetCtx; if(!c) return; $("sheet").dataset.type=c.type;
-  ({gallery:renderGallery,shop:renderShop,cook:renderCook,wizard:renderWizard,recipe:renderRecipeForm,gouts:renderGouts,export:renderExport})[c.type](); }
+  ({gallery:renderGallery,shop:renderShop,cook:renderCook,wizard:renderWizard,recipe:renderRecipeForm,gouts:renderGouts,export:renderExport,retour:renderRetourSheet,bilan:renderBilan})[c.type](); }
 async function keepAwake(on){ try{ if(on&&navigator.wakeLock&&!wakeLock){ wakeLock=await navigator.wakeLock.request("screen"); wakeLock.addEventListener&&wakeLock.addEventListener("release",()=>{wakeLock=null;}); }
   else if(!on&&wakeLock){ const w=wakeLock; wakeLock=null; await w.release(); } }catch(e){ wakeLock=null; } }
 document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible"&&sheetCtx&&sheetCtx.wake&&!wakeLock) keepAwake(true); });
@@ -2237,6 +2272,171 @@ function handleExportClick(D,T){
 $("sheet").addEventListener("change",e=>{ if(!sheetCtx||sheetCtx.type!=="export") return; if(e.target.id==="xleft"){ sheetCtx.onlyLeft=e.target.checked; renderExport(); } if(e.target.id==="xrec"){ sheetCtx.withRecipes=e.target.checked; renderExport(); } });
 $("export").onclick=()=>openSheet({type:"export",kind:"courses",which:"both",onlyLeft:true});
 
+// ===================== Retours sur les repas et bilan =====================
+// Échelle à 5 visages (échelle hédonique utilisée pour les enfants et les cantines),
+// « à refaire ? » et quelques mots à cocher pour savoir quoi corriger.
+const NOTES=[[1,"😖","Pas aimé du tout"],[2,"😕","Pas trop"],[3,"😐","Moyen"],[4,"🙂","Bon"],[5,"😋","Délicieux"]];
+const REFAIRE=[["oui","À refaire"],["peut","Pourquoi pas"],["non","Plus jamais"]];
+const MOTS=["Parfait comme ça","Trop salé","Fade","Trop épicé","Trop gras","Pas assez cuit","Trop cuit","Portion trop petite","Trop de restes","Trop long à faire"];
+let RETOURS={}, SEMAINES={}, unsubRetours=null, unsubSemaines=null;
+try{ const loc=JSON.parse(localStorage.getItem(KEY+"-retours")||"{}"); if(loc&&typeof loc==="object") RETOURS=loc; }catch(e){}
+function saveRetoursLocal(){ try{ localStorage.setItem(KEY+"-retours",JSON.stringify(RETOURS)); }catch(e){} }
+const slugNom = n => norm(n).replace(/ /g,"-").slice(0,30)||"x";
+const retourId = (iso,d,n) => `${iso}_${d}_${slugNom(n)}`;
+function cleanRetour(r){ if(!r||typeof r!=="object") return null; const note=+r.note; if(!(note>=1&&note<=5)) return null;
+  if(typeof r.plat!=="string"||typeof r.semaine!=="string"||!/^\d{4}-\d\d-\d\d$/.test(r.semaine)) return null;
+  return {semaine:r.semaine,jour:Math.max(0,Math.min(6,+r.jour||0)),plat:r.plat,nom:String(r.nom||"").slice(0,30),note:Math.round(note),
+    refaire:["oui","peut","non"].includes(r.refaire)?r.refaire:null,mots:Array.isArray(r.mots)?r.mots.filter(m=>MOTS.includes(m)).slice(0,6):[],
+    com:typeof r.com==="string"?r.com.slice(0,200):"",quand:typeof r.quand==="string"?r.quand:null,cuisinier:typeof r.cuisinier==="string"?r.cuisinier.slice(0,30):null}; }
+function subscribeRetours(){ if(!DB) return; if(unsubRetours) unsubRetours();
+  unsubRetours=DB.collection("retours").onSnapshot(q=>{ let ch=false;
+    q.docChanges().forEach(c=>{ if(c.type==="removed"){ delete RETOURS[c.doc.id]; ch=true; return; } const r=cleanRetour(c.doc.data()); if(r){ RETOURS[c.doc.id]=r; ch=true; } });
+    if(ch){ saveRetoursLocal(); renderRetours(); if(sheetCtx&&(sheetCtx.type==="bilan"||sheetCtx.type==="retour")) renderSheet(); } },()=>{});
+  // toutes les semaines partagées, pour retrouver les repas déjà mangés
+  if(unsubSemaines) unsubSemaines();
+  unsubSemaines=DB.collection("semaines").onSnapshot(q=>{ q.docChanges().forEach(c=>{ if(c.type==="removed") delete SEMAINES[c.doc.id]; else SEMAINES[c.doc.id]=c.doc.data(); }); renderRetours(); },()=>{});
+}
+// Repas déjà servis ces 14 derniers jours (le soir même à partir de 19 h)
+function repasPasses(jours=14){
+  const src={...state.weeks, ...SEMAINES}; src[curIso()]={...(src[curIso()]||{}),menu:state.week,cuisiniers:state.cooks,absents:state.absents,exterieur:state.exterieur};
+  const now=new Date(), lim=new Date(TODAY); lim.setDate(lim.getDate()-jours); const out=[];
+  Object.entries(src).forEach(([iso,w])=>{ if(!/^\d{4}-\d\d-\d\d$/.test(iso)||!w||!Array.isArray(w.menu)) return; const mon=isoDate(iso);
+    const ext=outList(cleanDays(w.exterieur)); const cooks=Array.isArray(w.cuisiniers)?w.cuisiniers:(Array.isArray(w.cooks)?w.cooks:[]);
+    w.menu.forEach((plat,d)=>{ if(!BYID[plat]||ext.includes(d)) return; const date=new Date(mon); date.setDate(mon.getDate()+d);
+      if(date<lim) return; const soir=new Date(date); soir.setHours(19,0,0,0); if(soir>now) return;
+      const abs=w.absents&&typeof w.absents==="object"?w.absents:{}; const pres=state.family.filter(n=>!(Array.isArray(abs[n])&&abs[n].includes(d)));
+      out.push({iso,d,date,plat,pres,cuisinier:cooks[d]||null}); }); });
+  return out.sort((a,b)=>b.date-a.date);
+}
+const retoursDu = (iso,d) => Object.values(RETOURS).filter(r=>r.semaine===iso&&r.jour===d);
+async function enregistrerRetour(iso,d,nom,patch){
+  const id=retourId(iso,d,nom), rp=repasPasses(21).find(x=>x.iso===iso&&x.d===d); if(!rp) return;
+  const prev=RETOURS[id]||{semaine:iso,jour:d,plat:rp.plat,nom,note:null,refaire:null,mots:[],com:""};
+  const next={...prev,...patch,plat:rp.plat,nom,cuisinier:rp.cuisinier,quand:new Date().toISOString(),par:ME||null};
+  if(!next.note){ RETOURS[id]=next; renderSheet(); return; } // on attend la note avant d'enregistrer
+  RETOURS[id]=cleanRetour(next); saveRetoursLocal(); renderRetours(); renderSheet();
+  if(DB){ try{ await DB.collection("retours").doc(id).set({...cleanRetour(next),par:ME||null}); }catch(e){ toast("L'avis n'a pas pu être partagé, il reste sur cet appareil"); } }
+}
+// ---- Calculs du bilan ----
+const moy = a => a.length? a.reduce((s,x)=>s+x,0)/a.length : null;
+const ecart = a => { if(a.length<2) return 0; const m=moy(a); return Math.sqrt(moy(a.map(x=>(x-m)**2))); };
+const n1 = v => v==null?"–":v.toLocaleString("fr-BE",{minimumFractionDigits:1,maximumFractionDigits:1});
+function analyse(){
+  const all=Object.values(RETOURS).filter(r=>r&&r.note&&BYID[r.plat]); const G=moy(all.map(r=>r.note))||3.5, K=2;
+  const parPlat={}; all.forEach(r=>{ (parPlat[r.plat]=parPlat[r.plat]||[]).push(r); });
+  const plats=Object.entries(parPlat).map(([id,l])=>{ const notes=l.map(r=>r.note), n=notes.length, m=moy(notes);
+    const servi=new Set(l.map(r=>r.semaine+"-"+r.jour)).size, ref=l.filter(r=>r.refaire), oui=ref.filter(r=>r.refaire==="oui").length, non=ref.filter(r=>r.refaire==="non").length;
+    const mots={}; l.forEach(r=>r.mots.forEach(w=>{ if(w!=="Parfait comme ça") mots[w]=(mots[w]||0)+1; }));
+    const topMots=Object.entries(mots).sort((a,b)=>b[1]-a[1]).filter(([,c])=>c>=2||n<=3).slice(0,2).map(([w])=>w);
+    const score=(n*m+K*G)/(n+K); // moyenne « prudente » : un seul avis ne suffit pas à classer un plat
+    let cout=null; try{ const r=BYID[id]; const x=recipeCost(r,state.gamme,null)/Math.max(1,state.family.length||5); cout=isFinite(x)&&x>0?x:null; }catch(e){}
+    return {id,nom:BYID[id].nom,n,m,score,servi,oui,non,refTot:ref.length,ecart:ecart(notes),topMots,cout,l}; });
+  plats.forEach(p=>{ p.cat = p.n<2 ? "tot" : (p.ecart>=1.3&&p.n>=3) ? "divise" : p.score>=3.9 ? "sur" : p.score<=2.6 ? (p.servi<3?"retester":"retirer") : "ameliorer"; });
+  const semaines={}; all.forEach(r=>{ (semaines[r.semaine]=semaines[r.semaine]||[]).push(r.note); });
+  const tendance=Object.keys(semaines).sort().slice(-8).map(k=>({iso:k,m:moy(semaines[k]),n:semaines[k].length}));
+  const passes=repasPasses(28), attendus=passes.reduce((s,p)=>s+p.pres.length,0), recus=passes.reduce((s,p)=>s+retoursDu(p.iso,p.d).filter(r=>r.note).length,0);
+  const personnes=state.family.map(n=>{ const l=all.filter(r=>r.nom===n); const byP={}; l.forEach(r=>{ (byP[r.plat]=byP[r.plat]||[]).push(r.note); });
+    const pl=Object.entries(byP).map(([id,v])=>({id,m:moy(v)})).sort((a,b)=>b.m-a.m);
+    const mots={}; l.forEach(r=>r.mots.forEach(w=>{ mots[w]=(mots[w]||0)+1; }));
+    const att=passes.filter(p=>p.pres.includes(n)).length, rec=passes.filter(p=>p.pres.includes(n)&&RETOURS[retourId(p.iso,p.d,n)]&&RETOURS[retourId(p.iso,p.d,n)].note).length;
+    return {n,count:l.length,m:moy(l.map(r=>r.note)),top:pl.filter(x=>x.m>=4).slice(0,2),bas:pl.filter(x=>x.m<=2).slice(-2).reverse(),mot:Object.entries(mots).sort((a,b)=>b[1]-a[1])[0],part:att?rec/att:null}; });
+  const coms=all.filter(r=>r.com).sort((a,b)=>String(b.quand).localeCompare(String(a.quand))).slice(0,6);
+  const refTot=all.filter(r=>r.refaire), pctOui=refTot.length?refTot.filter(r=>r.refaire==="oui").length/refTot.length:null;
+  return {all,G,plats,tendance,part:attendus?recus/attendus:null,recus,attendus,personnes,coms,pctOui};
+}
+// Influence sur les propositions de menus : bonus aux valeurs sûres, pause d'un mois pour les plats à retirer
+function bonusRetours(r){ const l=Object.values(RETOURS).filter(x=>x.plat===r.id&&x.note); if(!l.length) return 0;
+  const G=3.5, K=2, s=(l.length*moy(l.map(x=>x.note))+K*G)/(l.length+K);
+  const dernier=l.map(x=>x.quand).sort().pop(), recent=dernier&&(Date.now()-new Date(dernier))<28*864e5;
+  if(s<=2.6&&l.length>=2&&recent) return -4; return (s-3.5)*0.9; }
+// ---- Affichage : invitation à noter (onglet Menu) et résumé (onglet Famille) ----
+function renderRetours(){
+  const box=$("retoursbox"), fam=$("retoursfam"); if(!box||!fam) return;
+  const passes=repasPasses(4).filter(p=>p.pres.length), aNoter=passes.filter(p=>retoursDu(p.iso,p.d).filter(r=>r.note).length<p.pres.length).slice(0,3);
+  if(!state.family.length||!aNoter.length){ box.hidden=true; }
+  else { box.hidden=false; box.innerHTML=`<div class="rthead"><h2>C'était comment ?</h2><span class="note">Notez les derniers repas : les plats aimés reviendront plus souvent.</span></div>
+    <div class="rtlist">${aNoter.map(p=>{ const nb=retoursDu(p.iso,p.d).filter(r=>r.note).length;
+      return `<button class="rtitem" data-retour="${p.iso}|${p.d}"><img src="${photoSrc(p.plat)}" alt="" onerror="this.style.visibility='hidden'"><span><small>${JOURS[(p.date.getDay()+6)%7]} ${fmtShort(p.date)}</small><b>${esc(BYID[p.plat].nom)}</b><small>${nb?`${nb} avis sur ${p.pres.length}`:"Pas encore noté"}</small></span><span class="rtgo">Noter</span></button>`; }).join("")}</div>`; }
+  const A=analyse();
+  fam.innerHTML=`<div class="phead"><h2>Retours sur les repas</h2><button class="btn primary" data-bilan="1">Voir le bilan</button></div>
+    ${A.all.length?`<div class="rtkpis"><div><b>${n1(A.G)}</b><small>note moyenne sur 5</small></div><div><b>${A.all.length}</b><small>avis donnés</small></div><div><b>${A.part==null?"–":Math.round(A.part*100)+" %"}</b><small>de participation (4 semaines)</small></div></div>`
+      :`<p>Après chaque souper, chacun note le plat en un geste. Le bilan montre les valeurs sûres, les plats à ajuster et ceux qui divisent la famille.</p>`}
+    <div class="actions"><button class="btn" data-retourslist="1">Noter un repas</button></div>`;
+}
+// ---- Fenêtre : noter un repas ----
+function renderRetourSheet(){ const c=sheetCtx;
+  if(c.list){ const l=repasPasses(14);
+    $("seyebrow").textContent="Retours"; $("stitle").textContent="Noter un repas"; $("sextra").innerHTML="";
+    $("sbody").innerHTML=l.length?`<div class="rtlist">${l.map(p=>{ const nb=retoursDu(p.iso,p.d).filter(r=>r.note).length;
+      return `<button class="rtitem" data-retour="${p.iso}|${p.d}"><img src="${photoSrc(p.plat)}" alt="" onerror="this.style.visibility='hidden'"><span><small>${JOURS[(p.date.getDay()+6)%7]} ${fmtShort(p.date)}</small><b>${esc(BYID[p.plat].nom)}</b><small>${nb?`${nb} avis sur ${p.pres.length}`:"Pas encore noté"}</small></span><span class="rtgo">${nb>=p.pres.length?"Voir":"Noter"}</span></button>`; }).join("")}</div>`
+      :`<p class="note">Aucun repas des deux dernières semaines pour l'instant. Les repas apparaissent ici le soir même, à partir de 19 h.</p>`;
+    $("sfoot").innerHTML=`<button class="btn" data-bilan="1">Voir le bilan</button>`; return; }
+  const p=repasPasses(21).find(x=>x.iso===c.iso&&x.d===c.d); if(!p){ closeSheet(); return; }
+  const r=BYID[p.plat];
+  $("seyebrow").textContent=`${JOURS[(p.date.getDay()+6)%7]} ${fmtShort(p.date)}`; $("stitle").textContent=r.nom; $("sextra").innerHTML="";
+  $("sbody").innerHTML=`<p class="note">Chacun note pour lui, sur son téléphone ou ici. Une seule note suffit, le reste est facultatif.</p>
+    ${p.pres.map(n=>{ const v=RETOURS[retourId(p.iso,p.d,n)]||{}, o=c.open===n||(!v.note&&!c.open);
+      return `<section class="rtperson${v.note?" done":""}">
+        <div class="rtname"><b>${esc(n)}</b>${v.note?`<span>${NOTES[v.note-1][1]} ${NOTES[v.note-1][2]}${v.refaire?" · "+REFAIRE.find(x=>x[0]===v.refaire)[1]:""}</span>`:""}</div>
+        <div class="rtfaces" role="group" aria-label="Note de ${esc(n)}">${NOTES.map(([k,e,l])=>`<button class="rtface${v.note===k?" on":""}" data-rnote="${k}" data-rn="${esc(n)}" aria-label="${l}" title="${l}"><span>${e}</span><small>${l}</small></button>`).join("")}</div>
+        ${v.note?`<div class="rtmore"${o||c.open===n?"":""}>
+          <div class="gfilters">${REFAIRE.map(([k,l])=>`<button class="chip${v.refaire===k?" on":""}" data-rref="${k}" data-rn="${esc(n)}">${l}</button>`).join("")}</div>
+          <div class="gfilters wrapchips">${MOTS.map(w=>`<button class="chip${(v.mots||[]).includes(w)?" on":""}" data-rmot="${esc(w)}" data-rn="${esc(n)}">${w}</button>`).join("")}</div>
+          <div class="addrow"><input type="text" maxlength="200" data-rcom="${esc(n)}" value="${esc(v.com||"")}" placeholder="Un mot pour le cuisinier (facultatif)" aria-label="Commentaire de ${esc(n)}"><button class="btn" data-rcomok="${esc(n)}">OK</button></div>
+        </div>`:""}
+      </section>`; }).join("")}`;
+  $("sfoot").innerHTML=`<button class="btn" data-retourslist="1">Autres repas</button><button class="btn primary" data-bilan="1">Voir le bilan</button>`;
+}
+// ---- Fenêtre : bilan ----
+const CATS=[["sur","Les valeurs sûres","Bien notés par presque tout le monde : à garder dans la rotation."],
+  ["ameliorer","À ajuster","Corrects, mais un détail revient dans les avis : il suffit souvent de changer la recette."],
+  ["divise","Divise la famille","Adoré par les uns, pas aimé par les autres : à servir quand les amateurs sont là, ou avec une variante."],
+  ["retester","À retester","Mal notés, mais servis moins de 3 fois. Les études montrent qu'un enfant accepte souvent un plat après 8 à 10 essais : changez un ingrédient et reproposez-le dans quelques semaines."],
+  ["retirer","À retirer pour un temps","Mal notés à plusieurs reprises : ils ne seront plus proposés pendant un mois."],
+  ["tot","Pas encore assez d'avis","Un seul avis : trop tôt pour juger."]];
+function renderBilan(){ const A=analyse();
+  $("seyebrow").textContent="Retours sur les repas"; $("stitle").textContent="Bilan des repas"; $("sextra").innerHTML="";
+  $("sfoot").innerHTML=`<button class="btn" data-retourslist="1">Noter un repas</button>`;
+  if(!A.all.length){ $("sbody").innerHTML=`<p>Pas encore d'avis. Après le souper, touchez « C'était comment ? » dans l'onglet Menu : chacun choisit un visage, c'est tout.</p>
+    <p class="note">Le bilan apparaît dès les premiers avis. Il devient vraiment parlant après 2 ou 3 semaines.</p>`; return; }
+  const maxM=5, reco=[];
+  const surs=A.plats.filter(p=>p.cat==="sur").sort((a,b)=>b.score-a.score), adj=A.plats.filter(p=>p.cat==="ameliorer"&&p.topMots.length), ret=A.plats.filter(p=>p.cat==="retester");
+  if(surs.length) reco.push(`Proposer plus souvent : <b>${surs.slice(0,3).map(p=>esc(p.nom)).join(", ")}</b>.`);
+  adj.slice(0,2).forEach(p=>reco.push(`${esc(p.nom)} : souvent « ${esc(p.topMots[0].toLowerCase())} ». Adaptez la recette avant de le reproposer.`));
+  if(ret.length) reco.push(`Retester plus tard, avec une variante : <b>${ret.slice(0,2).map(p=>esc(p.nom)).join(", ")}</b>.`);
+  if(A.part!=null&&A.part<0.5) reco.push(`Seulement ${Math.round(A.part*100)} % des repas sont notés : rappelez à chacun que noter prend 2 secondes.`);
+  const bonPasCher=A.plats.filter(p=>p.cout&&p.n>=2&&p.score>=3.6).sort((a,b)=>(b.score/b.cout)-(a.score/a.cout)).slice(0,3);
+  $("sbody").innerHTML=`
+    <div class="rtkpis"><div><b>${n1(A.G)}</b><small>note moyenne sur 5</small></div><div><b>${A.pctOui==null?"–":Math.round(A.pctOui*100)+" %"}</b><small>« à refaire »</small></div><div><b>${A.part==null?"–":Math.round(A.part*100)+" %"}</b><small>participation (4 semaines)</small></div><div><b>${A.all.length}</b><small>avis</small></div></div>
+    ${reco.length?`<section class="rtsec"><h3>Ce que je vous conseille</h3><ul class="rtreco">${reco.map(t=>`<li>${t}</li>`).join("")}</ul></section>`:""}
+    ${A.tendance.length>1?`<section class="rtsec"><h3>Évolution par semaine</h3><div class="rttrend">${A.tendance.map(t=>`<div class="rtbar"><i style="height:${Math.round(t.m/maxM*100)}%"></i><b>${n1(t.m)}</b><small>${fmtShort(isoDate(t.iso))}</small></div>`).join("")}</div></section>`:""}
+    ${CATS.map(([k,t,d])=>{ const l=A.plats.filter(p=>p.cat===k).sort((a,b)=>b.score-a.score); if(!l.length) return "";
+      return `<section class="rtsec"><h3>${t} <span class="badge">${l.length}</span></h3><p class="note">${d}</p>
+        <div class="rtplats">${l.map(p=>`<div class="rtplat"><img src="${photoSrc(p.id)}" alt="" onerror="this.style.visibility='hidden'"><span><b>${esc(p.nom)}</b>
+          <small>${n1(p.m)}/5 · ${p.n} avis · servi ${p.servi} fois${p.refTot?` · ${Math.round(p.oui/p.refTot*100)} % à refaire`:""}${p.cout?` · ${eur(p.cout)}/pers.`:""}</small>
+          ${p.topMots.length?`<small class="rtwarn">Souvent : ${p.topMots.map(esc).join(", ").toLowerCase()}</small>`:""}
+          ${k==="divise"?`<small>${p.l.filter(r=>r.note>=4).map(r=>esc(r.nom)).filter((v,i,a)=>a.indexOf(v)===i).join(", ")||"–"} aiment · ${p.l.filter(r=>r.note<=2).map(r=>esc(r.nom)).filter((v,i,a)=>a.indexOf(v)===i).join(", ")||"–"} n'aiment pas</small>`:""}</span>
+          <span class="rtscore" style="--p:${Math.round(p.m/5*100)}%">${n1(p.m)}</span></div>`).join("")}</div></section>`; }).join("")}
+    ${bonPasCher.length?`<section class="rtsec"><h3>Bons et pas chers</h3><p class="note">Le meilleur rapport entre plaisir et prix par personne.</p><ol class="rtreco">${bonPasCher.map(p=>`<li><b>${esc(p.nom)}</b> : ${n1(p.m)}/5 pour ${eur(p.cout)} par personne</li>`).join("")}</ol></section>`:""}
+    <section class="rtsec"><h3>Les goûts de chacun</h3><div class="rtpeople">${A.personnes.map(p=>`<div class="rtpers"><b>${esc(p.n)}</b>
+      <small>${p.count?`${p.count} avis · moyenne ${n1(p.m)}/5`:"Pas encore d'avis"}${p.part!=null?` · note ${Math.round(p.part*100)} % de ses repas`:""}</small>
+      ${p.top.length?`<small>Adore : ${p.top.map(x=>esc(BYID[x.id].nom)).join(", ")}</small>`:""}${p.bas.length?`<small>N'aime pas : ${p.bas.map(x=>esc(BYID[x.id].nom)).join(", ")}</small>`:""}
+      ${p.mot&&p.mot[1]>=2&&p.mot[0]!=="Parfait comme ça"?`<small>Remarque souvent : ${esc(p.mot[0].toLowerCase())}</small>`:""}</div>`).join("")}</div></section>
+    ${A.coms.length?`<section class="rtsec"><h3>Derniers commentaires</h3>${A.coms.map(r=>`<blockquote class="rtcom">« ${esc(r.com)} »<small>${esc(r.nom)} · ${esc(BYID[r.plat].nom)} · ${fmtShort(isoDate(r.semaine))}</small></blockquote>`).join("")}</section>`:""}
+    <p class="note">Méthode : la note d'un plat est une moyenne prudente, qui tient compte du nombre d'avis, pour qu'un seul avis ne suffise pas à classer un plat. Les avis ne sont pas regroupés par cuisinier.</p>`;
+}
+document.addEventListener("click",e=>{ const b=e.target.closest("[data-retour],[data-bilan],[data-retourslist],[data-rnote],[data-rref],[data-rmot],[data-rcomok]"); if(!b) return; const D=b.dataset;
+  if(D.retour){ const [iso,d]=D.retour.split("|"); const ctx={type:"retour",iso,d:+d}; sheetCtx?(sheetCtx=ctx,renderSheet(),$("sbody").scrollTop=0):openSheet(ctx); return; }
+  if(D.bilan){ const ctx={type:"bilan"}; sheetCtx?(sheetCtx=ctx,renderSheet(),$("sbody").scrollTop=0):openSheet(ctx); return; }
+  if(D.retourslist){ const ctx={type:"retour",list:true}; sheetCtx?(sheetCtx=ctx,renderSheet(),$("sbody").scrollTop=0):openSheet(ctx); return; }
+  const c=sheetCtx; if(!c||c.type!=="retour"||c.list) return; const n=D.rn;
+  if(D.rnote){ enregistrerRetour(c.iso,c.d,n,{note:+D.rnote}); return; }
+  const v=RETOURS[retourId(c.iso,c.d,n)]||{};
+  if(D.rref){ enregistrerRetour(c.iso,c.d,n,{refaire:v.refaire===D.rref?null:D.rref}); return; }
+  if(D.rmot){ const s=new Set(v.mots||[]); s.has(D.rmot)?s.delete(D.rmot):s.add(D.rmot); enregistrerRetour(c.iso,c.d,n,{mots:[...s]}); return; }
+  if(D.rcomok!=null){ const inp=[...document.querySelectorAll("[data-rcom]")].find(x=>x.dataset.rcom===n); if(inp){ enregistrerRetour(c.iso,c.d,n,{com:inp.value.trim()}); toast("Commentaire enregistré"); } }
+});
+
 // démarrage du partage (silencieux si la page n'est pas partagée)
 (async()=>{
   try{
@@ -2250,7 +2450,7 @@ $("export").onclick=()=>openSheet({type:"export",kind:"courses",which:"both",onl
     IS_OWNER = u ? await u.isOwner() : true; if(!IS_OWNER) document.body.classList.add("notowner");
     DB.doc("validations/menus").onSnapshot(snap=>{ const dd=snap.exists?snap.data():{}; VALID=(dd.semaines&&typeof dd.semaines==="object")?{...dd.semaines}:{}; LIMITES=(dd.limites&&typeof dd.limites==="object")?{...dd.limites}:{}; applyValidation(); saveLocal(); render(); },()=>{});
     if(c===false){ document.body.classList.add("readonly"); }
-    subscribeRecettes(); subscribeGouts(); subscribeWeek(); subscribeFamily();
+    subscribeRecettes(); subscribeGouts(); subscribeWeek(); subscribeFamily(); subscribeRetours();
     setTimeout(maybeWizard,1500);
   }catch(e){ setSync("local"); setTimeout(maybeWizard,300); }
 })();
