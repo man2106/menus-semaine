@@ -621,6 +621,13 @@ body.notowner .owner-only{display:none!important}
 }
 @media (min-width:1600px){ .wrap{max-width:1560px} }
 @media (min-width:1900px){ #view-menu .days{grid-template-columns:repeat(3,minmax(0,1fr))} }
+
+.acomp h2{margin:0;font-size:17px}.acomp .acrow{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:8px 0;border-top:1px solid var(--line)}
+.acomp .acday{font-weight:700;color:var(--warm);font-size:13px;min-width:70px;line-height:1.2}.acomp .acinfo{display:grid;min-width:0}.acomp .acinfo small{color:var(--muted);font-size:12px}
+.acomp select{padding:6px 8px;border:1px solid var(--warm);border-radius:999px;background:var(--surface);color:var(--ink);font:inherit;font-size:13px;font-weight:600;max-width:150px}
+.acomp.ok{padding:10px 16px}.acomp.ok p{margin:0;color:var(--accent);font-weight:600}
+.dnocook{font-size:12px;color:var(--warm);font-weight:600}
+@media (max-width:480px){ .acomp .acrow{gap:8px;padding:6px 0}.acomp .acday{min-width:42px;font-size:12px}.acomp .acinfo b{font-size:13px}.acomp .acinfo small{display:none}.acomp select{max-width:110px} }
 </style>
 </head>
 <body>
@@ -653,6 +660,7 @@ body.notowner .owner-only{display:none!important}
   <!-- ===== MENU ===== -->
   <section id="view-menu">
     <div class="col-a">
+    <div class="panel acomp" id="acompleter"></div>
     <div class="panel weekbar" id="weekbar"></div>
     <div class="next" id="next"></div>
     <div class="panel retours" id="retoursbox" hidden></div>

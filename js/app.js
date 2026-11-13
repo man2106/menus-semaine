@@ -456,6 +456,24 @@ function isOut(d){ return d!==undefined && d!==null && outList(state.exterieur).
 function toggleOut(d){ const cur=new Set(outList(state.exterieur)); cur.has(d)?cur.delete(d):cur.add(d); state.exterieur=[...cur].sort(); save(); render(); if(modalCtx) renderModal();
   toast(isOut(d)?`${JOURS[d]} : repas à l'extérieur, pas de courses`:`${JOURS[d]} : on mange à la maison`); }
 const homeDays = () => JOURS.map((_,d)=>d).filter(d=>!isOut(d));
+// ---- Page principale : les soirs sans repas prévu ou sans cuisinier ----
+function renderACompleter(){ const box=$("acompleter"); if(!box) return;
+  const sansCuisinier=homeDays().filter(d=>headcount(d)>0&&!state.cooks[d]);
+  const dehors=JOURS.map((_,d)=>d).filter(d=>isOut(d)), personne=homeDays().filter(d=>headcount(d)===0);
+  const jour=d=>`${JOURS[d].slice(0,3)}<br>${fmtShort(dayOffset(d))}`;
+  if(!sansCuisinier.length&&!personne.length&&!dehors.length){ box.className="panel acomp ok"; box.innerHTML=`<p>✓ Chaque soir a un repas et un cuisinier.</p>`; return; }
+  box.className="panel acomp";
+  const lignes=[...sansCuisinier.map(d=>({d,html:`<span class="acday">${jour(d)}</span><span class="acinfo"><b>${esc(BYID[state.week[d]].nom)}</b><small>Pas encore de cuisinier · ${headcount(d)} à table</small></span><span class="edit-only">${state.family.length?cookSelect(d):""}</span>`})),
+    ...personne.map(d=>({d,html:`<span class="acday">${jour(d)}</span><span class="acinfo"><b>Personne à table</b><small>Tout le monde est absent : pas de repas prévu</small></span><span></span>`})),
+    ...dehors.map(d=>({d,html:`<span class="acday">${jour(d)}</span><span class="acinfo"><b>Pas de repas prévu à la maison</b><small>Soir marqué « à l'extérieur »</small></span><button class="chip edit-only" data-acout="${d}" type="button">Prévoir un repas</button>`}))].sort((x,y)=>x.d-y.d);
+  box.innerHTML=`<div class="phead"><h2>À compléter cette semaine</h2>${sansCuisinier.length>1&&state.family.length?`<button class="btn edit-only" id="acrepartir" type="button">Répartir ces soirs</button>`:""}</div>
+    ${!state.family.length?`<p class="note">Ajoutez les membres de la famille pour choisir qui cuisine.</p>`:""}
+    ${lignes.map(l=>`<div class="acrow">${l.html}</div>`).join("")}`; }
+document.addEventListener("click",e=>{ const o=e.target.closest("[data-acout]"); if(o){ toggleOut(+o.dataset.acout); return; }
+  if(e.target.closest("#acrepartir")){ const vides=homeDays().filter(d=>headcount(d)>0&&!state.cooks[d]), cnt={};
+    state.family.forEach(n=>cnt[n]=state.cooks.filter(c=>c===n).length);
+    vides.forEach(d=>{ const dispo=presentAt(d).filter(n=>state.family.includes(n)); const l=(dispo.length?dispo:state.family).slice().sort((a,b)=>cnt[a]-cnt[b]||Math.random()-.5); state.cooks[d]=l[0]; cnt[l[0]]++; });
+    save(); render(); toast(`${vides.length} soirs répartis entre les présents`); } });
 function headcount(d){
   if(isOut(d)) return 0;
   if(d===undefined||d===null) return state.persons;
@@ -499,7 +517,7 @@ function renderDays(){
         <span class="dinfo">
           <span class="dday">${JOURS[d]} ${fmtShort(dayOffset(d))}${isToday?' <span class="tonight">Ce soir</span>':""}</span>
           <b class="dish">${esc(r.nom)}</b>
-          <span class="dmeta"><span class="bdg b-${budgetOf(r)}">${BUDGETS[budgetOf(r)].court}</span> ${hc?`${r.t} min · ${hc} à table`:"Personne à table"}${state.cooks[d]?` · <span class="dcook">${esc(state.cooks[d])} cuisine</span>`:""}${pc&&hc?` · <span class="promo">promo</span>`:""}</span>
+          <span class="dmeta"><span class="bdg b-${budgetOf(r)}">${BUDGETS[budgetOf(r)].court}</span> ${hc?`${r.t} min · ${hc} à table`:"Personne à table"}${state.cooks[d]?` · <span class="dcook">${esc(state.cooks[d])} cuisine</span>`:(hc?` · <span class="dnocook">pas de cuisinier</span>`:"")}${pc&&hc?` · <span class="promo">promo</span>`:""}</span>
           ${w.length&&hc?`<span class="dwarn">${esc(w.join(", "))} n'aime${w.length>1?"nt":""} pas ce plat</span>`:""}
         </span>
         <span class="dchev" aria-hidden="true">›</span>
@@ -831,7 +849,7 @@ $("mbody").addEventListener("click",e=>{ if(e.target.id!=="mcopy") return;
 $("recipes").addEventListener("click",e=>{const b=e.target.closest("[data-openrec]"); if(b) openMeal(b.dataset.openrec,null);});
 $("trip1").onchange=e=>{state.trip1=e.target.value;state.checked={};save();render();toast("Course 1 : "+tripName(0));};
 $("trip2").onchange=e=>{state.trip2=+e.target.value;state.checked={};save();render();toast("Course 2 : "+tripName(1));};
-function render(){if(!$("view-menu")) return; $("trip1").value=state.trip1;$("trip2").value=String(state.trip2);renderWeekbar();renderPresences();renderBudget();renderStats();renderDays();renderCourses();renderPromos();renderRecettes();renderReglages();if(typeof renderRetours==="function")renderRetours();if(state.tab==="envies"&&typeof renderEnvies==="function")renderEnvies();}
+function render(){if(!$("view-menu")) return; $("trip1").value=state.trip1;$("trip2").value=String(state.trip2);renderWeekbar();renderACompleter();renderPresences();renderBudget();renderStats();renderDays();renderCourses();renderPromos();renderRecettes();renderReglages();if(typeof renderRetours==="function")renderRetours();if(state.tab==="envies"&&typeof renderEnvies==="function")renderEnvies();}
 $("sugg").addEventListener("change",e=>{const s=e.target.closest("select[data-add]"); if(!s||s.value==="") return;
   replaceDay(+s.value,s.dataset.add);});
 $("cmp").addEventListener("change",e=>{const inp=e.target.closest("input[data-pk]"); if(!inp) return;
