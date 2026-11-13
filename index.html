@@ -603,6 +603,24 @@ body.notowner .owner-only{display:none!important}
 .invite{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0}
 .invite code{flex:1 1 220px;min-width:0;overflow-wrap:anywhere;background:var(--accent-soft);color:var(--ink);padding:8px 10px;border-radius:10px;font-size:13px}
 #geoloc{margin:4px 0}
+
+/* Grand écran : la page utilise toute la largeur disponible */
+@media (min-width:860px){
+  .wrap{max-width:960px}
+  .days{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (min-width:1180px){
+  .wrap{max-width:1380px}
+  #view-menu:not([hidden]){display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:24px;align-items:start}
+  #view-courses:not([hidden]){display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:24px;align-items:start}
+  #view-courses .col-b>.sectitle:first-child{margin-top:0}
+  #view-famille:not([hidden]),#view-reglages:not([hidden]),#view-envies:not([hidden]){columns:2;column-gap:24px}
+  #view-famille>.panel,#view-reglages>.panel,#view-envies>.panel,#view-famille>details,#view-reglages>details{break-inside:avoid;page-break-inside:avoid}
+  .sbody{max-width:1040px}
+  .modal{max-width:760px}
+}
+@media (min-width:1600px){ .wrap{max-width:1560px} }
+@media (min-width:1900px){ #view-menu .days{grid-template-columns:repeat(3,minmax(0,1fr))} }
 </style>
 </head>
 <body>
@@ -634,16 +652,21 @@ body.notowner .owner-only{display:none!important}
 
   <!-- ===== MENU ===== -->
   <section id="view-menu">
+    <div class="col-a">
     <div class="panel weekbar" id="weekbar"></div>
     <div class="next" id="next"></div>
     <div class="panel retours" id="retoursbox" hidden></div>
     <details class="panel sum" id="budgetbox"><summary id="budgetsum"></summary><div id="budget"></div></details>
+    </div>
+    <div class="col-b">
     <div class="days" id="days"></div>
     <footer><button class="link edit-only" id="reset">Revenir au menu proposé</button></footer>
+    </div>
   </section>
 
   <!-- ===== COURSES ===== -->
   <section id="view-courses" hidden>
+    <div class="col-a">
     <div class="toolbar">
       <div class="progress"><span id="ptext"></span><div class="track"><i id="pbar"></i></div></div>
       <div class="actions">
@@ -656,6 +679,8 @@ body.notowner .owner-only{display:none!important}
     <details class="panel sum" id="planbox"><summary id="plansum"></summary><div id="plan"></div></details>
     <div id="aisles"></div>
     <p class="pantry"><b>À vérifier au placard :</b> huile, sel, poivre, ail, vinaigrette, sauce soja.</p>
+    </div>
+    <div class="col-b">
 
     <h2 class="sectitle" id="economies">Économiser</h2>
     <details class="panel sum" open><summary>Recettes qui profitent des promos <span class="badge" id="pcount"></span></summary>
@@ -670,6 +695,7 @@ body.notowner .owner-only{display:none!important}
       <div class="cmpwrap"><table class="cmp" id="cmp"></table></div>
       <p class="note" id="cmpnote"></p>
       <div class="actions"><button class="btn" id="clearprices">Effacer mes prix</button></div></details>
+    </div>
   </section>
 
   <!-- ===== FAMILLE ===== -->
