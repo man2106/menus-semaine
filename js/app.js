@@ -501,6 +501,7 @@ function renderCalendrier(){ const box=$("calendrier"), liste=$("days"); if(!box
   cases.push(`<div class="cbox bref"><span class="chead"><span>La semaine en bref</span></span><span class="cbody">
     <small>${homeDays().length} soirs à la maison · ${totalCouverts()} couverts</small><small>Budget ≈ ${eur(weekCost(state.gamme))}</small>
     ${state.family.length?`<small>Validations : ${ok.length}/${state.family.length}</small>`:""}
+    ${state.statut!=="valide"&&decompte(limiteDate())?`<small>Réponses avant ${esc(limiteTxt())} · il reste <b data-compte="${limiteDate().getTime()}">${decompte(limiteDate())}</b></small>`:""}
     <b style="color:${m.length?"var(--warm)":"var(--accent)"}">${m.length?"À compléter : "+esc(manquesTexte(m)):"✓ Prêt à être validé"}</b></span></div>`);
   box.innerHTML=cases.join("")+`<p class="calleg"><span><i style="background:var(--warm)"></i>à compléter</span><span><i style="background:var(--muted)"></i>pas de repas à la maison</span><span><i style="background:var(--accent)"></i>prêt</span></p>`; }
 document.addEventListener("click",e=>{ const v=e.target.closest("[data-vue]"); if(v){ state.vueMenu=v.dataset.vue; saveLocal(); renderCalendrier(); return; }
@@ -1149,18 +1150,28 @@ function renderWeekbar(){
 // ---- Validation par chaque membre et date limite ----
 const menuKey = () => state.week.join(",")+"|"+outList(state.exterieur).join("");
 function approvalOf(n){ const a=state.approbations[n]; if(!a) return null; return {...a, ancienne: a.menu && a.menu!==menuKey()}; }
-function limiteDate(){ return state.limite? new Date(state.limite) : null; }
+// Date limite de réponse : par défaut le samedi qui précède la semaine, à 10 h (jour de la première course)
+function limiteParDefaut(){ const d=new Date(MONDAY); d.setDate(d.getDate()-2); d.setHours(10,0,0,0); return d; }
+const isoLocal = d => isoOf(d)+"T"+String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0");
+function limiteDate(){ return state.limite? new Date(state.limite) : limiteParDefaut(); }
+// Décompte : « 1 j 12 h 05 min », mis à jour en continu dans tout élément portant data-compte
+function decompte(L){ let ms=L-Date.now(); if(ms<=0) return null; const j=Math.floor(ms/864e5); ms-=j*864e5; const h=Math.floor(ms/36e5); ms-=h*36e5; const m=Math.floor(ms/6e4), sec=Math.floor((ms-m*6e4)/1000);
+  return j?`${j} j ${h} h ${String(m).padStart(2,"0")} min`:h?`${h} h ${String(m).padStart(2,"0")} min`:`${m} min ${String(sec).padStart(2,"0")} s`; }
+setInterval(()=>{ document.querySelectorAll("[data-compte]").forEach(el=>{ const L=new Date(+el.dataset.compte), t=decompte(L);
+  if(t) el.textContent=t; else if(!el.dataset.fini){ el.dataset.fini="1"; render(); } }); },1000);
 function limiteTxt(){ const L=limiteDate(); if(!L||isNaN(L)) return null;
   return L.toLocaleDateString("fr-BE",{weekday:"long",day:"numeric",month:"long"})+" à "+L.toLocaleTimeString("fr-BE",{hour:"2-digit",minute:"2-digit"}); }
 function approvalStats(){ const ok=state.family.filter(n=>{const a=approvalOf(n); return a&&!a.ancienne;}); return {ok, wait:state.family.filter(n=>!ok.includes(n))}; }
 function renderApprovals(){
   if(!state.family.length) return "";
   const L=limiteDate(), past=L&&Date.now()>L.getTime(), {ok,wait}=approvalStats();
-  const left = L&&!past ? (()=>{const h=Math.round((L-Date.now())/3600000); return h<48?`encore ${h} h`:`encore ${Math.round(h/24)} jours`;})() : "";
+  const urgent=L&&!past&&(L-Date.now())<24*36e5;
   return `<div class="appr">
     <div class="apprhead"><b>Validation de la famille</b><span class="st ${wait.length?"soon":"on"}">${ok.length}/${state.family.length} ont validé</span></div>
-    <div class="apprdeadline${past?" late":""}">${L?(past?`Délai dépassé depuis ${esc(limiteTxt())}`:`Réponse attendue avant ${esc(limiteTxt())} · ${left}`):"Pas de date limite de réponse"}
-      <span class="owner-only edit-only"><label class="sr" for="limite">Date limite</label><input type="datetime-local" id="limite" value="${state.limite?esc(state.limite.slice(0,16)):""}" aria-label="Date limite de réponse">${state.limite?`<button class="chip" id="nolimite">Retirer</button>`:""}</span></div>
+    <div class="apprdeadline${past?" late":""}">
+      ${past?`<span>Délai dépassé depuis ${esc(limiteTxt())}</span>`:`<span>Réponse attendue avant <b>${esc(limiteTxt())}</b></span>
+        <span class="compte${urgent?" urgent":""}" role="timer" aria-live="off"><small>Il reste</small><b data-compte="${L.getTime()}">${decompte(L)}</b></span>`}
+      <span class="owner-only edit-only"><label class="sr" for="limite">Date limite</label><input type="datetime-local" id="limite" value="${esc(isoLocal(L))}" aria-label="Date limite de réponse" data-tip="Par défaut : le samedi avant la semaine, à 10 h">${state.limite?`<button class="chip" id="nolimite" data-tip="Revenir au samedi 10 h">Samedi 10 h</button>`:""}</span></div>
     <div class="apprlist">${state.family.map((n,i)=>{const a=approvalOf(n);
       const st=!a?"wait":a.ancienne?"old":"ok";
       return `<div class="apprrow ${st}"><span class="adot" aria-hidden="true">${st==="ok"?"✓":st==="old"?"!":"…"}</span><span class="aname"><b>${esc(n)}</b><small>${st==="ok"?"a validé "+ago(a.quand):st==="old"?"a validé une version précédente "+ago(a.quand):(past?"n'a pas répondu à temps":"n'a pas encore validé")}</small></span>
@@ -1176,7 +1187,7 @@ const APP_URL="https://man2106.github.io/menus-semaine/";
 function setLimite(v){ if(DB&&!IS_OWNER){ toast("Seul le propriétaire fixe la date limite"); return; }
   state.limite=v||null;
   if(DB){ LIMITES={...LIMITES}; if(v) LIMITES[curIso()]=v; else delete LIMITES[curIso()]; DB.doc("validations/menus").set({semaines:VALID,limites:LIMITES}).catch(()=>toast("La date limite n'a pas pu être enregistrée")); }
-  saveLocal(); render(); toast(v?"Réponse attendue avant "+limiteTxt():"Date limite retirée"); }
+  saveLocal(); render(); toast(v?"Réponse attendue avant "+limiteTxt():"Date limite : le samedi à 10 h, avant la première course"); }
 $("weekbar").addEventListener("change",e=>{ if(e.target.id==="limite"){ const v=e.target.value; if(v) setLimite(v); } });
 $("weekbar").addEventListener("click",e=>{
   const w=e.target.closest("[data-week]"); if(w&&!w.disabled){ goWeek(+w.dataset.week); toast(relWeek()+" : semaine du "+weekLabel()); return; }
