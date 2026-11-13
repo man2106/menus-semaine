@@ -1,0 +1,227 @@
+// =====================================================================
+// Menus de la semaine : connexion à Supabase
+// Fournit window.claude.use("db" | "user" | "downloads") à l'application,
+// avec la même interface que la version Claude, pour que le reste du code
+// ne change pas.
+// =====================================================================
+(function(){
+  const SB_URL = "https://ixxtgncailsbvlbumuqs.supabase.co";
+  const SB_KEY = "sb_publishable_LgqTWMGHMkRCpfc-BBBsgg_l5Lx6mMg"; // clé publique, faite pour être visible
+  window.APP_URL_PUBLIC = "https://man2106.github.io/menus-semaine/";
+
+  const sb = (window.supabase && window.supabase.createClient)
+    ? window.supabase.createClient(SB_URL, SB_KEY, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false, storageKey: "menus-semaine-auth" } })
+    : null;
+  window.__sb = sb;
+
+  let ACCES = null;        // { role, nom }
+  let UID = null;
+  let resolveReady; const ready = new Promise(r => { resolveReady = r; });
+  window.__acces = () => ACCES;
+
+  // ---------- Base de documents ----------
+  const CACHE = new Map();
+  const docListeners = new Map();   // path -> Set(cb)
+  const colListeners = new Set();   // {prefix, cb}
+  const clone = v => v === undefined ? undefined : JSON.parse(JSON.stringify(v));
+  const lastSeg = p => p.split("/").pop();
+
+  function snap(path, pending){
+    return { id: lastSeg(path), exists: CACHE.has(path), data: () => clone(CACHE.get(path)),
+             metadata: { hasPendingWrites: !!pending, fromCache: false } };
+  }
+  function qsnap(changes){
+    return { docChanges: () => changes.map(c => ({ type: c.type, doc: { id: lastSeg(c.path), data: () => clone(c.data) } })),
+             docs: changes.filter(c => c.type !== "removed").map(c => ({ id: lastSeg(c.path), data: () => clone(c.data) })) };
+  }
+  function emit(path, type, pending){
+    const set = docListeners.get(path); if (set) set.forEach(cb => { try { cb(snap(path, pending)); } catch(e){ console.error(e); } });
+    colListeners.forEach(l => { if (path.startsWith(l.prefix + "/") && path.split("/").length === l.prefix.split("/").length + 1) {
+      try { l.cb(qsnap([{ type, path, data: CACHE.get(path) }])); } catch(e){ console.error(e); } } });
+  }
+  async function loadAll(){
+    const { data, error } = await sb.from("docs").select("path,data");
+    if (error) throw error;
+    const seen = new Set();
+    data.forEach(r => { seen.add(r.path); const had = CACHE.has(r.path), same = had && JSON.stringify(CACHE.get(r.path)) === JSON.stringify(r.data);
+      CACHE.set(r.path, r.data); if (!same) emit(r.path, had ? "modified" : "added", false); });
+    [...CACHE.keys()].forEach(p => { if (!seen.has(p)) { CACHE.delete(p); emit(p, "removed", false); } });
+  }
+  let channel = null, firstSub = true;
+  async function startDb(){
+    await loadAll();
+    channel = sb.channel("docs-temps-reel")
+      .on("postgres_changes", { event: "*", schema: "public", table: "docs" }, p => {
+        const path = (p.new && p.new.path) || (p.old && p.old.path); if (!path) return;
+        if (p.eventType === "DELETE") { if (CACHE.has(path)) { CACHE.delete(path); emit(path, "removed", false); } return; }
+        const had = CACHE.has(path); CACHE.set(path, p.new.data); emit(path, had ? "modified" : "added", false);
+      })
+      .subscribe(st => { if (st === "SUBSCRIBED") { if (!firstSub) loadAll().catch(()=>{}); firstSub = false; } });
+    // à la reprise de l'appli (téléphone sorti de veille), on se remet à jour
+    document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") loadAll().catch(()=>{}); });
+  }
+  function refused(error){ const e = new Error(error && error.message || "refusé");
+    e.code = (error && (error.code === "42501" || /row-level security/i.test(error.message||""))) ? "invalid_argument" : "unavailable"; return e; }
+  function docRef(path){
+    return {
+      id: lastSeg(path),
+      async get(){ return snap(path, false); },
+      onSnapshot(cb, err){
+        if (!docListeners.has(path)) docListeners.set(path, new Set());
+        docListeners.get(path).add(cb); setTimeout(() => cb(snap(path, false)), 0);
+        return () => docListeners.get(path).delete(cb);
+      },
+      async set(data){
+        const prev = CACHE.get(path); CACHE.set(path, clone(data)); emit(path, prev === undefined ? "added" : "modified", true);
+        const { error } = await sb.from("docs").upsert({ path, data, updated_at: new Date().toISOString() });
+        if (error) { if (prev === undefined) CACHE.delete(path); else CACHE.set(path, prev); emit(path, "modified", false); throw refused(error); }
+      },
+      async update(fields){ return this.set({ ...(CACHE.get(path) || {}), ...fields }); },
+      async delete(){
+        const prev = CACHE.get(path); CACHE.delete(path); emit(path, "removed", true);
+        const { error } = await sb.from("docs").delete().eq("path", path);
+        if (error) { CACHE.set(path, prev); emit(path, "added", false); throw refused(error); }
+      }
+    };
+  }
+  const DB = {
+    doc: path => docRef(path),
+    collection: prefix => ({
+      doc: id => docRef(prefix + "/" + id),
+      onSnapshot(cb){
+        const l = { prefix, cb }; colListeners.add(l);
+        setTimeout(() => { const all = [...CACHE.keys()].filter(p => p.startsWith(prefix + "/") && p.split("/").length === prefix.split("/").length + 1).map(p => ({ type: "added", path: p, data: CACHE.get(p) })); cb(qsnap(all)); }, 0);
+        return () => colListeners.delete(l);
+      }
+    })
+  };
+
+  // ---------- Identité ----------
+  const PROFILS = new Map();
+  const USER = {
+    id: async () => UID,
+    me: async () => ({ id: UID, name: ACCES && ACCES.nom || "" }),
+    isOwner: () => !!(ACCES && ACCES.role === "proprio"),
+    canEdit: () => !!ACCES,
+    can: () => !!ACCES,
+    async profiles(ids){
+      const out = {}; const need = ids.filter(id => id && !PROFILS.has(id));
+      if (need.length) { const { data } = await sb.from("acces").select("uid,nom").in("uid", need); (data||[]).forEach(r => PROFILS.set(r.uid, r.nom || "")); }
+      ids.forEach(id => { if (id) out[id] = { id, name: PROFILS.get(id) || "", isMe: id === UID }; });
+      return out;
+    }
+  };
+
+  // ---------- Partage de fichiers (PDF) ----------
+  const DOWNLOADS = {
+    async save({ filename, data }){
+      const blob = data instanceof Blob ? data : new Blob([data], { type: "application/octet-stream" });
+      try {
+        const file = new File([blob], filename, { type: blob.type || "application/pdf" });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], title: filename }); return { status: "shared" }; }
+      } catch (e) { if (e && e.name === "AbortError") { const x = new Error("annulé"); x.code = "declined"; throw x; } }
+      const url = URL.createObjectURL(blob), a = document.createElement("a");
+      a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 5000);
+      return { status: "saved" };
+    }
+  };
+
+  window.claude = {
+    async use(name){
+      if (name === "downloads") return DOWNLOADS;
+      const ok = await ready; if (!ok) return null;
+      if (name === "db") return DB; if (name === "user") return USER; return null;
+    }
+  };
+
+  // ---------- Écran d'accueil : code famille ----------
+  const $ = id => document.getElementById(id);
+  function showGate(msg){
+    const g = $("gate"); if (!g) { resolveReady(false); return; }
+    const code = new URLSearchParams(location.search).get("code") || "";
+    if (code) $("g-code").value = code;
+    $("g-msg").textContent = msg || ""; g.hidden = false;
+    setTimeout(() => { try { (code ? $("g-nom") : $("g-code")).focus(); } catch(e){} }, 50);
+  }
+  async function enter(){
+    const code = $("g-code").value.trim(), nom = $("g-nom").value.trim();
+    if (!code) { $("g-msg").textContent = "Entrez le code reçu dans l'invitation."; return; }
+    if (!nom) { $("g-msg").textContent = "Indiquez votre prénom : il apparaît dans le journal des modifications."; return; }
+    $("g-go").disabled = true; $("g-msg").textContent = "Connexion…";
+    try {
+      const { data: role, error } = await sb.rpc("rejoindre", { code, nom }); if (error) throw error;
+      if (!role) { $("g-msg").textContent = "Ce code n'est pas le bon. Vérifiez-le dans votre invitation."; $("g-go").disabled = false; return; }
+      const r = await sb.rpc("mon_acces"); ACCES = r.data;
+      history.replaceState(null, "", location.pathname + location.hash);
+      await startDb(); $("gate").hidden = true; resolveReady(true); renderAcces();
+    } catch (e) {
+      $("g-msg").textContent = /essais/i.test(e.message||"") ? "Trop d'essais de code : réessayez dans un quart d'heure." : "Connexion impossible pour le moment. Vérifiez votre connexion Internet et réessayez.";
+    }
+    $("g-go").disabled = false;
+  }
+  async function boot(){
+    if (!sb) { resolveReady(false); return; }
+    try {
+      let { data: { session } } = await sb.auth.getSession();
+      if (!session) { const r = await sb.auth.signInAnonymously(); if (r.error) throw r.error; session = r.data.session; }
+      UID = session.user.id;
+      const { data, error } = await sb.rpc("mon_acces"); if (error) throw error;
+      if (data) { ACCES = data; await startDb(); resolveReady(true); renderAcces(); }
+      else showGate();
+    } catch (e) {
+      console.error(e);
+      showGate("Le partage n'est pas joignable pour le moment. Réessayez, ou continuez sans partage.");
+    }
+  }
+
+  // ---------- Réglages : accès de la famille ----------
+  async function renderAcces(){
+    const box = $("accesbox"); if (!box || !ACCES) return;
+    const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+    let html = `<h2>Accès de la famille</h2>
+      <p>Vous êtes connecté sur cet appareil en tant que <b>${esc(ACCES.nom || "?")}</b>${ACCES.role === "proprio" ? " (propriétaire)" : ""}.</p>
+      <div class="addrow"><input id="acc-nom" type="text" maxlength="30" value="${esc(ACCES.nom || "")}" aria-label="Mon prénom"><button class="btn" id="acc-nom-ok" type="button">Changer mon prénom</button></div>`;
+    if (ACCES.role === "proprio") {
+      const [{ data: code }, { data: devs }] = await Promise.all([sb.rpc("code_famille"), sb.from("acces").select("uid,nom,role,joined_at").order("joined_at")]);
+      window.INVITE_URL = window.APP_URL_PUBLIC + "?code=" + encodeURIComponent(code || "");
+      html += `<h3 class="shopray">Lien d'invitation</h3>
+        <p class="note">Toute personne qui ouvre ce lien et indique son prénom peut voir et modifier les menus. Ne le partagez qu'avec la famille.</p>
+        <div class="invite"><code id="acc-link">${esc(window.INVITE_URL)}</code><button class="btn primary" id="acc-copy" type="button">Copier le lien</button></div>
+        <p class="note">Code famille : <b>${esc(code)}</b></p>
+        <div class="addrow"><input id="acc-code" type="text" maxlength="40" placeholder="Nouveau code (6 caractères minimum)" aria-label="Nouveau code famille"><button class="btn" id="acc-code-ok" type="button">Changer le code</button></div>
+        <h3 class="shopray">Appareils connectés (${(devs||[]).length})</h3>
+        <div class="sorder">${(devs||[]).map(d => `<div class="sitem"><span class="srank">${esc((d.nom||"?").slice(0,1).toUpperCase())}</span><span class="sinfo"><b>${esc(d.nom||"Sans prénom")}${d.uid===UID?" (cet appareil)":""}</b><small>${d.role==="proprio"?"Propriétaire":"Membre"} · depuis le ${new Date(d.joined_at).toLocaleDateString("fr-BE")}</small></span>
+          <span class="sbtns">${d.role==="proprio"?"":`<button class="sbtn wide" data-retirer="${d.uid}">Retirer</button>`}</span></div>`).join("")}</div>`;
+    }
+    box.innerHTML = html; box.hidden = false;
+    if (typeof renderWeekbar === "function") { try { renderWeekbar(); } catch(e){} }
+  }
+  document.addEventListener("click", async e => {
+    const t = e.target.closest("button"); if (!t) return;
+    const toastFn = window.toast || (m => alert(m));
+    if (t.id === "g-go") { e.preventDefault(); enter(); }
+    if (t.id === "g-local") { $("gate").hidden = true; resolveReady(false); }
+    if (t.id === "acc-nom-ok") { const n = $("acc-nom").value.trim(); if (!n) return; await sb.rpc("definir_nom", { nom: n }); ACCES.nom = n; PROFILS.set(UID, n); toastFn("Prénom enregistré"); renderAcces(); }
+    if (t.id === "acc-copy") { try { await navigator.clipboard.writeText(window.INVITE_URL); toastFn("Lien d'invitation copié"); } catch(err){ toastFn(window.INVITE_URL); } }
+    if (t.id === "acc-code-ok") { const c = $("acc-code").value.trim(); const { error } = await sb.rpc("changer_code_famille", { nouveau: c });
+      if (error) toastFn(/court/.test(error.message) ? "Code trop court : 6 caractères minimum" : "Le code n'a pas pu être changé"); else { toastFn("Nouveau code enregistré : envoyez le nouveau lien"); renderAcces(); } }
+    if (t.dataset.retirer) { const { error } = await sb.rpc("retirer_acces", { cible: t.dataset.retirer }); toastFn(error ? "Impossible de retirer cet appareil" : "Accès retiré"); renderAcces(); }
+  });
+  document.addEventListener("keydown", e => { if (e.key === "Enter" && !$("gate").hidden && (e.target.id === "g-code" || e.target.id === "g-nom")) { e.preventDefault(); enter(); } });
+
+  // Géolocalisation (disponible sur un vrai site)
+  document.addEventListener("click", e => {
+    if (!e.target.closest || !e.target.closest("#geoloc")) return;
+    const toastFn = window.toast || (m => alert(m));
+    if (!navigator.geolocation) { toastFn("La position n'est pas disponible sur cet appareil"); return; }
+    toastFn("Recherche de votre position…");
+    navigator.geolocation.getCurrentPosition(p => {
+      if (typeof setHome === "function") setHome({ nom: "Ma position", precision: "exacte", lat: Math.round(p.coords.latitude*1e4)/1e4, lon: Math.round(p.coords.longitude*1e4)/1e4 });
+    }, err => toastFn(err.code === 1 ? "Position refusée : autorisez-la dans les réglages du navigateur" : "Position introuvable pour le moment"), { enableHighAccuracy: false, timeout: 15000, maximumAge: 600000 });
+  });
+
+  // Application installable : mise en cache pour l'ouverture hors ligne
+  if ("serviceWorker" in navigator) window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(()=>{}));
+
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot); else boot();
+})();
