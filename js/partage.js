@@ -208,6 +208,9 @@
         <div class="invite"><code id="acc-link">${esc(window.INVITE_URL)}</code><button class="btn primary" id="acc-copy" type="button">Copier le lien</button></div>
         <p class="note">Code famille : <b>${esc(code)}</b></p>
         <div class="addrow"><input id="acc-code" type="text" maxlength="40" placeholder="Nouveau code (6 caractères minimum)" aria-label="Nouveau code famille"><button class="btn" id="acc-code-ok" type="button">Changer le code</button></div>
+        <h3 class="shopray">Sauvegarde</h3>
+        <p class="note">Téléchargez de temps en temps une copie de toutes les données de la famille : menus, recettes, avis, sondage et goûts. ${(()=>{ let d=null; try{ d=localStorage.getItem("menus-semaine-sauvegarde"); }catch(e){} return d?"Dernière sauvegarde depuis cet appareil : "+new Date(d).toLocaleDateString("fr-BE")+".":"Aucune sauvegarde depuis cet appareil."; })()}</p>
+        <div class="actions"><button class="btn" id="acc-backup" type="button">Télécharger une sauvegarde</button></div>
         <h3 class="shopray">Appareils connectés (${(devs||[]).length})</h3>${avecVu ? "" : `<p class="note">Pour voir les dernières connexions, exécutez le script « mise-a-jour-connexions.sql » dans Supabase.</p>`}
         <div class="sorder">${(devs||[]).map(d => `<div class="sitem"><span class="srank">${esc((d.nom||"?").slice(0,1).toUpperCase())}</span><span class="sinfo"><b>${esc(d.nom||"Sans prénom")}${d.uid===UID?" (cet appareil)":""}</b><small>${avecVu ? esc(quandTxt(d.uid===UID ? new Date().toISOString() : d.vu_le)) + " · " : ""}${d.role==="proprio"?"Propriétaire":"Membre"} depuis le ${new Date(d.joined_at).toLocaleDateString("fr-BE")}</small></span>
           <span class="sbtns">${d.role==="proprio"?"":`<button class="sbtn wide" data-retirer="${d.uid}">Retirer</button>`}</span></div>`).join("")}</div>`;
@@ -224,6 +227,13 @@
     if (t.id === "acc-copy") { try { await navigator.clipboard.writeText(window.INVITE_URL); toastFn("Lien d'invitation copié"); } catch(err){ toastFn(window.INVITE_URL); } }
     if (t.id === "acc-code-ok") { const c = $("acc-code").value.trim(); const { error } = await sb.rpc("changer_code_famille", { nouveau: c });
       if (error) toastFn(/court/.test(error.message) ? "Code trop court : 6 caractères minimum" : "Le code n'a pas pu être changé"); else { toastFn("Nouveau code enregistré : envoyez le nouveau lien"); renderAcces(); } }
+    if (t.id === "acc-backup") {
+      const docs = {}; [...CACHE.keys()].sort().forEach(k => { docs[k] = CACHE.get(k); });
+      const jour = new Date().toISOString().slice(0, 10);
+      const data = new Blob([JSON.stringify({ application: "menus-semaine", version: 1, date: new Date().toISOString(), documents: docs }, null, 1)], { type: "application/json" });
+      try { await DOWNLOADS.save({ filename: `sauvegarde-menus-${jour}.json`, data }); try { localStorage.setItem("menus-semaine-sauvegarde", new Date().toISOString()); } catch (e) {} toastFn(`Sauvegarde prête : ${Object.keys(docs).length} documents`); renderAcces(); }
+      catch (e) { toastFn("Sauvegarde annulée"); }
+      return; }
     if (t.dataset.retirer) { const { error } = await sb.rpc("retirer_acces", { cible: t.dataset.retirer }); toastFn(error ? "Impossible de retirer cet appareil" : "Accès retiré"); renderAcces(); }
   });
   document.addEventListener("submit", e => { if (e.target && e.target.id === "gateform") { e.preventDefault(); enter(); } });
