@@ -58,3 +58,11 @@ Ne jamais modifier `index.html`, `js/`, `supabase/` ni les autres fichiers penda
 - `ing` : `[nom, quantité pour 5, unité, rayon]` ; unités `g`, `cl`, `""` (pièce) ou un mot (boîte, pot, sachet…) ; rayons `fl` fruits-légumes, `bou` boucherie, `cre` crèmerie, `bl` boulangerie, `epi` épicerie, `sur` surgelés. Réutiliser le nom exact d'un ingrédient de l'inventaire quand il existe ; sinon ajouter son prix de référence dans `prix` (`[prix, "kg" | "L" | "u"]`). Sel, poivre, huile, ail, épices courantes : ne pas les lister.
 - `etapes` : 3 à 8 phrases courtes, rédigées avec nos propres mots (ne pas recopier le texte du site source).
 - `source` : la page web qui a inspiré l'idée.
+
+## Propositions de la famille
+
+Les membres proposent des recettes dans l'onglet Envies (un lien, une envie décrite, ou la photo d'une recette).
+
+- `CLE_ROBOT=… node outils/suggestions.js lister` : écrit les propositions en attente dans `suggestions-a-traiter/` (une fiche `.json` par proposition, et la photo en `.jpg` s'il y en a une). Ce dossier n'est jamais publié.
+- Pour chaque proposition : lire la page du lien, ou regarder la photo, ou chercher sur le web une recette qui répond à l'envie. En faire une recette au format de `recettes.json` (5 personnes, 30 minutes maximum si possible ; ajouter `"propose_par": "<prénom>"`). Si ce n'est pas faisable (trop long, introuvable, doublon d'une recette existante), la refuser avec une explication courte et bienveillante.
+- Après la publication : `node outils/suggestions.js marquer <chemin> ajoutee <id>` ou `marquer <chemin> refusee "<explication>"`.

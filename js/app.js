@@ -2111,6 +2111,57 @@ document.addEventListener("click",e=>{ const b=e.target.closest("[data-retour],[
   if(D.rcomok!=null){ const inp=[...document.querySelectorAll("[data-rcom]")].find(x=>x.dataset.rcom===n); if(inp){ enregistrerRetour(c.iso,c.d,n,{com:inp.value.trim()}); toast("Commentaire enregistré"); } }
 });
 
+
+// ===================== Propositions de recettes par la famille =====================
+// Un lien, une envie en quelques mots, ou la photo d'une recette : la tâche du lundi et du mercredi en fait une recette de la bibliothèque.
+let SUGG={}, unsubSugg=null, suggForm={type:"lien",photo:null};
+function cleanSugg(x){ if(!x||typeof x!=="object") return null; const st=["attente","ajoutee","refusee"].includes(x.statut)?x.statut:"attente";
+  return {nom:propre(x.nom,30),type:["lien","envie","photo"].includes(x.type)?x.type:"envie",texte:propre(x.texte,600),
+    url:typeof x.url==="string"&&/^https?:\/\/[^\s"<>]{3,400}$/.test(x.url)?x.url:"",photo:typeof x.photo==="string"&&/^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(x.photo)&&x.photo.length<380000?x.photo:null,
+    quand:typeof x.quand==="string"?x.quand.slice(0,40):"",statut:st,recette:typeof x.recette==="string"&&/^[a-z0-9]{2,40}$/.test(x.recette)?x.recette:null,note:propre(x.note,300)}; }
+function subscribeSugg(){ if(!DB) return; if(unsubSugg) unsubSugg();
+  unsubSugg=DB.collection("suggestions").onSnapshot(q=>{ q.docChanges().forEach(c=>{ if(c.type==="removed") delete SUGG[c.doc.id]; else { const v=cleanSugg(c.doc.data()); if(v) SUGG[c.doc.id]=v; } }); if(state.tab==="envies") renderEnvies(); },()=>{}); }
+function compresserPhoto(file){ return new Promise((ok,ko)=>{ const img=new Image(), url=URL.createObjectURL(file);
+  img.onload=()=>{ let w=img.naturalWidth, h=img.naturalHeight, m=Math.min(1,1400/Math.max(w,h)); const c=document.createElement("canvas"); c.width=Math.round(w*m); c.height=Math.round(h*m);
+    c.getContext("2d").drawImage(img,0,0,c.width,c.height); URL.revokeObjectURL(url); let q=0.75, d=c.toDataURL("image/jpeg",q);
+    while(d.length>330000&&q>0.3){ q-=0.1; d=c.toDataURL("image/jpeg",q); } if(d.length>370000){ const c2=document.createElement("canvas"); c2.width=Math.round(c.width*0.7); c2.height=Math.round(c.height*0.7); c2.getContext("2d").drawImage(c,0,0,c2.width,c2.height); d=c2.toDataURL("image/jpeg",0.6); }
+    ok(d); }; img.onerror=()=>{ URL.revokeObjectURL(url); ko(new Error("image")); }; img.src=url; }); }
+function htmlSuggestions(){ const qui=envQui||(window.__acces&&window.__acces()&&window.__acces().nom)||"";
+  const T=[["lien","🔗 Un lien internet"],["envie","💬 Une envie, une idée"],["photo","📷 La photo d'une recette"]], f=suggForm;
+  const liste=Object.entries(SUGG).sort((a,b)=>String(b[1].quand).localeCompare(String(a[1].quand)));
+  return `<div class="panel" id="suggbox"><h2>Proposer une recette</h2>
+    <p>Un plat que vous aimeriez manger ? Donnez un lien vers une recette, décrivez votre envie (« des lasagnes végétariennes », « un plat thaï pas trop épicé ») ou photographiez une page de livre. Les propositions sont ajoutées à la bibliothèque le lundi ou le mercredi.</p>
+    <div class="gfilters wrapchips">${T.map(([k,l])=>`<button class="chip${f.type===k?" on":""}" data-sgtype="${k}" type="button">${l}</button>`).join("")}</div>
+    <form class="addrform" id="suggform" autocomplete="off">
+      ${f.type==="lien"?`<label class="wfield">Lien de la recette<input id="sg-url" type="url" inputmode="url" maxlength="400" placeholder="https://www.exemple.be/recette-de-…" required></label>`:""}
+      ${f.type==="photo"?`<label class="wfield">Photo de la recette<input id="sg-photo" type="file" accept="image/*" capture="environment"></label>${f.photo?`<img class="sgprev" src="${f.photo}" alt="Aperçu de la photo">`:""}`:""}
+      <label class="wfield">${f.type==="envie"?"Votre envie":"Un mot sur cette recette (facultatif)"}<textarea id="sg-texte" rows="3" maxlength="600" placeholder="${f.type==="envie"?"Ex. : un gratin de chicons, des wraps végétariens, quelque chose avec du saumon…":"Ex. : on l'a mangée chez mamie, sans les champignons pour les enfants"}"${f.type==="envie"?" required":""}></textarea></label>
+      <label class="wfield">Proposé par<select id="sg-nom" class="pick">${state.family.map(n=>`<option${n===qui?" selected":""}>${esc(n)}</option>`).join("")}<option value="">Quelqu'un de la famille</option></select></label>
+      <button class="btn primary edit-only" type="submit">Envoyer la proposition</button>
+    </form>
+    ${liste.length?`<h3 class="shopray">Propositions de la famille (${liste.length})</h3><div class="sglist">${liste.map(([id,x])=>{ const r=x.recette&&BYID[x.recette];
+      const st=x.statut==="ajoutee"?`<span class="bdg b-eco">Ajoutée</span>`:x.statut==="refusee"?`<span class="bdg b-plaisir">Pas retenue</span>`:`<span class="bdg b-moyen">En attente</span>`;
+      return `<div class="sgitem">${x.photo?`<img src="${x.photo}" alt="">`:`<span class="sgicon" aria-hidden="true">${x.type==="lien"?"🔗":"💬"}</span>`}<span class="sginfo"><b>${esc(x.texte||x.url||"Photo d'une recette")}</b>
+        <small>${st} ${esc(x.nom||"Quelqu'un")} · ${x.quand?new Date(x.quand).toLocaleDateString("fr-BE"):""}${x.url?` · <a href="${esc(x.url)}" target="_blank" rel="noopener noreferrer">voir le lien</a>`:""}</small>
+        ${r?`<small>Devenue : <button class="link" data-openrec="${r.id}" type="button">${esc(r.nom)}</button></small>`:x.statut==="ajoutee"?`<small>La recette arrive à la prochaine mise à jour.</small>`:""}${x.note?`<small>${esc(x.note)}</small>`:""}</span>
+        <button class="sbtn owner-only" data-sgdel="${esc(id)}" type="button" aria-label="Supprimer cette proposition">×</button></div>`; }).join("")}</div>`:""}
+  </div>`; }
+document.addEventListener("click",async e=>{ const o=e.target.closest("#suggbox [data-openrec]"); if(o){ openMeal(o.dataset.openrec,null); return; }
+  const b=e.target.closest("[data-sgtype],[data-sgdel]"); if(!b) return;
+  if(b.dataset.sgtype){ suggForm={type:b.dataset.sgtype,photo:null}; renderEnvies(); return; }
+  if(b.dataset.sgdel){ const id=b.dataset.sgdel; if(!DB) { delete SUGG[id]; renderEnvies(); return; } try{ await DB.collection("suggestions").doc(id).delete(); toast("Proposition supprimée"); }catch(err){ toast("Seul le propriétaire peut supprimer une proposition"); } } });
+document.addEventListener("change",async e=>{ if(e.target.id!=="sg-photo") return; const f=e.target.files&&e.target.files[0]; if(!f) return;
+  try{ suggForm.photo=await compresserPhoto(f); renderEnvies(); const s=$("suggbox"); if(s) s.scrollIntoView({block:"start"}); }catch(err){ toast("Cette photo n'a pas pu être lue"); } });
+document.addEventListener("submit",async e=>{ if(e.target.id!=="suggform") return; e.preventDefault();
+  const f=suggForm, texte=($("sg-texte")||{}).value||"", url=(($("sg-url")||{}).value||"").trim(), nom=($("sg-nom")||{}).value||"";
+  if(f.type==="lien"&&!/^https?:\/\/\S{3,}$/.test(url)){ toast("Collez le lien complet de la recette (il commence par https://)"); return; }
+  if(f.type==="photo"&&!f.photo){ toast("Choisissez d'abord une photo"); return; }
+  if(f.type==="envie"&&texte.trim().length<3){ toast("Décrivez votre envie en quelques mots"); return; }
+  const doc=cleanSugg({nom,type:f.type,texte,url,photo:f.photo,quand:new Date().toISOString(),statut:"attente"}); const id=Date.now().toString(36)+"-"+slugNom(nom||"famille");
+  if(!DB){ SUGG[id]=doc; suggForm={type:f.type,photo:null}; renderEnvies(); toast("Proposition notée sur cet appareil (partage non activé)"); return; }
+  try{ await DB.collection("suggestions").doc(id).set(doc); suggForm={type:f.type,photo:null}; toast("Merci ! Votre proposition sera ajoutée lundi ou mercredi"); }
+  catch(err){ toast("La proposition n'a pas pu être envoyée. Réessayez dans un instant."); } });
+
 // ===================== Envies : sondage, goûts de chacun et plannings suggérés =====================
 const ENVIE=[[1,"😍","J'en ai envie"],[0,"😐","Bof"],[-1,"🙅","Non merci"]];
 const PREF_VEGE=[[0,"Jamais"],[1,"1 soir"],[2,"2 soirs ou plus"]];
@@ -2202,6 +2253,7 @@ function renderEnvies(){ const box=$("view-envies"); if(!box) return;
       ${nbRep?`<details class="homeadv"><summary>Revoir mes réponses (${nbRep})</summary><div class="envmine">${Object.entries(sd.envies).map(([id,v])=>`<span class="chip on" data-envreset="${id}">${ENVIE.find(x=>x[0]===v)[1]} ${esc(BYID[id].nom)} ×</span>`).join("")}</div><p class="note">Touchez une réponse pour l'effacer.</p></details>`:""}`;
   } else html+=`<p class="note">Choisissez votre prénom pour répondre.</p>`;
   html+=`</div>`;
+  html+=htmlSuggestions();
   // --- 2. Les goûts de chacun ---
   html+=`<div class="panel"><h2>Les goûts de chacun</h2><p class="note">Ce profil se précise à chaque avis et chaque réponse au sondage.</p><div class="rtpeople">${fam.map(n=>{ const P=profil(n);
     const cu=Object.entries(P.cuis).filter(([,m])=>m>=3.8).sort((a,b)=>b[1]-a[1]).map(([k])=>CUISINES[k]); P.sd.prefs.cuisines.forEach(c=>{ if(!cu.includes(CUISINES[c])) cu.push(CUISINES[c]); });
@@ -2322,7 +2374,7 @@ setTimeout(peutEtreVisite,2500);
     IS_OWNER = u ? await u.isOwner() : true; if(!IS_OWNER) document.body.classList.add("notowner");
     DB.doc("validations/menus").onSnapshot(snap=>{ const dd=snap.exists?snap.data():{}; VALID=(dd.semaines&&typeof dd.semaines==="object")?{...dd.semaines}:{}; LIMITES=(dd.limites&&typeof dd.limites==="object")?{...dd.limites}:{}; applyValidation(); saveLocal(); render(); },()=>{});
     if(c===false){ document.body.classList.add("readonly"); }
-    subscribeRecettes(); subscribeGouts(); subscribeWeek(); subscribeFamily(); subscribeRetours(); subscribeSondage(); subscribeGoogle();
+    subscribeRecettes(); subscribeGouts(); subscribeWeek(); subscribeFamily(); subscribeRetours(); subscribeSondage(); subscribeSugg(); subscribeGoogle();
     setTimeout(maybeWizard,1500);
   }catch(e){ setSync("local"); setTimeout(maybeWizard,300); }
 })();
