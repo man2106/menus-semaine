@@ -639,7 +639,7 @@ body.notowner .owner-only{display:none!important}
               <label class="wfield">Localité<select id="addr-ville" class="pick" aria-label="Localité"><option value="">Entrez d'abord le code postal</option></select></label>
             </div>
             <button class="btn primary" type="submit">Utiliser cette adresse</button>
-            <p class="note">Le trajet part du centre de votre localité (à quelques centaines de mètres près). Votre adresse reste sur cet appareil : elle n'est pas partagée avec la famille.</p>
+            <p class="note">L'adresse est placée exactement sur la carte grâce à OpenStreetMap (le service reçoit seulement la rue, le code postal et la localité). Elle reste sur cet appareil : elle n'est pas partagée avec la famille.</p>
           </form>
         </details>
         <details class="homeadv"><summary>Position exacte (coordonnées Google Maps)</summary>
@@ -647,7 +647,8 @@ body.notowner .owner-only{display:none!important}
           <div class="addrow"><input id="homecoord" type="text" inputmode="text" autocomplete="off" placeholder="Lien Google Maps ou coordonnées" aria-label="Lien Google Maps ou coordonnées"><button class="btn primary" type="button" id="homeset">Utiliser</button></div>
         </details>
         <p class="note" id="homenote"></p>
-        <button class="btn primary" type="button" id="nearest">Choisir les magasins les plus proches de mon adresse</button>
+        <button class="btn primary" type="button" id="osmstores">Trouver les vrais magasins autour de mon adresse</button>
+        <button class="btn" type="button" id="nearest">Choisir les magasins les plus proches de mon adresse</button>
       </div>
       <p>Choisissez les magasins où vous faites vos courses et classez-les du préféré au moins aimé. Le premier est votre magasin habituel.</p>
       <label class="wfield">Comment choisir le magasin de chaque course
@@ -665,7 +666,7 @@ body.notowner .owner-only{display:none!important}
           <div class="rgrid2"><label class="wfield">Code postal<input id="as-cp" type="text" inputmode="numeric" maxlength="4" placeholder="7041"></label>
             <label class="wfield">Localité<select id="as-ville" class="pick"><option value="">Entrez d'abord le code postal</option></select></label></div>
           <button class="btn primary" type="submit">Ajouter ce magasin</button>
-          <p class="note">Le magasin est placé au centre de sa localité. Il reste sur cet appareil.</p>
+          <p class="note">Le magasin est placé à son adresse exacte quand elle est trouvée sur la carte, sinon au centre de sa localité. Il reste sur cet appareil.</p>
         </form>
       </details>
     </div>
@@ -893,6 +894,12 @@ if(![1,2,3,5].includes(state.seuil)) state.seuil=2;
 if(!state.weeks||typeof state.weeks!=="object") state.weeks={};
 if(!Array.isArray(state.customStores)) state.customStores=[];
 state.customStores=state.customStores.filter(m=>m&&typeof m.id==="string"&&/^c[a-z0-9]{3,20}$/.test(m.id)&&typeof m.lat==="number"&&typeof m.lon==="number"&&ENS[m.ens]).slice(0,30);
+const cleanTxt = t => String(t==null?"":t).replace(/[<>&"'`]/g,"").trim();
+if(!Array.isArray(state.osmStores)) state.osmStores=[];
+state.osmStores=state.osmStores.filter(m=>m&&typeof m.id==="string"&&/^o[nwr]\d{1,14}$/.test(m.id)&&typeof m.lat==="number"&&typeof m.lon==="number"&&ENS[m.ens]).slice(0,80);
+if(!state.storeFix||typeof state.storeFix!=="object") state.storeFix={};
+Object.entries(state.storeFix).forEach(([id,c])=>{ const m=MAGASINS.find(x=>x.id===id); if(m&&c&&typeof c.lat==="number"&&typeof c.lon==="number"){ m.lat=c.lat; m.lon=c.lon; if(c.lieu) m.lieu=cleanTxt(c.lieu).slice(0,80); m.osm=true; } });
+state.osmStores.forEach(m=>{ if(!MAGASINS.some(x=>x.id===m.id)) MAGASINS.push({id:m.id,ens:m.ens,nom:cleanTxt(m.nom).slice(0,40),lieu:cleanTxt(m.lieu).slice(0,80),lat:m.lat,lon:m.lon,osm:true}); });
 state.customStores.forEach(m=>{ if(!MAGASINS.some(x=>x.id===m.id)) MAGASINS.push({id:m.id,ens:m.ens,nom:String(m.nom).slice(0,40),lieu:String(m.lieu).slice(0,80),lat:m.lat,lon:m.lon,perso:true}); });
 if(state.home&&typeof state.home.lat==="number"&&typeof state.home.lon==="number"&&state.home.lat>49.3&&state.home.lat<51.6&&state.home.lon>2.4&&state.home.lon<6.5) HOME={nom:String(state.home.nom||"Mon domicile").slice(0,90),lat:state.home.lat,lon:state.home.lon,precision:state.home.precision==="exacte"?"exacte":"localite"}; else state.home=null;
 if(!Number.isInteger(state.weekOffset)||state.weekOffset<0||state.weekOffset>3) state.weekOffset=0;
@@ -932,7 +939,7 @@ function applyWeekData(w){ state.week=[...w.menu]; state.cooks=(w.cooks&&w.cooks
 { const w=state.weeks[curIso()]; if(w&&Array.isArray(w.menu)&&w.menu.length===7&&w.menu.every(id=>BYID[id])) applyWeekData(w); }
 if(!Array.isArray(state.cooks)||state.cooks.length!==7) state.cooks=Array(7).fill(null);
 function save(){ saveLocal(); if(typeof shareSync==="function"){ shareSync(); familySync(); goutsSync(); } }
-function saveLocal(){ stashWeek(); try{localStorage.setItem(KEY,JSON.stringify({outDefault:state.outDefault,customStores:state.customStores,home:state.home,perso:state.perso,avis:state.avis,exclus:state.exclus,storeOrder:state.storeOrder,storeOff:state.storeOff,storeMode:state.storeMode,onboarded:state.onboarded,emails:state.emails,weekOffset:state.weekOffset,weeks:state.weeks,statut:state.statut,journal:state.journal,week:state.week,persons:state.persons,checked:state.checked,tab:state.tab,family:state.family,cooks:state.cooks,prices:state.prices,trip1:state.trip1,trip2:state.trip2,tripStore:state.tripStore,gamme:state.gamme,maxStores:state.maxStores,seuil:state.seuil}))}catch(e){}}
+function saveLocal(){ stashWeek(); try{localStorage.setItem(KEY,JSON.stringify({outDefault:state.outDefault,customStores:state.customStores,osmStores:state.osmStores,osmAt:state.osmAt,storeFix:state.storeFix,home:state.home,perso:state.perso,avis:state.avis,exclus:state.exclus,storeOrder:state.storeOrder,storeOff:state.storeOff,storeMode:state.storeMode,onboarded:state.onboarded,emails:state.emails,weekOffset:state.weekOffset,weeks:state.weeks,statut:state.statut,journal:state.journal,week:state.week,persons:state.persons,checked:state.checked,tab:state.tab,family:state.family,cooks:state.cooks,prices:state.prices,trip1:state.trip1,trip2:state.trip2,tripStore:state.tripStore,gamme:state.gamme,maxStores:state.maxStores,seuil:state.seuil}))}catch(e){}}
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 function cookSelect(d,extra=""){
   const v=state.cooks[d];
@@ -1889,7 +1896,7 @@ function renderStoreOrder(){
   const custom=state.home&&!COMMUNES.some(([n])=>n===state.home.nom);
   if(state.home&&state.home.adresse&&!$("addr-cp").value){ $("addr-rue").value=state.home.adresse.rue||""; $("addr-cp").value=state.home.adresse.cp||""; }
   $("homesel").innerHTML=(custom?`<option value="__custom" selected>${esc(HOME.nom)}</option>`:"")+COMMUNES.map(([n])=>`<option value="${esc(n)}"${!custom&&HOME.nom===n?" selected":""}>${esc(n)}</option>`).join("");
-  $("homenote").textContent=`Les distances et les frais de route sont calculés depuis ${HOME.nom}${HOME.precision==="exacte"?"":" (centre approximatif)"}. Ce réglage est propre à cet appareil.`;
+  $("homenote").textContent=`Les distances et les frais de route sont calculés depuis ${HOME.nom}${HOME.precision==="exacte"?" (position exacte)":HOME.precision==="rue"?" (milieu de la rue)":" (centre de la localité : entrez votre rue pour plus de précision)"}. Ce réglage est propre à cet appareil.`;
   const n=state.storeOrder.length;
   $("sorder").innerHTML=state.storeOrder.map((id,i)=>{const m=MAGBYID(id);
     return `<li class="sitem"><span class="srank">${i+1}</span><span class="sinfo"><b>${esc(m.nom)}</b><small>${esc(m.lieu)} · ≈ ${kmTxt(km(HOME,m))}${i===0?" · magasin habituel":""}${m.perso?" · ajouté par vous":""}</small></span>
@@ -1905,6 +1912,7 @@ function renderStoreOrder(){
     : `Chaque rang de préférence vaut ${eur(PREF_EUR)} : un magasin moins bien classé n'est choisi que si ses promos compensent la différence et le trajet. Seuls vos magasins sont proposés.`;
 }
 function setHome(h){ HOME=h; state.home={...h}; saveLocal(); render();
+  if((h.precision==="exacte"||h.precision==="rue")&&typeof chercherMagasinsOSM==="function"&&!(state.osmAt&&km(state.osmAt,h)<2)){ toast("Position enregistrée. Recherche des magasins autour…"); chercherMagasinsOSM(); return; }
   const far=state.storeOrder.length&&state.storeOrder.every(id=>km(HOME,MAGBYID(id))>8);
   if(far) toast("Vos magasins sont loin de cette adresse.",()=>pickNearest(),"Prendre les plus proches"); else toast("Trajets calculés depuis "+h.nom); }
 // Garde le magasin le plus proche de chaque enseigne, jusqu'à 6, triés par distance
@@ -1912,6 +1920,51 @@ function pickNearest(){ const prev=[...state.storeOrder], seen=new Set();
   const list=MAGASINS.slice().sort((a,b)=>km(HOME,a)-km(HOME,b)).filter(m=>{ if(seen.has(m.ens)) return false; seen.add(m.ens); return true; }).slice(0,6);
   state.storeOrder=list.map(m=>m.id); state.tripStore=[null,null]; save(); render();
   toast(`Magasins les plus proches : ${list.slice(0,3).map(m=>MAGNOM[m.id]).join(", ")}…`,()=>{ state.storeOrder=prev; save(); render(); }); }
+// --- Position précise : adresse -> coordonnées, et vrais magasins autour (OpenStreetMap) ---
+async function geocodeAdresse(rue,cp,ville){
+  const tries=[rue, rue.replace(/\s*\d+[a-zA-Z]?(\s*(bte|bt|boîte|bus)\s*\w+)?\s*$/i,"").replace(/^\d+[a-zA-Z]?,?\s*/,"")].filter((v,i,a)=>v&&a.indexOf(v)===i);
+  for(const street of tries){
+    const u="https://nominatim.openstreetmap.org/search?"+new URLSearchParams({format:"jsonv2",countrycodes:"be",limit:"1","accept-language":"fr",street,postalcode:cp,city:ville});
+    const r=await fetch(u,{headers:{Accept:"application/json"}}); if(!r.ok) throw new Error("geocode "+r.status);
+    const j=await r.json(); if(j&&j[0]) return {lat:Math.round(+j[0].lat*1e5)/1e5, lon:Math.round(+j[0].lon*1e5)/1e5, exacte:street===rue&&/\d/.test(rue)};
+  }
+  return null;
+}
+const OSM_BRANDS=[[/bio ?planet/,"bioplanet"],[/louis delhaize/,"louisdelhaize"],[/delhaize|proxy/,"delhaize"],[/\baldi\b/,"aldi"],[/\blidl\b/,"lidl"],[/colruyt/,"colruyt"],[/carrefour/,"carrefour"],[/intermarche/,"inter"],[/\bokay\b/,"okay"],[/\bspar\b/,"spar"]];
+async function overpass(q){
+  for(const ep of ["https://overpass-api.de/api/interpreter","https://overpass.kumi.systems/api/interpreter"]){
+    try{ const r=await fetch(ep,{method:"POST",body:"data="+encodeURIComponent(q),headers:{"Content-Type":"application/x-www-form-urlencoded"}}); if(r.ok) return await r.json(); }catch(e){}
+  }
+  throw new Error("overpass");
+}
+let osmBusy=false;
+async function chercherMagasinsOSM(){
+  if(osmBusy) return; osmBusy=true; const btn=$("osmstores"); if(btn){ btn.disabled=true; btn.textContent="Recherche des magasins…"; }
+  try{
+    const R=15000, a=`(around:${R},${HOME.lat},${HOME.lon})`;
+    const j=await overpass(`[out:json][timeout:25];(nwr["shop"="supermarket"]${a};nwr["shop"="convenience"]["brand"]${a};);out center tags 300;`);
+    const found=[];
+    (j.elements||[]).forEach(el=>{ const t=el.tags||{}, txt=norm((t.brand||"")+" "+(t.name||"")+" "+(t.operator||""));
+      const b=OSM_BRANDS.find(([re])=>re.test(txt)); if(!b) return;
+      const lat=el.lat!=null?el.lat:el.center&&el.center.lat, lon=el.lon!=null?el.lon:el.center&&el.center.lon; if(typeof lat!=="number"||typeof lon!=="number") return;
+      const rue=cleanTxt([t["addr:street"],t["addr:housenumber"]].filter(Boolean).join(" ")), ville=cleanTxt(t["addr:city"]||t["addr:place"]||"");
+      found.push({id:"o"+el.type[0]+el.id, ens:b[1], nom:(cleanTxt(t.name||t.brand)||ENS[b[1]]).slice(0,40), lieu:([rue,ville].filter(Boolean).join(", ")||"Localisé sur la carte").slice(0,80), lat:Math.round(lat*1e5)/1e5, lon:Math.round(lon*1e5)/1e5}); });
+    if(!found.length){ toast("Aucun magasin trouvé autour de cette adresse"); return; }
+    // les magasins déjà connus reçoivent leur position exacte, les autres sont ajoutés
+    const fix={...state.storeFix}, add=[]; let corr=0;
+    found.forEach(f=>{ const twin=MAGASINS.filter(m=>!m.perso&&m.ens===f.ens&&!/^o[nwr]\d/.test(m.id)&&km(m,f)<1.2).sort((x,y)=>km(x,f)-km(y,f))[0];
+      if(twin){ if(!fix[twin.id]||km(fix[twin.id],f)>0.01){ fix[twin.id]={lat:f.lat,lon:f.lon,lieu:f.lieu!=="Localisé sur la carte"?f.lieu:twin.lieu}; corr++; } twin.lat=f.lat; twin.lon=f.lon; twin.osm=true; }
+      else add.push(f); });
+    state.storeFix=fix; state.osmAt={lat:HOME.lat,lon:HOME.lon};
+    const keep=state.osmStores.filter(m=>!add.some(x=>x.id===m.id));
+    state.osmStores=[...add,...keep].sort((x,y)=>km(HOME,x)-km(HOME,y)).slice(0,80);
+    state.osmStores.forEach(m=>{ const ex=MAGASINS.find(x=>x.id===m.id); if(ex) Object.assign(ex,m,{osm:true}); else MAGASINS.push({...m,osm:true}); });
+    save(); render();
+    toast(`${found.length} magasins trouvés dans un rayon de 15 km${corr?`, dont ${corr} ${corr>1?"repositionnés":"repositionné"} exactement`:""}.`,()=>pickNearest(),"Prendre les plus proches");
+  }catch(e){ toast("La recherche des magasins n'a pas abouti. Vérifiez votre connexion et réessayez."); }
+  finally{ osmBusy=false; if(btn){ btn.disabled=false; btn.textContent="Trouver les vrais magasins autour de mon adresse"; } }
+}
+$("osmstores").onclick=chercherMagasinsOSM;
 $("nearest").onclick=pickNearest;
 // ajout manuel d'un magasin
 async function fillVillesFor(cpId,selId){ const cp=$(cpId).value.trim(), sel=$(selId);
@@ -1923,7 +1976,8 @@ $("addstore").addEventListener("submit",async e=>{ e.preventDefault();
   const ens=$("as-ens").value, cp=$("as-cp").value.trim(), rue=$("as-rue").value.trim();
   const d=await loadCP(); const hits=d?d.filter(x=>x[0]===cp):[]; const h=hits[+$("as-ville").value];
   if(!h){ toast("Indiquez le code postal et la localité du magasin"); return; }
-  const m={id:"c"+Date.now().toString(36),ens,nom:($("as-nom").value.trim()||ENS[ens]).slice(0,40),lieu:(rue?rue+", ":"")+h[1],lat:h[2],lon:h[3]};
+  let g=null; if(rue){ try{ g=await geocodeAdresse(rue,cp,h[1]); }catch(err){} if(g&&km(g,{lat:h[2],lon:h[3]})>15) g=null; }
+  const m={id:"c"+Date.now().toString(36),ens,nom:($("as-nom").value.trim()||ENS[ens]).slice(0,40),lieu:(rue?rue+", ":"")+h[1],lat:g?g.lat:h[2],lon:g?g.lon:h[3]};
   state.customStores=[...state.customStores,m]; MAGASINS.push({...m,perso:true}); state.storeOrder=[...state.storeOrder,m.id];
   ["as-nom","as-rue","as-cp"].forEach(id=>$(id).value=""); $("as-ville").innerHTML='<option value="">Entrez d\'abord le code postal</option>'; $("addstorebox").open=false;
   save(); render(); toast(m.nom+" ajouté à vos magasins"); });
@@ -1951,7 +2005,11 @@ $("addrform").addEventListener("submit",async e=>{ e.preventDefault();
   if(!/^\d{4}$/.test(cp)){ toast("Entrez un code postal belge à 4 chiffres"); $("addr-cp").focus(); return; }
   const d=await loadCP(); if(!d){ toast("La liste des codes postaux n'a pas pu être chargée"); return; }
   const hits=d.filter(x=>x[0]===cp); const h=hits[+sel.value]; if(!h){ toast("Choisissez votre localité"); return; }
-  setHome({nom:(rue?rue+", ":"")+h[1], lat:h[2], lon:h[3], precision:"localite", adresse:{rue,cp,ville:h[1]}});
+  const nom=(rue?rue+", ":"")+h[1]; let g=null;
+  if(rue){ const b=e.submitter||$("addrform").querySelector("button[type=submit]"); b.disabled=true; b.textContent="Recherche de l'adresse…";
+    try{ g=await geocodeAdresse(rue,cp,h[1]); }catch(err){ g=null; } b.disabled=false; b.textContent="Utiliser cette adresse"; }
+  if(g&&km(g,{lat:h[2],lon:h[3]})<15){ setHome({nom, lat:g.lat, lon:g.lon, precision:g.exacte?"exacte":"rue", adresse:{rue,cp,ville:h[1]}}); }
+  else { setHome({nom, lat:h[2], lon:h[3], precision:"localite", adresse:{rue,cp,ville:h[1]}}); if(rue) setTimeout(()=>toast("Adresse introuvable sur la carte : le trajet part du centre de "+h[1]+". Vérifiez l'orthographe de la rue."),2600); }
   $("homeaddr").open=false; });
 $("outdef").addEventListener("click",e=>{ const b=e.target.closest("[data-outdef]"); if(!b) return; const d=+b.dataset.outdef, cur=new Set(state.outDefault);
   cur.has(d)?cur.delete(d):cur.add(d); state.outDefault=[...cur].sort(); save(); render();
