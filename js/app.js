@@ -647,8 +647,12 @@ function renderPlan(trips){
   $("plansum").innerHTML=`<span class="sumtitle">Trajet</span><span class="sumval">${plans.map(p=>MAGNOM[p.primary]+(p.secondary?" + "+MAGNOM[p.secondary]:"")).join(" puis ")} · ≈ ${kmTxt(totKm)}</span>`;
   return plans;
 }
+let tripVue=null; // course affichée sur téléphone (une à la fois)
+const tripAuto=()=>{ const t=[0,1].find(x=>tripDate(x)>=TODAY); return t===undefined?1:t; };
 function renderCourses(){
   const trips=coursesTrips(); let done=0, total=0;
+  if(tripVue===null) tripVue=tripAuto();
+  const tdone=trips.map(items=>items.filter(i=>state.checked[i.ck]).length);
   const plans=renderPlan(trips);
   $("aisles").innerHTML=trips.map((items,t)=>{
     const plan=plans[t], store=plan.primary, date=plan.date;
@@ -657,18 +661,19 @@ function renderCourses(){
     const stopsHtml=[plan.primary,plan.secondary].filter(Boolean).map((mag,si)=>{
       const sitems=items.filter(i=>plan.assign[i.k]===mag); if(!sitems.length) return "";
       const m=MAGBYID(mag), nP=sitems.filter(i=>promosFor(i.n).some(p=>p.mag===ensOf(mag)&&validOn(p,date))).length;
-    const groups=ORDRE.map(ray=>{const its=sitems.filter(i=>i.ray===ray); if(!its.length) return "";
+    const groups=ORDRE.map(ray=>{const its=sitems.filter(i=>i.ray===ray).sort((a,b)=>(!!state.checked[a.ck])-(!!state.checked[b.ck])); if(!its.length) return "";
       const rows=its.map(i=>{const c=!!state.checked[i.ck]; total++; if(c) done++;
         const tags=promosFor(i.n).map(p=>{const ok=validOn(p,date);
           const when= ok ? `jusqu'au ${fmtShort(isoDate(p.au))}` : (isoDate(p.du)>date ? `dès le ${fmtShort(isoDate(p.du))}, pas encore valable ce jour-là` : `terminée le ${fmtShort(isoDate(p.au))}`);
-          return `<span class="ptag"${ok&&p.mag===ensOf(mag)?"":' style="opacity:.6"'}>· Promo ${ENS[p.mag]} ${eur(p.prix)} ${when}</span>`}).join("");
+          return `<span class="ptag${ok&&p.mag===ensOf(mag)?"":" off"}">· Promo ${ENS[p.mag]} ${eur(p.prix)} ${when}</span>`}).join("");
         return `<label class="item${c?" checked":""}"><input type="checkbox" data-k="${esc(i.ck)}"${c?" checked":""}><span class="iname"><b>${esc(i.n)}</b><small>${[...i.pour].join(", ")}${i.freeze?'<span class="ptag" style="color:var(--accent)">· à congeler à l\'achat</span>':""}${tags}</small></span><span class="qty">${fmt(i.q,i.u)}</span></label>`}).join("");
       return `<div class="aisle"><h2><span>${RAYONS[ray]}</span><span>${its.length}</span></h2><div class="list">${rows}</div></div>`}).join("");
       return `<div class="stop"><div class="stophead"><span class="stopno">Arrêt ${si+1}</span><b>${esc(m.nom)}</b><small>${esc(m.lieu)} · ${sitems.length} article${sitems.length>1?"s":""}${nP?` · ${nP} en promo`:""} · ≈ ${eur(sitems.reduce((s,i)=>s+itemCost(i.n,i.u,i.q,i.ray),0))}</small></div>${groups}</div>`}).join("");
-    return `<div class="trip" id="trip-${t}"><div class="triphead"><div><div class="tripno">Course ${t+1} · ${fmtD(date)}</div><p class="note">${cover}</p></div>
+    return `<div class="trip${t===tripVue?" on":""}" id="trip-${t}"><div class="triphead"><div><div class="tripno">Course ${t+1} · ${fmtD(date)}</div><p class="note">${cover}</p></div>
       <button class="btn primary" data-shop="${t}" data-tip="Liste plein écran, rayon par rayon : cochez en avançant dans le magasin">Mode magasin</button>
       <label class="tripstore">Magasin principal <select data-store="${t}" aria-label="Magasin principal de la course ${t+1}"><option value="">Automatique</option>${orderedStores().map(m=>`<option value="${m.id}"${m.id===state.tripStore[t]?" selected":""}>${m.nom} · ${kmTxt(km(HOME,m))}</option>`).join("")}</select></label></div>
       <p class="note">${items.length} articles · ≈ ${eur(items.reduce((s,i)=>s+itemCost(i.n,i.u,i.q,i.ray),0))} (gamme ${GAMMES[state.gamme].nom.toLowerCase()}) · trajet ≈ ${kmTxt(plan.route)}</p>${stopsHtml}</div>`}).join("");
+  $("aisles").insertAdjacentHTML("afterbegin",`<div class="tripsel" role="tablist" aria-label="Choisir la course">${trips.map((items,t)=>`<button role="tab" data-tripvue="${t}" aria-selected="${t===tripVue}"><b>Course ${t+1}</b><small>${fmtShort(tripDate(t))} · ${tdone[t]}/${items.length}</small></button>`).join("")}</div>`);
   $("ptext").textContent=`${done} sur ${total} dans le caddie`;
   $("pbar").style.width=(total?done/total*100:0)+"%";
   $("ccount").textContent=total-done?String(total-done):"";
@@ -815,7 +820,7 @@ function goTo(tab,elId){ setTab(tab,{keepScroll:!!elId}); if(!elId) return;
   requestAnimationFrame(()=>{const el=$(elId); if(!el) return; el.scrollIntoView({behavior:"smooth",block:"start"}); el.classList.remove("flash"); void el.offsetWidth; el.classList.add("flash");}); }
 document.addEventListener("click",e=>{
   const g=e.target.closest("[data-goto]"); if(g){ e.preventDefault(); if(modalCtx) closeMeal(); goTo(g.dataset.goto,g.dataset.el||null); return; }
-  const tr=e.target.closest("[data-gotrip]"); if(tr){ e.preventDefault(); if(modalCtx) closeMeal(); goTo("courses","trip-"+tr.dataset.gotrip); }
+  const tr=e.target.closest("[data-gotrip]"); if(tr){ e.preventDefault(); if(modalCtx) closeMeal(); tripVue=+tr.dataset.gotrip; renderCourses(); goTo("courses","trip-"+tr.dataset.gotrip); }
 });
 // Bandeau « À suivre » : prochain repas et prochaine course
 function renderNext(){
@@ -1530,6 +1535,7 @@ $("mbody").addEventListener("click",e=>{ const b=e.target.closest("button"); if(
 });
 
 // --- Divers boutons ---
+$("aisles").addEventListener("click",e=>{ const v=e.target.closest("[data-tripvue]"); if(v){ tripVue=+v.dataset.tripvue; renderCourses(); return; } });
 $("aisles").addEventListener("click",e=>{ const b=e.target.closest("[data-shop]"); if(b) openSheet({type:"shop",t:+b.dataset.shop,stop:0,wake:true}); });
 $("members").addEventListener("click",e=>{ const b=e.target.closest("[data-gouts]"); if(b) openSheet({type:"gouts",i:+b.dataset.gouts}); });
 let ensFilter="";
