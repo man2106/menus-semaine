@@ -2203,6 +2203,15 @@ function pickNearest(){ const prev=[...state.storeOrder], seen=new Set();
 async function chercherAdresses(q){
   const out=[], add=(label,lat,lon,precis)=>{ lat=Math.round(+lat*1e5)/1e5; lon=Math.round(+lon*1e5)/1e5; if(!(lat>49.4&&lat<51.6&&lon>2.5&&lon<6.5)) return; if(!out.some(x=>km(x,{lat,lon})<0.03)) out.push({label,lat,lon,precis}); };
   const tm=ms=>{ const c=new AbortController(); setTimeout(()=>c.abort(),ms); return c.signal; };
+  // 1) Service officiel de la Région wallonne (adresses ICAR, registre officiel) : gratuit, sans clé
+  try{ const r=await fetch("https://geoservices.wallonie.be/geocodeWS/geocode?"+new URLSearchParams({address:q,crs:"EPSG:4326"}),{signal:tm(6000)});
+    if(r.ok){ const j=await r.json(); (j.candidates||[]).slice(0,6).forEach(c=>{ const g=c.geometry&&c.geometry.coordinates; if(!g) return; let [a,b]=g; if(a<40){ const t=a; a=b; b=t; } // [lon,lat] ou [lat,lon]
+      const nm=o=>o&&(o.name||o.ident)?String(o.name||o.ident):""; const sc=String(c.score||"");
+      const rue=[nm(c.street),c.house&&c.house.name].filter(Boolean).join(" "), lieu=[c.zone&&c.zone.ident,nm(c.city)].filter(Boolean).join(" ");
+      add(([rue,lieu].filter(Boolean).join(", ")||q).replace(/</g,""), a, b, sc==="111"||!!(c.house&&c.house.name)); }); }
+  }catch(e){}
+  if(out.length) return out;
+  // 2) Photon, puis 3) Nominatim (OpenStreetMap)
   try{ const r=await fetch("https://photon.komoot.io/api/?"+new URLSearchParams({q,limit:"7",lang:"fr",lat:String(HOME.lat),lon:String(HOME.lon),bbox:"2.5,49.45,6.45,51.55"}),{signal:tm(8000)});
     if(r.ok){ const j=await r.json(); (j.features||[]).forEach(f=>{ const p=f.properties||{}, c=f.geometry&&f.geometry.coordinates; if(!c||(p.countrycode&&p.countrycode!=="BE")) return;
       const rue=[p.street||(p.type==="street"?p.name:""),p.housenumber].filter(Boolean).join(" "), lieu=[p.postcode,p.city||p.district||p.locality||(p.type==="city"?p.name:"")].filter(Boolean).join(" ");
