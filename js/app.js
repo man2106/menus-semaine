@@ -846,6 +846,7 @@ function renderModal(){
       <div class="actions" style="margin-top:8px"><button class="btn" id="mcopy">Copier ces ingrédients</button></div></section>
     <section><h3><span>Préparation</span><span class="mtotal">${r.t} min</span></h3>${steps?`<ol class="steps">${steps}</ol>`:`<p class="note">Pas encore d'étapes pour cette recette.</p>`}</section>
     ${r.astuce?`<div class="mtip"><b>Astuce :</b> ${esc(r.astuce)}</div>`:""}
+    ${r.proposePar?`<p class="note">Recette proposée par ${esc(r.proposePar)}.</p>`:""}
     ${r.source?`<p class="note">Idée trouvée sur <a href="${esc(r.source.url)}" target="_blank" rel="noopener">${esc(r.source.titre||"le web")}</a>${r.ajoute?`, ajoutée le ${new Date(r.ajoute).toLocaleDateString("fr-BE")}`:""}.</p>`:""}
     ${avis}
     <p class="note">Sel, poivre, huile et ail sont à prendre au placard. Coût estimé selon la gamme ${GAMMES[state.gamme].nom.toLowerCase()}.</p>
@@ -2303,7 +2304,7 @@ function accepterRecette(x){
     b:["eco","moyen","plaisir"].includes(x.b)?x.b:undefined,p:PROT[x.p]?x.p:undefined,f:FECU[x.f]?x.f:undefined,c:CUISINES[x.c]?x.c:undefined,
     astuce:txtOk(x.astuce,200),ing,etapes,nouveau:true,
     source:x.source&&typeof x.source.url==="string"&&/^https:\/\//.test(x.source.url)?{titre:txtOk(x.source.titre,80),url:x.source.url.slice(0,300)}:null,
-    ajoute:typeof x.ajoute==="string"&&/^\d{4}-\d\d-\d\d$/.test(x.ajoute)?x.ajoute:null};
+    ajoute:typeof x.ajoute==="string"&&/^\d{4}-\d\d-\d\d$/.test(x.ajoute)?x.ajoute:null, proposePar:propre(x.propose_par,30)||null};
 }
 async function chargerDonnees(){
   const lire=async f=>{ try{ const r=await fetch(f+"?v="+Date.now(),{cache:"no-store"}); return r.ok?await r.json():null; }catch(e){ return null; } };

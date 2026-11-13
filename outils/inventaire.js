@@ -2,7 +2,7 @@
 // Utilisation : node outils/inventaire.js
 const fs = require("fs"), path = require("path");
 const racine = path.join(__dirname, "..");
-const html = fs.readFileSync(path.join(racine, "index.html"), "utf8");
+const html = fs.readFileSync(path.join(racine, "index.html"), "utf8") + "\n" + fs.readFileSync(path.join(racine, "js/app.js"), "utf8"); // le code de l'application est dans js/app.js
 const extra = JSON.parse(fs.readFileSync(path.join(racine, "donnees/recettes.json"), "utf8"));
 const recettes = [...html.matchAll(/^ \{id:"([a-z0-9]+)",nom:"([^"]+)",acc:"[^"]*",t:(\d+)(?:,b:"(\w+)")?(?:,p:"(\w+)")?(?:,f:"(\w+)")?(?:,c:"(\w+)")?/gm)]
   .map(m => ({ id: m[1], nom: m[2] }));

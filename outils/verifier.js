@@ -2,7 +2,7 @@
 // Utilisation : node outils/verifier.js
 const fs = require("fs"), path = require("path");
 const racine = path.join(__dirname, "..");
-const html = fs.readFileSync(path.join(racine, "index.html"), "utf8");
+const html = fs.readFileSync(path.join(racine, "index.html"), "utf8") + "\n" + fs.readFileSync(path.join(racine, "js/app.js"), "utf8"); // le code de l'application est dans js/app.js
 const err = []; const ok = (c, m) => { if (!c) err.push(m); };
 const ENS = Object.keys(eval("(" + html.match(/const ENS = (\{[^}]+\})/)[1] + ")"));
 const idsApp = new Set([...html.matchAll(/^ \{id:"([a-z0-9]+)",nom:/gm)].map(m => m[1]));
@@ -40,7 +40,7 @@ if (R) {
     ok(Array.isArray(r.ing) && r.ing.length >= 2 && r.ing.length <= 15, q + " : 2 à 15 ingrédients");
     (r.ing || []).forEach(g => ok(Array.isArray(g) && typeof g[0] === "string" && +g[1] > 0 && typeof g[2] === "string" && ["fl", "bou", "cre", "bl", "epi", "sur"].includes(g[3]), q + " : ingrédient mal formé " + JSON.stringify(g)));
     ok(Array.isArray(r.etapes) && r.etapes.length >= 3 && r.etapes.length <= 8, q + " : 3 à 8 étapes");
-    ok(r.source && /^https:\/\//.test(r.source.url || ""), q + " : source.url (https) manquante");
+    ok((r.source && /^https:\/\//.test(r.source.url || "")) || (typeof r.propose_par === "string" && r.propose_par), q + " : source.url (https) ou propose_par manquant");
     ok(jour.test(r.ajoute || ""), q + " : date « ajoute » manquante");
   });
 }
