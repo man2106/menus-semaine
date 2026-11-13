@@ -4,6 +4,11 @@
 //   CLE_ROBOT=... node outils/suggestions.js marquer <chemin> ajoutee <id-recette>
 //   CLE_ROBOT=... node outils/suggestions.js marquer <chemin> refusee "<explication courte>"
 const fs = require("fs"), path = require("path");
+// Derrière un proxy (sessions planifiées), Node doit utiliser HTTPS_PROXY : on se relance avec l'option prévue pour cela.
+if ((process.env.HTTPS_PROXY || process.env.https_proxy) && !process.env.NODE_USE_ENV_PROXY) {
+  const r = require("child_process").spawnSync(process.execPath, ["--no-warnings", ...process.argv.slice(1)], { stdio: "inherit", env: { ...process.env, NODE_USE_ENV_PROXY: "1" } });
+  process.exit(r.status === null ? 1 : r.status);
+}
 const URL_SB = "https://ixxtgncailsbvlbumuqs.supabase.co", CLE_PUBLIQUE = "sb_publishable_LgqTWMGHMkRCpfc-BBBsgg_l5Lx6mMg";
 const cle = process.env.CLE_ROBOT; if (!cle) { console.error("Variable CLE_ROBOT manquante"); process.exit(1); }
 async function rpc(nom, args) {
