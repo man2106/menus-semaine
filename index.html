@@ -1025,7 +1025,7 @@ const MAGASINS = [
  {id:"okay-roeulx",ens:"okay",nom:"OKay",lieu:"Rue d'Houdeng, Le Rœulx",lat:50.5004,lon:4.1179}
 ];
 // Enseignes : les promotions sont relevées par enseigne et valent dans tous ses magasins
-const ENS = {autre:"Autre",inter:"Intermarché",lidl:"Lidl",delhaize:"Delhaize",aldi:"Aldi",carrefour:"Carrefour",colruyt:"Colruyt",okay:"OKay",bioplanet:"Bio-Planet",spar:"Spar",louisdelhaize:"Louis Delhaize"};
+const ENS = {autre:"Autre",inter:"Intermarché",lidl:"Lidl",delhaize:"Delhaize",aldi:"Aldi",carrefour:"Carrefour",colruyt:"Colruyt",okay:"OKay",bioplanet:"Bio-Planet",spar:"Spar",louisdelhaize:"Louis Delhaize",ah:"Albert Heijn",jumbo:"Jumbo",match:"Match",cora:"Cora",eurospar:"Eurospar"};
 const ensOf = id => { const m=MAGASINS.find(x=>x.id===id); return m?m.ens:id; };
 // Domicile approximatif (Ghlin) ; distance routière estimée = vol d'oiseau × 1,3
 let HOME = {nom:"Ghlin",lat:50.48,lon:3.88};
@@ -2194,26 +2194,31 @@ async function geocodeAdresse(rue,cp,ville){
   }
   return null;
 }
-const OSM_BRANDS=[[/bio ?planet/,"bioplanet"],[/louis delhaize/,"louisdelhaize"],[/delhaize|proxy/,"delhaize"],[/\baldi\b/,"aldi"],[/\blidl\b/,"lidl"],[/colruyt/,"colruyt"],[/carrefour/,"carrefour"],[/intermarche/,"inter"],[/\bokay\b/,"okay"],[/\bspar\b/,"spar"]];
+const OSM_BRANDS=[[/bio ?planet/,"bioplanet"],[/louis delhaize/,"louisdelhaize"],[/delhaize|proxy|shop ?& ?go/,"delhaize"],[/\baldi\b/,"aldi"],[/\blidl\b/,"lidl"],[/colruyt/,"colruyt"],[/carrefour/,"carrefour"],[/intermarche|\bitm\b/,"inter"],[/\bok ?ay\b/,"okay"],[/eurospar/,"eurospar"],[/\bspar\b/,"spar"],[/albert heijn|\bah\b/,"ah"],[/\bjumbo\b/,"jumbo"],[/\bs?match\b/,"match"],[/\bcora\b/,"cora"]];
 async function overpass(q){
-  for(const ep of ["https://overpass-api.de/api/interpreter","https://overpass.kumi.systems/api/interpreter"]){
-    try{ const r=await fetch(ep,{method:"POST",body:"data="+encodeURIComponent(q),headers:{"Content-Type":"application/x-www-form-urlencoded"}}); if(r.ok) return await r.json(); }catch(e){}
+  // trois serveurs publics OpenStreetMap, 20 secondes maximum chacun
+  for(const ep of ["https://overpass-api.de/api/interpreter","https://overpass.private.coffee/api/interpreter","https://maps.mail.ru/osm/tools/overpass/api/interpreter"]){
+    const ctl=new AbortController(), tm=setTimeout(()=>ctl.abort(),20000);
+    try{ const r=await fetch(ep,{method:"POST",body:"data="+encodeURIComponent(q),headers:{"Content-Type":"application/x-www-form-urlencoded"},signal:ctl.signal}); clearTimeout(tm); if(r.ok) return await r.json(); }catch(e){ clearTimeout(tm); }
   }
   throw new Error("overpass");
 }
 let osmBusy=false;
 async function chercherMagasinsOSM(){
-  if(osmBusy) return; osmBusy=true; const btn=$("osmstores"); if(btn){ btn.disabled=true; btn.textContent="Recherche des magasins…"; }
+  if(osmBusy) return; if(HOME.precision!=="exacte"&&HOME.precision!=="rue") toast("Astuce : entrez votre rue dans « Entrer mon adresse » pour une recherche plus précise.");
+  osmBusy=true; const btn=$("osmstores"); if(btn){ btn.disabled=true; btn.textContent="Recherche des magasins…"; }
   try{
     const R=RAYON_KM*1000, a=`(around:${R},${HOME.lat},${HOME.lon})`;
     const j=await overpass(`[out:json][timeout:25];(nwr["shop"="supermarket"]${a};nwr["shop"="convenience"]["brand"]${a};);out center tags 300;`);
     const found=[];
     (j.elements||[]).forEach(el=>{ const t=el.tags||{}, txt=norm((t.brand||"")+" "+(t.name||"")+" "+(t.operator||""));
-      const b=OSM_BRANDS.find(([re])=>re.test(txt)); if(!b) return;
+      let b=OSM_BRANDS.find(([re])=>re.test(txt)); if(!b){ if(t.shop!=="supermarket"||!t.name) return; b=[null,"autre"]; }
       const lat=el.lat!=null?el.lat:el.center&&el.center.lat, lon=el.lon!=null?el.lon:el.center&&el.center.lon; if(typeof lat!=="number"||typeof lon!=="number") return;
       const rue=cleanTxt([t["addr:street"],t["addr:housenumber"]].filter(Boolean).join(" ")), ville=cleanTxt(t["addr:city"]||t["addr:place"]||"");
       found.push({id:"o"+el.type[0]+el.id, ens:b[1], nom:(cleanTxt(t.name||t.brand)||ENS[b[1]]).slice(0,40), lieu:([rue,ville].filter(Boolean).join(", ")||"Localisé sur la carte").slice(0,80), lat:Math.round(lat*1e5)/1e5, lon:Math.round(lon*1e5)/1e5}); });
-    if(!found.length){ toast("Aucun magasin trouvé autour de cette adresse"); return; }
+    // le même magasin est parfois dessiné deux fois (un point et le bâtiment) : on n'en garde qu'un
+    for(let i=found.length-1;i>=0;i--){ if(found.some((g,k)=>k<i&&g.ens===found[i].ens&&km(g,found[i])<0.15)) found.splice(i,1); }
+    if(!found.length){ toast(`Aucun supermarché trouvé à moins de ${RAYON_KM} km de ${HOME.nom}. Vérifiez votre adresse.`); return; }
     // les magasins déjà connus reçoivent leur position exacte, les autres sont ajoutés
     const fix={...state.storeFix}, add=[]; let corr=0;
     found.forEach(f=>{ const twin=MAGASINS.filter(m=>!m.perso&&m.ens===f.ens&&!/^o[nwr]\d/.test(m.id)&&km(m,f)<1.2).sort((x,y)=>km(x,f)-km(y,f))[0];
@@ -2225,7 +2230,7 @@ async function chercherMagasinsOSM(){
     state.osmStores.forEach(m=>{ const ex=MAGASINS.find(x=>x.id===m.id); if(ex) Object.assign(ex,m,{osm:true}); else MAGASINS.push({...m,osm:true}); });
     save(); render();
     toast(`${found.length} magasins trouvés dans un rayon de ${RAYON_KM} km${corr?`, dont ${corr} ${corr>1?"repositionnés":"repositionné"} exactement`:""}.`,()=>pickNearest(),"Prendre les plus proches");
-  }catch(e){ toast("La recherche des magasins n'a pas abouti. Vérifiez votre connexion et réessayez."); }
+  }catch(e){ toast("Le service de carte OpenStreetMap ne répond pas pour le moment. Réessayez dans une minute."); }
   finally{ osmBusy=false; if(btn){ btn.disabled=false; btn.textContent="Trouver les vrais magasins autour de mon adresse"; } }
 }
 $("osmstores").onclick=chercherMagasinsOSM;
