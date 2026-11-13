@@ -435,7 +435,7 @@ function applyWeekData(w){ state.week=[...w.menu]; state.cooks=(Array.isArray(w.
 { const w=state.weeks[curIso()]; if(w&&Array.isArray(w.menu)&&w.menu.length===7&&w.menu.every(id=>BYID[id])) applyWeekData(w); }
 if(!Array.isArray(state.cooks)||state.cooks.length!==7) state.cooks=Array(7).fill(null);
 function save(){ saveLocal(); if(typeof shareSync==="function"){ shareSync(); familySync(); goutsSync(); } }
-function saveLocal(){ stashWeek(); try{localStorage.setItem(KEY,JSON.stringify({outDefault:state.outDefault,mix:state.mix,rayon:state.rayon,customStores:state.customStores,osmStores:state.osmStores,osmAt:state.osmAt,storeFix:state.storeFix,home:state.home,perso:state.perso,avis:state.avis,exclus:state.exclus,storeOrder:state.storeOrder,storeOff:state.storeOff,storeMode:state.storeMode,onboarded:state.onboarded,emails:state.emails,weekOffset:state.weekOffset,weeks:state.weeks,statut:state.statut,journal:state.journal,week:state.week,persons:state.persons,checked:state.checked,tab:state.tab,family:state.family,cooks:state.cooks,prices:state.prices,trip1:state.trip1,trip2:state.trip2,tripStore:state.tripStore,gamme:state.gamme,maxStores:state.maxStores,seuil:state.seuil}))}catch(e){}}
+function saveLocal(){ stashWeek(); try{localStorage.setItem(KEY,JSON.stringify({outDefault:state.outDefault,mix:state.mix,rayon:state.rayon,vueMenu:state.vueMenu,customStores:state.customStores,osmStores:state.osmStores,osmAt:state.osmAt,storeFix:state.storeFix,home:state.home,perso:state.perso,avis:state.avis,exclus:state.exclus,storeOrder:state.storeOrder,storeOff:state.storeOff,storeMode:state.storeMode,onboarded:state.onboarded,emails:state.emails,weekOffset:state.weekOffset,weeks:state.weeks,statut:state.statut,journal:state.journal,week:state.week,persons:state.persons,checked:state.checked,tab:state.tab,family:state.family,cooks:state.cooks,prices:state.prices,trip1:state.trip1,trip2:state.trip2,tripStore:state.tripStore,gamme:state.gamme,maxStores:state.maxStores,seuil:state.seuil}))}catch(e){}}
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 function cookSelect(d,extra=""){
   const v=state.cooks[d];
@@ -483,6 +483,30 @@ function manques(){ const l=[];
 function manquesTexte(m){ const liste=l=>l.length>1?l.slice(0,-1).join(", ")+" et "+l[l.length-1]:l[0];
   const j=x=>JOURS[x.d].toLowerCase(), pc=m.filter(x=>x.court.startsWith("pas de cuisinier")).map(j), pp=m.filter(x=>x.court.startsWith("pas de plat")).map(j);
   return [pp.length?"il manque un plat "+liste(pp):"",pc.length?"il manque un cuisinier "+liste(pc):""].filter(Boolean).join(" ; "); }
+// ---- Vue calendrier : la semaine comme dans l'export PDF, cases à compléter en orange ----
+function renderCalendrier(){ const box=$("calendrier"), liste=$("days"); if(!box||!liste) return;
+  const cal=(state.vueMenu||(innerWidth>=700?"cal":"liste"))==="cal"; box.hidden=!cal; liste.hidden=cal;
+  document.querySelectorAll("[data-vue]").forEach(b=>b.classList.toggle("on",(b.dataset.vue==="cal")===cal));
+  if(!cal) return;
+  const cases=menuRows().map(x=>{ const today=x.date.getTime()===TODAY.getTime(), head=`<span class="chead"><span>${JOURS[x.d]}</span><small>${fmtShort(x.date)}</small></span>`;
+    if(x.out) return `<div class="cbox dehors">${head}<span class="cvide"><b>Pas de repas à la maison</b><span>Soir à l'extérieur</span><button class="chip edit-only" data-acout="${x.d}" type="button">Prévoir un repas</button></span></div>`;
+    if(!x.hc) return `<div class="cbox dehors">${head}<span class="cvide"><b>Personne à table</b><span>Tout le monde est absent</span></span></div>`;
+    if(!x.r) return `<div class="cbox manque">${head}<span class="cvide"><b>Aucun plat prévu</b><button class="chip on edit-only" data-cpick="${x.d}" type="button">Choisir un plat</button></span></div>`;
+    const sansCuisinier=!x.cook;
+    return `<div class="cbox${today?" today":""}${sansCuisinier?" manque":""}" data-copen="${x.d}" role="button" tabindex="0" aria-label="${JOURS[x.d]} : ${esc(x.r.nom)}">${head}
+      <img src="${photoSrc(x.r.id)}" alt="" loading="lazy" data-cache-err="1">
+      <span class="cbody"><b>${esc(x.r.nom)}</b>${x.r.acc?`<small>avec ${esc(x.r.acc.toLowerCase())}</small>`:""}<small><span class="bdg b-${budgetOf(x.r)}">${BUDGETS[budgetOf(x.r)].court}</span> ${x.r.t} min${x.abs.length?` · absent : ${x.abs.map(esc).join(", ")}`:""}${x.inv?` · +${x.inv} invité${x.inv>1?"s":""}`:""}</small></span>
+      <span class="cfoot"><span><small>Cuisine</small>${sansCuisinier?(state.family.length?`<span class="edit-only">${cookSelect(x.d)}</span>`:"<b>à définir</b>"):`<b>${esc(x.cook)}</b>`}</span><span><small>Couverts</small><span class="ccouv">${x.hc}</span></span></span></div>`; });
+  const m=manques(), {ok}=approvalStats();
+  cases.push(`<div class="cbox bref"><span class="chead"><span>La semaine en bref</span></span><span class="cbody">
+    <small>${homeDays().length} soirs à la maison · ${totalCouverts()} couverts</small><small>Budget ≈ ${eur(weekCost(state.gamme))}</small>
+    ${state.family.length?`<small>Validations : ${ok.length}/${state.family.length}</small>`:""}
+    <b style="color:${m.length?"var(--warm)":"var(--accent)"}">${m.length?"À compléter : "+esc(manquesTexte(m)):"✓ Prêt à être validé"}</b></span></div>`);
+  box.innerHTML=cases.join("")+`<p class="calleg"><span><i style="background:var(--warm)"></i>à compléter</span><span><i style="background:var(--muted)"></i>pas de repas à la maison</span><span><i style="background:var(--accent)"></i>prêt</span></p>`; }
+document.addEventListener("click",e=>{ const v=e.target.closest("[data-vue]"); if(v){ state.vueMenu=v.dataset.vue; saveLocal(); renderCalendrier(); return; }
+  const pk=e.target.closest("[data-cpick]"); if(pk){ openSheet({type:"gallery",d:+pk.dataset.cpick}); return; }
+  if(e.target.closest("select,button,a")) return; const c=e.target.closest("[data-copen]"); if(c) openMeal(state.week[+c.dataset.copen],+c.dataset.copen); });
+document.addEventListener("keydown",e=>{ if(e.key!=="Enter") return; const c=e.target.closest&&e.target.closest("[data-copen]"); if(c&&e.target===c) openMeal(state.week[+c.dataset.copen],+c.dataset.copen); });
 // ---- Page principale : les soirs sans repas prévu ou sans cuisinier ----
 function renderACompleter(){ const box=$("acompleter"); if(!box) return;
   const sansCuisinier=homeDays().filter(d=>headcount(d)>0&&!state.cooks[d]);
@@ -877,7 +901,7 @@ $("mbody").addEventListener("click",e=>{ if(e.target.id!=="mcopy") return;
 $("recipes").addEventListener("click",e=>{const b=e.target.closest("[data-openrec]"); if(b) openMeal(b.dataset.openrec,null);});
 $("trip1").onchange=e=>{state.trip1=e.target.value;state.checked={};save();render();toast("Course 1 : "+tripName(0));};
 $("trip2").onchange=e=>{state.trip2=+e.target.value;state.checked={};save();render();toast("Course 2 : "+tripName(1));};
-function render(){if(!$("view-menu")) return; $("trip1").value=state.trip1;$("trip2").value=String(state.trip2);renderWeekbar();renderACompleter();renderPresences();renderBudget();renderStats();renderDays();renderCourses();renderPromos();renderRecettes();renderReglages();if(typeof renderRetours==="function")renderRetours();if(state.tab==="envies"&&typeof renderEnvies==="function")renderEnvies();}
+function render(){if(!$("view-menu")) return; $("trip1").value=state.trip1;$("trip2").value=String(state.trip2);renderWeekbar();renderACompleter();renderCalendrier();renderPresences();renderBudget();renderStats();renderDays();renderCourses();renderPromos();renderRecettes();renderReglages();if(typeof renderRetours==="function")renderRetours();if(state.tab==="envies"&&typeof renderEnvies==="function")renderEnvies();}
 $("sugg").addEventListener("change",e=>{const s=e.target.closest("select[data-add]"); if(!s||s.value==="") return;
   replaceDay(+s.value,s.dataset.add);});
 $("cmp").addEventListener("change",e=>{const inp=e.target.closest("input[data-pk]"); if(!inp) return;
