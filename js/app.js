@@ -902,7 +902,7 @@ $("mbody").addEventListener("click",e=>{ if(e.target.id!=="mcopy") return;
 $("recipes").addEventListener("click",e=>{const b=e.target.closest("[data-openrec]"); if(b) openMeal(b.dataset.openrec,null);});
 $("trip1").onchange=e=>{state.trip1=e.target.value;state.checked={};save();render();toast("Course 1 : "+tripName(0));};
 $("trip2").onchange=e=>{state.trip2=+e.target.value;state.checked={};save();render();toast("Course 2 : "+tripName(1));};
-function render(){if(!$("view-menu")) return; $("trip1").value=state.trip1;$("trip2").value=String(state.trip2);renderWeekbar();renderACompleter();renderCalendrier();renderPresences();renderBudget();renderStats();renderDays();renderCourses();renderPromos();renderRecettes();renderReglages();if(typeof renderRetours==="function")renderRetours();if(state.tab==="envies"&&typeof renderEnvies==="function")renderEnvies();}
+function render(){if(!$("view-menu")) return; $("trip1").value=state.trip1;$("trip2").value=String(state.trip2);renderWeekbar();renderCompteHaut();renderACompleter();renderCalendrier();renderPresences();renderBudget();renderStats();renderDays();renderCourses();renderPromos();renderRecettes();renderReglages();if(typeof renderRetours==="function")renderRetours();if(state.tab==="envies"&&typeof renderEnvies==="function")renderEnvies();}
 $("sugg").addEventListener("change",e=>{const s=e.target.closest("select[data-add]"); if(!s||s.value==="") return;
   replaceDay(+s.value,s.dataset.add);});
 $("cmp").addEventListener("change",e=>{const inp=e.target.closest("input[data-pk]"); if(!inp) return;
@@ -1154,9 +1154,16 @@ function approvalOf(n){ const a=state.approbations[n]; if(!a) return null; retur
 function limiteParDefaut(){ const d=new Date(MONDAY); d.setDate(d.getDate()-2); d.setHours(10,0,0,0); return d; }
 const isoLocal = d => isoOf(d)+"T"+String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0");
 function limiteDate(){ return state.limite? new Date(state.limite) : limiteParDefaut(); }
+// Décompte affiché en haut à droite de la page
+function renderCompteHaut(){ const box=$("comptehaut"); if(!box) return; const L=limiteDate();
+  if(!state.family.length||!L||isNaN(L)){ box.hidden=true; return; } box.hidden=false; const t=decompte(L);
+  if(state.statut==="valide"){ box.className="comptehaut"; box.innerHTML=`<small>Menu validé</small><b>✓</b><small>Semaine du ${esc(weekLabel())}</small>`; return; }
+  box.className="comptehaut"+(!t?" fini":(L-Date.now())<24*36e5?" urgent":"");
+  box.innerHTML=t?`<small>Validation du menu : il reste</small><b role="timer" data-compte="${L.getTime()}">${t}</b><small>avant ${esc(limiteTxt())}</small>`:`<small>Validation du menu</small><b>Délai dépassé</b><small>depuis ${esc(limiteTxt())}</small>`; }
 // Décompte : « 1 j 12 h 05 min », mis à jour en continu dans tout élément portant data-compte
 function decompte(L){ let ms=L-Date.now(); if(ms<=0) return null; const j=Math.floor(ms/864e5); ms-=j*864e5; const h=Math.floor(ms/36e5); ms-=h*36e5; const m=Math.floor(ms/6e4), sec=Math.floor((ms-m*6e4)/1000);
-  return j?`${j} j ${h} h ${String(m).padStart(2,"0")} min`:h?`${h} h ${String(m).padStart(2,"0")} min`:`${m} min ${String(sec).padStart(2,"0")} s`; }
+  const mm=String(m).padStart(2,"0"), ss=String(sec).padStart(2,"0");
+  return j?`${j} j ${h} h ${mm} min ${ss} s`:h?`${h} h ${mm} min ${ss} s`:`${m} min ${ss} s`; }
 setInterval(()=>{ document.querySelectorAll("[data-compte]").forEach(el=>{ const L=new Date(+el.dataset.compte), t=decompte(L);
   if(t) el.textContent=t; else if(!el.dataset.fini){ el.dataset.fini="1"; render(); } }); },1000);
 function limiteTxt(){ const L=limiteDate(); if(!L||isNaN(L)) return null;
@@ -1170,7 +1177,7 @@ function renderApprovals(){
     <div class="apprhead"><b>Validation de la famille</b><span class="st ${wait.length?"soon":"on"}">${ok.length}/${state.family.length} ont validé</span></div>
     <div class="apprdeadline${past?" late":""}">
       ${past?`<span>Délai dépassé depuis ${esc(limiteTxt())}</span>`:`<span>Réponse attendue avant <b>${esc(limiteTxt())}</b></span>
-        <span class="compte${urgent?" urgent":""}" role="timer" aria-live="off"><small>Il reste</small><b data-compte="${L.getTime()}">${decompte(L)}</b></span>`}
+`}
       <span class="owner-only edit-only"><label class="sr" for="limite">Date limite</label><input type="datetime-local" id="limite" value="${esc(isoLocal(L))}" aria-label="Date limite de réponse" data-tip="Par défaut : le samedi avant la semaine, à 10 h">${state.limite?`<button class="chip" id="nolimite" data-tip="Revenir au samedi 10 h">Samedi 10 h</button>`:""}</span></div>
     <div class="apprlist">${state.family.map((n,i)=>{const a=approvalOf(n);
       const st=!a?"wait":a.ancienne?"old":"ok";
