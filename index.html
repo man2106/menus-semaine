@@ -82,6 +82,10 @@
 .planlist li{display:grid;grid-template-columns:40px 1fr;gap:8px;align-items:start}
 .pday{font-weight:700;color:var(--accent);font-size:13px;padding-top:2px}.pinfo{display:grid;min-width:0}.pinfo small{color:var(--muted);font-size:12px}
 @media (max-width:420px){ nav button span:not(.badge){font-size:11px} }
+
+.addrsugg{display:grid;gap:6px}
+.addritem{display:grid;text-align:left;gap:1px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:8px 10px;cursor:pointer;color:var(--ink);font:inherit}
+.addritem:hover,.addritem:focus{border-color:var(--accent)}.addritem small{color:var(--muted);font-size:12px}
 </style>
 <title>Menus de la semaine</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -708,6 +712,12 @@ body.notowner .owner-only{display:none!important}
           <select id="homesel" class="pick" aria-label="Point de départ des trajets"></select></label>
         <button class="btn" type="button" id="geoloc">Utiliser ma position actuelle</button>
         <details class="homeadv" id="homeaddr"><summary>Entrer mon adresse</summary>
+          <div class="addrform">
+            <label class="wfield">Tapez votre adresse<input id="addr-q" type="search" maxlength="120" placeholder="Ex. : Rue de la Station 12, Givry" autocomplete="off" aria-describedby="addr-hint"></label>
+            <div class="addrsugg" id="addr-sugg" role="listbox" aria-label="Adresses trouvées"></div>
+            <p class="note" id="addr-hint">Choisissez votre adresse dans la liste qui apparaît pendant la frappe.</p>
+          </div>
+          <p class="note"><b>Ou</b> par code postal :</p>
           <form class="addrform" id="addrform" autocomplete="off">
             <label class="wfield">Rue et numéro<input id="addr-rue" type="text" maxlength="80" placeholder="Ex. : Rue de Tournai 12" autocomplete="street-address"></label>
             <div class="rgrid2">
@@ -731,7 +741,8 @@ body.notowner .owner-only{display:none!important}
         <select id="storemode" class="pick"><option value="auto">Le plus avantageux, en tenant compte de mon ordre</option><option value="fixe">Toujours mon magasin préféré</option></select></label>
       <ol class="sorder" id="sorder"></ol>
       <p class="note" id="sordernote"></p>
-      <h3 class="shopray">Autres magasins à moins de 10 km</h3>
+      <h3 class="shopray" id="savailtitle">Magasins autour de chez vous</h3>
+      <div class="envq"><b>Rayon de recherche</b><div class="gfilters" id="rayonchips"></div></div>
       <div class="gfilters" id="ensfilter"></div>
       <div class="sorder" id="savail"></div>
       <details class="homeadv" id="addstorebox"><summary>Mon magasin n'est pas dans la liste</summary>
@@ -1041,8 +1052,9 @@ function km(a,b){ const R=6371, toR=x=>x*Math.PI/180, dLa=toR(b.lat-a.lat), dLo=
 const MAGBYID = id => MAGASINS.find(m=>m.id===id);
 const COUT_KM = 0.25; // carburant + usure, estimation
 const PREF_EUR = 0.6;  // valeur d'un rang de préférence, en euros
-const RAYON_KM = 10; // magasins retenus : à 10 km maximum du domicile (à vol d'oiseau)
-const inRayon = m => !!m && km(HOME,m) <= RAYON_KM;
+// magasins retenus : dans un rayon de 10 à 15 km autour du domicile (à vol d'oiseau), réglable
+const rayonKm = () => [10,12,15].includes(state.rayon) ? state.rayon : 15;
+const inRayon = m => !!m && km(HOME,m) <= rayonKm();
 const orderedStores = () => { const l=state.storeOrder.map(MAGBYID).filter(Boolean), near=l.filter(inRayon); return near.length?near:l; };
 function prefBonus(id){ const act=state.storeOrder, r=act.indexOf(id); return r<0?0:(act.length-1-r)*PREF_EUR; }
 const MAGNOM = new Proxy({}, {get:(_,id)=>{ const m=MAGASINS.find(x=>x.id===id); if(!m) return ENS[id]||id; const twin=(state&&state.storeOrder||[]).filter(x=>x!==id&&MAGASINS.find(y=>y.id===x&&y.nom===m.nom)).length; return twin? m.nom+" "+m.lieu.split(", ").pop() : m.nom; }});
@@ -1147,7 +1159,7 @@ function applyWeekData(w){ state.week=[...w.menu]; state.cooks=(w.cooks&&w.cooks
 { const w=state.weeks[curIso()]; if(w&&Array.isArray(w.menu)&&w.menu.length===7&&w.menu.every(id=>BYID[id])) applyWeekData(w); }
 if(!Array.isArray(state.cooks)||state.cooks.length!==7) state.cooks=Array(7).fill(null);
 function save(){ saveLocal(); if(typeof shareSync==="function"){ shareSync(); familySync(); goutsSync(); } }
-function saveLocal(){ stashWeek(); try{localStorage.setItem(KEY,JSON.stringify({outDefault:state.outDefault,mix:state.mix,customStores:state.customStores,osmStores:state.osmStores,osmAt:state.osmAt,storeFix:state.storeFix,home:state.home,perso:state.perso,avis:state.avis,exclus:state.exclus,storeOrder:state.storeOrder,storeOff:state.storeOff,storeMode:state.storeMode,onboarded:state.onboarded,emails:state.emails,weekOffset:state.weekOffset,weeks:state.weeks,statut:state.statut,journal:state.journal,week:state.week,persons:state.persons,checked:state.checked,tab:state.tab,family:state.family,cooks:state.cooks,prices:state.prices,trip1:state.trip1,trip2:state.trip2,tripStore:state.tripStore,gamme:state.gamme,maxStores:state.maxStores,seuil:state.seuil}))}catch(e){}}
+function saveLocal(){ stashWeek(); try{localStorage.setItem(KEY,JSON.stringify({outDefault:state.outDefault,mix:state.mix,rayon:state.rayon,customStores:state.customStores,osmStores:state.osmStores,osmAt:state.osmAt,storeFix:state.storeFix,home:state.home,perso:state.perso,avis:state.avis,exclus:state.exclus,storeOrder:state.storeOrder,storeOff:state.storeOff,storeMode:state.storeMode,onboarded:state.onboarded,emails:state.emails,weekOffset:state.weekOffset,weeks:state.weeks,statut:state.statut,journal:state.journal,week:state.week,persons:state.persons,checked:state.checked,tab:state.tab,family:state.family,cooks:state.cooks,prices:state.prices,trip1:state.trip1,trip2:state.trip2,tripStore:state.tripStore,gamme:state.gamme,maxStores:state.maxStores,seuil:state.seuil}))}catch(e){}}
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 function cookSelect(d,extra=""){
   const v=state.cooks[d];
@@ -2162,15 +2174,17 @@ function renderStoreOrder(){
   $("homenote").textContent=`Les distances et les frais de route sont calculés depuis ${HOME.nom}${HOME.precision==="exacte"?" (position exacte)":HOME.precision==="rue"?" (milieu de la rue)":" (centre de la localité : entrez votre rue pour plus de précision)"}. Ce réglage est propre à cet appareil.`;
   const n=state.storeOrder.length;
   $("sorder").innerHTML=state.storeOrder.map((id,i)=>{const m=MAGBYID(id);
-    return `<li class="sitem"><span class="srank">${i+1}</span><span class="sinfo"><b>${esc(m.nom)}</b><small>${esc(m.lieu)} · ≈ ${kmTxt(km(HOME,m))}${i===0?" · magasin habituel":""}${m.perso?" · ajouté par vous":""}${inRayon(m)?"":` · <span class="rtwarn">à plus de ${RAYON_KM} km : pas utilisé pour les courses</span>`}</small></span>
+    return `<li class="sitem"><span class="srank">${i+1}</span><span class="sinfo"><b>${esc(m.nom)}</b><small>${esc(m.lieu)} · ≈ ${kmTxt(km(HOME,m))}${i===0?" · magasin habituel":""}${m.perso?" · ajouté par vous":""}${inRayon(m)?"":` · <span class="rtwarn">à plus de ${rayonKm()} km : pas utilisé pour les courses</span>`}</small></span>
       <span class="sbtns"><button class="sbtn" data-sup="${i}" ${i===0?"disabled":""} aria-label="Monter ${esc(m.nom)}">↑</button><button class="sbtn" data-sdown="${i}" ${i===n-1?"disabled":""} aria-label="Descendre ${esc(m.nom)}">↓</button>
       <button class="sbtn wide" data-sdel="${id}" ${n<=1?"disabled":""}>Retirer</button></span></li>`}).join("");
   if(!$("as-ens").options.length) $("as-ens").innerHTML=Object.entries(ENS).filter(([k])=>k!=="autre").map(([k,l])=>`<option value="${k}">${l}</option>`).join("")+'<option value="autre">Autre enseigne</option>';
   const ens=[...new Set(MAGASINS.map(m=>m.ens))];
   $("ensfilter").innerHTML=[["","Toutes"],...ens.map(e=>[e,ENS[e]])].map(([k,l])=>`<button class="chip${ensFilter===k?" on":""}" data-ensf="${k}">${l}</button>`).join("");
+  $("rayonchips").innerHTML=[10,12,15].map(k=>`<button class="chip${rayonKm()===k?" on":""}" data-rayon="${k}" type="button">${k} km</button>`).join("");
+  $("savailtitle").textContent=`Magasins à moins de ${rayonKm()} km, du plus proche au plus loin`;
   const avail=MAGASINS.filter(m=>inRayon(m)&&!state.storeOrder.includes(m.id)&&(!ensFilter||m.ens===ensFilter)).sort((a,b)=>km(HOME,a)-km(HOME,b));
   $("savail").innerHTML=avail.length?avail.map(m=>`<div class="sitem avail"><span class="srank plus" aria-hidden="true">+</span><span class="sinfo"><b>${esc(m.nom)}</b><small>${esc(m.lieu)} · ≈ ${kmTxt(km(HOME,m))}${PROMOS.some(p=>p.mag===m.ens)?" · promos relevées":""}</small></span>
-      <span class="sbtns"><button class="sbtn wide add" data-sadd="${m.id}">Ajouter</button></span></div>`).join("") : `<p class="note">Aucun autre magasin${ensFilter?" de cette enseigne":""} à moins de ${RAYON_KM} km de votre domicile. Touchez « Trouver les vrais magasins autour de mon adresse » pour compléter la liste.</p>`;
+      <span class="sbtns"><button class="sbtn wide add" data-sadd="${m.id}">Ajouter</button></span></div>`).join("") : `<p class="note">Aucun autre magasin${ensFilter?" de cette enseigne":""} à moins de ${rayonKm()} km de votre domicile. Touchez « Trouver les vrais magasins autour de mon adresse » pour compléter la liste.</p>`;
   $("sordernote").textContent = state.storeMode==="fixe" ? `Toutes les courses se font chez ${MAGNOM[state.storeOrder[0]]}, sauf si vous choisissez un autre magasin dans l'onglet Courses.`
     : `Chaque rang de préférence vaut ${eur(PREF_EUR)} : un magasin moins bien classé n'est choisi que si ses promos compensent la différence et le trajet. Seuls vos magasins sont proposés.`;
 }
@@ -2181,11 +2195,35 @@ function setHome(h){ HOME=h; state.home={...h}; saveLocal(); render();
 // Garde le magasin le plus proche de chaque enseigne, jusqu'à 6, triés par distance
 function pickNearest(){ const prev=[...state.storeOrder], seen=new Set();
   const list=MAGASINS.filter(inRayon).sort((a,b)=>km(HOME,a)-km(HOME,b)).filter(m=>{ if(seen.has(m.ens)) return false; seen.add(m.ens); return true; }).slice(0,6);
-  if(!list.length){ toast("Aucun magasin connu à moins de 10 km : touchez « Trouver les vrais magasins autour de mon adresse »"); return; }
+  if(!list.length){ toast("Aucun magasin connu dans votre rayon : touchez « Trouver les vrais magasins autour de mon adresse »"); return; }
   state.storeOrder=list.map(m=>m.id); state.tripStore=[null,null]; save(); render();
   toast(`Magasins les plus proches : ${list.slice(0,3).map(m=>MAGNOM[m.id]).join(", ")}…`,()=>{ state.storeOrder=prev; save(); render(); }); }
 // --- Position précise : adresse -> coordonnées, et vrais magasins autour (OpenStreetMap) ---
+// Recherche libre : Photon (OpenStreetMap, fait pour la saisie au fil de la frappe), puis Nominatim en secours
+async function chercherAdresses(q){
+  const out=[], add=(label,lat,lon,precis)=>{ lat=Math.round(+lat*1e5)/1e5; lon=Math.round(+lon*1e5)/1e5; if(!(lat>49.4&&lat<51.6&&lon>2.5&&lon<6.5)) return; if(!out.some(x=>km(x,{lat,lon})<0.03)) out.push({label,lat,lon,precis}); };
+  const tm=ms=>{ const c=new AbortController(); setTimeout(()=>c.abort(),ms); return c.signal; };
+  try{ const r=await fetch("https://photon.komoot.io/api/?"+new URLSearchParams({q,limit:"7",lang:"fr",lat:String(HOME.lat),lon:String(HOME.lon),bbox:"2.5,49.45,6.45,51.55"}),{signal:tm(8000)});
+    if(r.ok){ const j=await r.json(); (j.features||[]).forEach(f=>{ const p=f.properties||{}, c=f.geometry&&f.geometry.coordinates; if(!c||(p.countrycode&&p.countrycode!=="BE")) return;
+      const rue=[p.street||(p.type==="street"?p.name:""),p.housenumber].filter(Boolean).join(" "), lieu=[p.postcode,p.city||p.district||p.locality||(p.type==="city"?p.name:"")].filter(Boolean).join(" ");
+      add([rue||(p.type!=="city"?p.name:""),lieu].filter(Boolean).join(", ")||p.name, c[1], c[0], !!p.housenumber||p.type==="house"); }); }
+  }catch(e){}
+  if(!out.length){ try{ const r=await fetch("https://nominatim.openstreetmap.org/search?"+new URLSearchParams({q,format:"jsonv2",countrycodes:"be",limit:"6","accept-language":"fr",addressdetails:"1"}),{signal:tm(8000),headers:{Accept:"application/json"}});
+    if(r.ok){ const j=await r.json(); (j||[]).forEach(x=>{ const a=x.address||{}; const rue=[a.road,a.house_number].filter(Boolean).join(" "), lieu=[a.postcode,a.village||a.town||a.city||a.municipality].filter(Boolean).join(" ");
+      add([rue,lieu].filter(Boolean).join(", ")||x.display_name.split(",").slice(0,3).join(","), x.lat, x.lon, !!a.house_number); }); } }catch(e){} }
+  return out; }
+let addrTimer=null, addrSeq=0, addrRes=[];
+$("addr-q").addEventListener("input",()=>{ clearTimeout(addrTimer); const q=$("addr-q").value.trim(), box=$("addr-sugg");
+  if(q.length<4){ box.innerHTML=""; return; }
+  addrTimer=setTimeout(async()=>{ const my=++addrSeq; box.innerHTML=`<p class="note">Recherche…</p>`; const l=await chercherAdresses(q); if(my!==addrSeq) return; addrRes=l;
+    box.innerHTML=l.length?l.map((x,i)=>`<button type="button" class="addritem" data-addr="${i}" role="option"><b>${esc(x.label)}</b><small>${x.precis?"Adresse exacte":"Rue ou localité"}</small></button>`).join("")
+      :`<p class="note">Aucune adresse trouvée. Vérifiez l'orthographe, ajoutez la localité, ou utilisez le code postal ci-dessous.</p>`; },450); });
+$("addr-sugg").addEventListener("click",e=>{ const b=e.target.closest("[data-addr]"); if(!b) return; const x=addrRes[+b.dataset.addr]; if(!x) return;
+  $("addr-sugg").innerHTML=""; $("addr-q").value=""; $("homeaddr").open=false;
+  setHome({nom:x.label.slice(0,80),lat:x.lat,lon:x.lon,precision:x.precis?"exacte":"rue"}); });
 async function geocodeAdresse(rue,cp,ville){
+  // d'abord la recherche libre (plus tolérante sur l'ordre rue / numéro), puis la recherche structurée
+  try{ const l=await chercherAdresses(`${rue}, ${cp} ${ville}`); const ok=l.find(x=>x.precis)||l[0]; if(ok) return {lat:ok.lat,lon:ok.lon,exacte:ok.precis}; }catch(e){}
   const tries=[rue, rue.replace(/\s*\d+[a-zA-Z]?(\s*(bte|bt|boîte|bus)\s*\w+)?\s*$/i,"").replace(/^\d+[a-zA-Z]?,?\s*/,"")].filter((v,i,a)=>v&&a.indexOf(v)===i);
   for(const street of tries){
     const u="https://nominatim.openstreetmap.org/search?"+new URLSearchParams({format:"jsonv2",countrycodes:"be",limit:"1","accept-language":"fr",street,postalcode:cp,city:ville});
@@ -2208,7 +2246,7 @@ async function chercherMagasinsOSM(){
   if(osmBusy) return; if(HOME.precision!=="exacte"&&HOME.precision!=="rue") toast("Astuce : entrez votre rue dans « Entrer mon adresse » pour une recherche plus précise.");
   osmBusy=true; const btn=$("osmstores"); if(btn){ btn.disabled=true; btn.textContent="Recherche des magasins…"; }
   try{
-    const R=RAYON_KM*1000, a=`(around:${R},${HOME.lat},${HOME.lon})`;
+    const R=rayonKm()*1000, a=`(around:${R},${HOME.lat},${HOME.lon})`;
     const j=await overpass(`[out:json][timeout:25];(nwr["shop"="supermarket"]${a};nwr["shop"="convenience"]["brand"]${a};);out center tags 300;`);
     const found=[];
     (j.elements||[]).forEach(el=>{ const t=el.tags||{}, txt=norm((t.brand||"")+" "+(t.name||"")+" "+(t.operator||""));
@@ -2218,7 +2256,7 @@ async function chercherMagasinsOSM(){
       found.push({id:"o"+el.type[0]+el.id, ens:b[1], nom:(cleanTxt(t.name||t.brand)||ENS[b[1]]).slice(0,40), lieu:([rue,ville].filter(Boolean).join(", ")||"Localisé sur la carte").slice(0,80), lat:Math.round(lat*1e5)/1e5, lon:Math.round(lon*1e5)/1e5}); });
     // le même magasin est parfois dessiné deux fois (un point et le bâtiment) : on n'en garde qu'un
     for(let i=found.length-1;i>=0;i--){ if(found.some((g,k)=>k<i&&g.ens===found[i].ens&&km(g,found[i])<0.15)) found.splice(i,1); }
-    if(!found.length){ toast(`Aucun supermarché trouvé à moins de ${RAYON_KM} km de ${HOME.nom}. Vérifiez votre adresse.`); return; }
+    if(!found.length){ toast(`Aucun supermarché trouvé à moins de ${rayonKm()} km de ${HOME.nom}. Vérifiez votre adresse.`); return; }
     // les magasins déjà connus reçoivent leur position exacte, les autres sont ajoutés
     const fix={...state.storeFix}, add=[]; let corr=0;
     found.forEach(f=>{ const twin=MAGASINS.filter(m=>!m.perso&&m.ens===f.ens&&!/^o[nwr]\d/.test(m.id)&&km(m,f)<1.2).sort((x,y)=>km(x,f)-km(y,f))[0];
@@ -2229,7 +2267,7 @@ async function chercherMagasinsOSM(){
     state.osmStores=[...add,...keep].sort((x,y)=>km(HOME,x)-km(HOME,y)).slice(0,80);
     state.osmStores.forEach(m=>{ const ex=MAGASINS.find(x=>x.id===m.id); if(ex) Object.assign(ex,m,{osm:true}); else MAGASINS.push({...m,osm:true}); });
     save(); render();
-    toast(`${found.length} magasins trouvés dans un rayon de ${RAYON_KM} km${corr?`, dont ${corr} ${corr>1?"repositionnés":"repositionné"} exactement`:""}.`,()=>pickNearest(),"Prendre les plus proches");
+    toast(`${found.length} magasins trouvés dans un rayon de ${rayonKm()} km${corr?`, dont ${corr} ${corr>1?"repositionnés":"repositionné"} exactement`:""}.`,()=>pickNearest(),"Prendre les plus proches");
   }catch(e){ toast("Le service de carte OpenStreetMap ne répond pas pour le moment. Réessayez dans une minute."); }
   finally{ osmBusy=false; if(btn){ btn.disabled=false; btn.textContent="Trouver les vrais magasins autour de mon adresse"; } }
 }
@@ -2289,6 +2327,8 @@ $("sorder").addEventListener("click",e=>{ const b=e.target.closest("button"); if
   else if(D.sdown){ const i=+D.sdown; [o[i+1],o[i]]=[o[i],o[i+1]]; state.storeOrder=o; }
   else if(D.sdel){ if(o.length<=1){ toast("Gardez au moins un magasin"); return; } const id=D.sdel; state.storeOrder=o.filter(x=>x!==id); state.tripStore=state.tripStore.map(x=>x===id?null:x); toast(MAGNOM[id]+" retiré de vos magasins"); }
   else return; save(); render(); });
+$("rayonchips").addEventListener("click",e=>{ const b=e.target.closest("[data-rayon]"); if(!b) return; const before=rayonKm(); state.rayon=+b.dataset.rayon; save(); render();
+  if(state.rayon>before&&typeof chercherMagasinsOSM==="function"){ state.osmAt=null; chercherMagasinsOSM(); } else toast(`Rayon de ${state.rayon} km`); });
 $("savail").addEventListener("click",e=>{ const b=e.target.closest("[data-sadd]"); if(!b) return; const id=b.dataset.sadd; if(state.storeOrder.includes(id)) return;
   state.storeOrder=[...state.storeOrder,id]; save(); render(); toast(MAGNOM[id]+" ajouté en dernière position : remontez-le si besoin"); });
 $("ensfilter").addEventListener("click",e=>{ const b=e.target.closest("[data-ensf]"); if(!b) return; ensFilter=b.dataset.ensf; renderStoreOrder(); });
