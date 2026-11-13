@@ -86,6 +86,9 @@
 .addrsugg{display:grid;gap:6px}
 .addritem{display:grid;text-align:left;gap:1px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:8px 10px;cursor:pointer;color:var(--ink);font:inherit}
 .addritem:hover,.addritem:focus{border-color:var(--accent)}.addritem small{color:var(--muted);font-size:12px}
+
+.gkey{border-top:1px solid var(--line);padding-top:10px;margin-top:4px;display:grid;gap:6px}
+.gkey input{font-family:ui-monospace,Menlo,monospace;font-size:12px}
 </style>
 <title>Menus de la semaine</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -733,6 +736,7 @@ body.notowner .owner-only{display:none!important}
           <div class="addrow"><input id="homecoord" type="text" inputmode="text" autocomplete="off" placeholder="Lien Google Maps ou coordonnées" aria-label="Lien Google Maps ou coordonnées"><button class="btn primary" type="button" id="homeset">Utiliser</button></div>
         </details>
         <p class="note" id="homenote"></p>
+        <div class="gkey" id="gkeybox"></div>
         <button class="btn primary" type="button" id="osmstores">Trouver les vrais magasins autour de mon adresse</button>
         <button class="btn" type="button" id="nearest">Choisir les magasins les plus proches de mon adresse</button>
       </div>
@@ -1116,7 +1120,7 @@ if(!Array.isArray(state.customStores)) state.customStores=[];
 state.customStores=state.customStores.filter(m=>m&&typeof m.id==="string"&&/^c[a-z0-9]{3,20}$/.test(m.id)&&typeof m.lat==="number"&&typeof m.lon==="number"&&ENS[m.ens]).slice(0,30);
 const cleanTxt = t => String(t==null?"":t).replace(/[<>&"'`]/g,"").trim();
 if(!Array.isArray(state.osmStores)) state.osmStores=[];
-state.osmStores=state.osmStores.filter(m=>m&&typeof m.id==="string"&&/^o[nwr]\d{1,14}$/.test(m.id)&&typeof m.lat==="number"&&typeof m.lon==="number"&&ENS[m.ens]).slice(0,80);
+state.osmStores=state.osmStores.filter(m=>m&&typeof m.id==="string"&&/^(o[nwr]\d{1,14}|g[A-Za-z0-9_-]{6,90})$/.test(m.id)&&typeof m.lat==="number"&&typeof m.lon==="number"&&ENS[m.ens]).slice(0,80);
 if(!state.storeFix||typeof state.storeFix!=="object") state.storeFix={};
 Object.entries(state.storeFix).forEach(([id,c])=>{ const m=MAGASINS.find(x=>x.id===id); if(m&&c&&typeof c.lat==="number"&&typeof c.lon==="number"){ m.lat=c.lat; m.lon=c.lon; if(c.lieu) m.lieu=cleanTxt(c.lieu).slice(0,80); m.osm=true; } });
 state.osmStores.forEach(m=>{ if(!MAGASINS.some(x=>x.id===m.id)) MAGASINS.push({id:m.id,ens:m.ens,nom:cleanTxt(m.nom).slice(0,40),lieu:cleanTxt(m.lieu).slice(0,80),lat:m.lat,lon:m.lon,osm:true}); });
@@ -2171,6 +2175,7 @@ function renderStoreOrder(){
   const custom=state.home&&!COMMUNES.some(([n])=>n===state.home.nom);
   if(state.home&&state.home.adresse&&!$("addr-cp").value){ $("addr-rue").value=state.home.adresse.rue||""; $("addr-cp").value=state.home.adresse.cp||""; }
   $("homesel").innerHTML=(custom?`<option value="__custom" selected>${esc(HOME.nom)}</option>`:"")+COMMUNES.map(([n])=>`<option value="${esc(n)}"${!custom&&HOME.nom===n?" selected":""}>${esc(n)}</option>`).join("");
+  renderGkey();
   $("homenote").textContent=`Les distances et les frais de route sont calculés depuis ${HOME.nom}${HOME.precision==="exacte"?" (position exacte)":HOME.precision==="rue"?" (milieu de la rue)":" (centre de la localité : entrez votre rue pour plus de précision)"}. Ce réglage est propre à cet appareil.`;
   const n=state.storeOrder.length;
   $("sorder").innerHTML=state.storeOrder.map((id,i)=>{const m=MAGBYID(id);
@@ -2199,10 +2204,56 @@ function pickNearest(){ const prev=[...state.storeOrder], seen=new Set();
   state.storeOrder=list.map(m=>m.id); state.tripStore=[null,null]; save(); render();
   toast(`Magasins les plus proches : ${list.slice(0,3).map(m=>MAGNOM[m.id]).join(", ")}…`,()=>{ state.storeOrder=prev; save(); render(); }); }
 // --- Position précise : adresse -> coordonnées, et vrais magasins autour (OpenStreetMap) ---
+// ---- Google Maps (clé du propriétaire, enregistrée dans la base de la famille) ----
+let GKEY=null, gmLoad=null, gmToken=null;
+try{ GKEY=localStorage.getItem(KEY+"-gkey")||null; }catch(e){}
+function chargerGoogle(){ if(!GKEY) return Promise.reject(new Error("pas de clé")); if(window.google&&google.maps&&google.maps.importLibrary) return Promise.resolve();
+  if(gmLoad) return gmLoad;
+  gmLoad=new Promise((ok,ko)=>{ window.__gmReady=()=>ok(); window.gm_authFailure=()=>{ GKEY_ERR=true; toast("Google Maps refuse la clé : vérifiez les restrictions de la clé (site et API autorisés)."); ko(new Error("auth")); };
+    const sc=document.createElement("script"); sc.async=true; sc.onerror=()=>{ gmLoad=null; ko(new Error("load")); };
+    sc.src="https://maps.googleapis.com/maps/api/js?"+new URLSearchParams({key:GKEY,v:"weekly",libraries:"places",language:"fr",region:"BE",loading:"async",callback:"__gmReady"});
+    document.head.appendChild(sc); setTimeout(()=>ko(new Error("timeout")),12000); });
+  return gmLoad; }
+let GKEY_ERR=false;
+async function adressesGoogle(q){ await chargerGoogle(); const {AutocompleteSuggestion,AutocompleteSessionToken}=await google.maps.importLibrary("places");
+  if(!gmToken) gmToken=new AutocompleteSessionToken();
+  const {suggestions}=await AutocompleteSuggestion.fetchAutocompleteSuggestions({input:q,includedRegionCodes:["be"],language:"fr",region:"be",sessionToken:gmToken,origin:{lat:HOME.lat,lng:HOME.lon}});
+  return (suggestions||[]).map(x=>x.placePrediction).filter(Boolean).slice(0,6).map(pp=>({label:cleanTxt(pp.text&&pp.text.text||""),precis:(pp.types||[]).some(t=>["street_address","premise","subpremise"].includes(t)),
+    resolve:async()=>{ const pl=pp.toPlace(); await pl.fetchFields({fields:["location","formattedAddress","types"]}); gmToken=null;
+      return {label:cleanTxt(pl.formattedAddress||"").replace(/, Belgique$|, Belgium$/,""),lat:Math.round(pl.location.lat()*1e5)/1e5,lon:Math.round(pl.location.lng()*1e5)/1e5,precis:(pl.types||[]).some(t=>["street_address","premise","subpremise"].includes(t))}; }})); }
+async function magasinsGoogle(R){ await chargerGoogle(); const {Place,SearchNearbyRankPreference}=await google.maps.importLibrary("places");
+  const center={lat:HOME.lat,lng:HOME.lon}, out=[], vu=new Set();
+  const garder=list=>(list||[]).forEach(pl=>{ if(!pl.location||vu.has(pl.id)) return; vu.add(pl.id); const nom=pl.displayName||"", txt=norm(nom);
+    let b=OSM_BRANDS.find(([re])=>re.test(txt)); if(!b){ if(!(pl.types||[]).includes("supermarket")) return; b=[null,"autre"]; }
+    const lat=Math.round(pl.location.lat()*1e5)/1e5, lon=Math.round(pl.location.lng()*1e5)/1e5; if(km(HOME,{lat,lon})>R/1000) return;
+    const adr=cleanTxt(pl.formattedAddress||"").replace(/, Belgique$|, Belgium$/,"").replace(/\b\d{4} /,"");
+    out.push({id:("g"+pl.id).replace(/[^A-Za-z0-9_-]/g,"").slice(0,90),ens:b[1],nom:(cleanTxt(nom)||ENS[b[1]]).slice(0,40),lieu:(adr||"Localisé sur la carte").slice(0,80),lat,lon}); });
+  const champs=["id","displayName","location","formattedAddress","types"];
+  // 20 résultats au plus par demande : les plus proches, puis une recherche par enseigne pour ne rien oublier
+  const r1=await Place.searchNearby({fields:champs,locationRestriction:{center,radius:Math.min(R,50000)},includedPrimaryTypes:["supermarket","grocery_store"],maxResultCount:20,rankPreference:SearchNearbyRankPreference.DISTANCE,language:"fr",region:"be"});
+  garder(r1.places);
+  const enseignes=["Delhaize","Carrefour","Colruyt","Aldi","Lidl","Intermarché","OKay","Spar","Albert Heijn","Louis Delhaize"];
+  await Promise.all(enseignes.map(async e=>{ try{ const r=await Place.searchByText({textQuery:e+" supermarché",fields:champs,locationBias:{center,radius:Math.min(R,50000)},maxResultCount:5,language:"fr",region:"be"}); garder(r.places); }catch(err){} }));
+  return out; }
+function setGoogleKey(k){ GKEY=k||null; gmLoad=null; GKEY_ERR=false; try{ k?localStorage.setItem(KEY+"-gkey",k):localStorage.removeItem(KEY+"-gkey"); }catch(e){} renderGkey(); }
+function renderGkey(){ const b=$("gkeybox"); if(!b) return;
+  b.innerHTML=`<b>Google Maps</b> <span class="bdg ${GKEY?"b-eco":"b-plaisir"}">${GKEY?"activé":"pas encore activé"}</span>
+    <p class="note">${GKEY?"Les adresses et les magasins viennent de Google Maps. OpenStreetMap sert de secours.":"Sans clé, les adresses et les magasins viennent d'OpenStreetMap, moins complet."}</p>
+    <div class="owner-only"><div class="addrow"><input id="gkey" type="text" autocomplete="off" spellcheck="false" placeholder="Clé Google Maps (commence par AIza)" value="${GKEY?esc(GKEY):""}" aria-label="Clé Google Maps"><button class="btn primary" type="button" id="gkeyok">Enregistrer</button></div>
+    <p class="note">La clé est partagée avec la famille pour que tout le monde en profite. Limitez-la à votre site dans Google Cloud.</p></div>`; }
+document.addEventListener("click",async e=>{ if(!e.target.closest("#gkeyok")) return; const k=$("gkey").value.trim();
+  if(k&&!/^AIza[0-9A-Za-z_-]{30,}$/.test(k)){ toast("Cette clé ne ressemble pas à une clé Google Maps (elle commence par AIza)"); return; }
+  setGoogleKey(k);
+  if(DB){ try{ await DB.doc("validations/google").set({cle:k||null,maj:new Date().toISOString()}); toast(k?"Clé enregistrée et partagée avec la famille":"Clé retirée"); }catch(err){ toast("La clé est enregistrée sur cet appareil seulement"); } }
+  else toast(k?"Clé enregistrée sur cet appareil":"Clé retirée");
+  if(k){ try{ await chargerGoogle(); toast("Google Maps fonctionne"); state.osmAt=null; }catch(err){ if(!GKEY_ERR) toast("Google Maps ne répond pas : vérifiez la clé et les API activées"); } } });
+function subscribeGoogle(){ if(!DB) return; DB.doc("validations/google").onSnapshot(snap=>{ if(!snap.exists) return; const d=snap.data(); const k=d&&typeof d.cle==="string"&&/^AIza[0-9A-Za-z_-]{30,}$/.test(d.cle)?d.cle:null; if(k!==GKEY) setGoogleKey(k); },()=>{}); }
 // Recherche libre : Photon (OpenStreetMap, fait pour la saisie au fil de la frappe), puis Nominatim en secours
 async function chercherAdresses(q){
   const out=[], add=(label,lat,lon,precis)=>{ lat=Math.round(+lat*1e5)/1e5; lon=Math.round(+lon*1e5)/1e5; if(!(lat>49.4&&lat<51.6&&lon>2.5&&lon<6.5)) return; if(!out.some(x=>km(x,{lat,lon})<0.03)) out.push({label,lat,lon,precis}); };
   const tm=ms=>{ const c=new AbortController(); setTimeout(()=>c.abort(),ms); return c.signal; };
+  // 0) Google Maps quand la clé est réglée
+  if(GKEY&&!GKEY_ERR){ try{ const g=await adressesGoogle(q); if(g.length) return g; }catch(e){} }
   // 1) Service officiel de la Région wallonne (adresses ICAR, registre officiel) : gratuit, sans clé
   try{ const r=await fetch("https://geoservices.wallonie.be/geocodeWS/geocode?"+new URLSearchParams({address:q,crs:"EPSG:4326"}),{signal:tm(6000)});
     if(r.ok){ const j=await r.json(); (j.candidates||[]).slice(0,6).forEach(c=>{ const g=c.geometry&&c.geometry.coordinates; if(!g) return; let [a,b]=g; if(a<40){ const t=a; a=b; b=t; } // [lon,lat] ou [lat,lon]
@@ -2227,7 +2278,8 @@ $("addr-q").addEventListener("input",()=>{ clearTimeout(addrTimer); const q=$("a
   addrTimer=setTimeout(async()=>{ const my=++addrSeq; box.innerHTML=`<p class="note">Recherche…</p>`; const l=await chercherAdresses(q); if(my!==addrSeq) return; addrRes=l;
     box.innerHTML=l.length?l.map((x,i)=>`<button type="button" class="addritem" data-addr="${i}" role="option"><b>${esc(x.label)}</b><small>${x.precis?"Adresse exacte":"Rue ou localité"}</small></button>`).join("")
       :`<p class="note">Aucune adresse trouvée. Vérifiez l'orthographe, ajoutez la localité, ou utilisez le code postal ci-dessous.</p>`; },450); });
-$("addr-sugg").addEventListener("click",e=>{ const b=e.target.closest("[data-addr]"); if(!b) return; const x=addrRes[+b.dataset.addr]; if(!x) return;
+$("addr-sugg").addEventListener("click",async e=>{ const b=e.target.closest("[data-addr]"); if(!b) return; let x=addrRes[+b.dataset.addr]; if(!x) return;
+  if(x.resolve){ try{ b.disabled=true; x=await x.resolve(); }catch(err){ toast("Cette adresse n'a pas pu être localisée, essayez-en une autre"); b.disabled=false; return; } }
   $("addr-sugg").innerHTML=""; $("addr-q").value=""; $("homeaddr").open=false;
   setHome({nom:x.label.slice(0,80),lat:x.lat,lon:x.lon,precision:x.precis?"exacte":"rue"}); });
 async function geocodeAdresse(rue,cp,ville){
@@ -2256,19 +2308,21 @@ async function chercherMagasinsOSM(){
   osmBusy=true; const btn=$("osmstores"); if(btn){ btn.disabled=true; btn.textContent="Recherche des magasins…"; }
   try{
     const R=rayonKm()*1000, a=`(around:${R},${HOME.lat},${HOME.lon})`;
-    const j=await overpass(`[out:json][timeout:25];(nwr["shop"="supermarket"]${a};nwr["shop"="convenience"]["brand"]${a};);out center tags 300;`);
+    let gfound=null; if(GKEY){ try{ gfound=await magasinsGoogle(R); }catch(err){ gfound=null; } }
+    const j=gfound?{elements:[]}:await overpass(`[out:json][timeout:25];(nwr["shop"="supermarket"]${a};nwr["shop"="convenience"]["brand"]${a};);out center tags 300;`);
     const found=[];
     (j.elements||[]).forEach(el=>{ const t=el.tags||{}, txt=norm((t.brand||"")+" "+(t.name||"")+" "+(t.operator||""));
       let b=OSM_BRANDS.find(([re])=>re.test(txt)); if(!b){ if(t.shop!=="supermarket"||!t.name) return; b=[null,"autre"]; }
       const lat=el.lat!=null?el.lat:el.center&&el.center.lat, lon=el.lon!=null?el.lon:el.center&&el.center.lon; if(typeof lat!=="number"||typeof lon!=="number") return;
       const rue=cleanTxt([t["addr:street"],t["addr:housenumber"]].filter(Boolean).join(" ")), ville=cleanTxt(t["addr:city"]||t["addr:place"]||"");
       found.push({id:"o"+el.type[0]+el.id, ens:b[1], nom:(cleanTxt(t.name||t.brand)||ENS[b[1]]).slice(0,40), lieu:([rue,ville].filter(Boolean).join(", ")||"Localisé sur la carte").slice(0,80), lat:Math.round(lat*1e5)/1e5, lon:Math.round(lon*1e5)/1e5}); });
+    if(gfound) found.push(...gfound);
     // le même magasin est parfois dessiné deux fois (un point et le bâtiment) : on n'en garde qu'un
     for(let i=found.length-1;i>=0;i--){ if(found.some((g,k)=>k<i&&g.ens===found[i].ens&&km(g,found[i])<0.15)) found.splice(i,1); }
     if(!found.length){ toast(`Aucun supermarché trouvé à moins de ${rayonKm()} km de ${HOME.nom}. Vérifiez votre adresse.`); return; }
     // les magasins déjà connus reçoivent leur position exacte, les autres sont ajoutés
     const fix={...state.storeFix}, add=[]; let corr=0;
-    found.forEach(f=>{ const twin=MAGASINS.filter(m=>!m.perso&&m.ens===f.ens&&!/^o[nwr]\d/.test(m.id)&&km(m,f)<1.2).sort((x,y)=>km(x,f)-km(y,f))[0];
+    found.forEach(f=>{ const twin=MAGASINS.filter(m=>!m.perso&&m.ens===f.ens&&!/^(o[nwr]\d|g[A-Za-z0-9_-]{6})/.test(m.id)&&km(m,f)<1.2).sort((x,y)=>km(x,f)-km(y,f))[0];
       if(twin){ if(!fix[twin.id]||km(fix[twin.id],f)>0.01){ fix[twin.id]={lat:f.lat,lon:f.lon,lieu:f.lieu!=="Localisé sur la carte"?f.lieu:twin.lieu}; corr++; } twin.lat=f.lat; twin.lon=f.lon; twin.osm=true; }
       else add.push(f); });
     state.storeFix=fix; state.osmAt={lat:HOME.lat,lon:HOME.lon};
@@ -2277,7 +2331,7 @@ async function chercherMagasinsOSM(){
     state.osmStores.forEach(m=>{ const ex=MAGASINS.find(x=>x.id===m.id); if(ex) Object.assign(ex,m,{osm:true}); else MAGASINS.push({...m,osm:true}); });
     save(); render();
     toast(`${found.length} magasins trouvés dans un rayon de ${rayonKm()} km${corr?`, dont ${corr} ${corr>1?"repositionnés":"repositionné"} exactement`:""}.`,()=>pickNearest(),"Prendre les plus proches");
-  }catch(e){ toast("Le service de carte OpenStreetMap ne répond pas pour le moment. Réessayez dans une minute."); }
+  }catch(e){ toast(GKEY?"La recherche n'a pas abouti : vérifiez la clé Google Maps dans Mes magasins.":"Le service de carte OpenStreetMap ne répond pas pour le moment. Réessayez dans une minute."); }
   finally{ osmBusy=false; if(btn){ btn.disabled=false; btn.textContent="Trouver les vrais magasins autour de mon adresse"; } }
 }
 $("osmstores").onclick=chercherMagasinsOSM;
@@ -2877,7 +2931,7 @@ document.addEventListener("click",e=>{ const b=e.target.closest("[data-envqui],[
     IS_OWNER = u ? await u.isOwner() : true; if(!IS_OWNER) document.body.classList.add("notowner");
     DB.doc("validations/menus").onSnapshot(snap=>{ const dd=snap.exists?snap.data():{}; VALID=(dd.semaines&&typeof dd.semaines==="object")?{...dd.semaines}:{}; LIMITES=(dd.limites&&typeof dd.limites==="object")?{...dd.limites}:{}; applyValidation(); saveLocal(); render(); },()=>{});
     if(c===false){ document.body.classList.add("readonly"); }
-    subscribeRecettes(); subscribeGouts(); subscribeWeek(); subscribeFamily(); subscribeRetours(); subscribeSondage();
+    subscribeRecettes(); subscribeGouts(); subscribeWeek(); subscribeFamily(); subscribeRetours(); subscribeSondage(); subscribeGoogle();
     setTimeout(maybeWizard,1500);
   }catch(e){ setSync("local"); setTimeout(maybeWizard,300); }
 })();
