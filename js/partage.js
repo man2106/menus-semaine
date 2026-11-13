@@ -58,7 +58,8 @@
       })
       .subscribe(st => { if (st === "SUBSCRIBED") { if (!firstSub) loadAll().catch(()=>{}); firstSub = false; } });
     // à la reprise de l'appli (téléphone sorti de veille), on se remet à jour
-    document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") loadAll().catch(()=>{}); });
+    document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") { loadAll().catch(()=>{}); visite(); } });
+    visite();
   }
   function refused(error){ const e = new Error(error && error.message || "refusé");
     e.code = (error && (error.code === "42501" || /row-level security/i.test(error.message||""))) ? "invalid_argument" : "unavailable"; return e; }
@@ -95,6 +96,17 @@
       }
     })
   };
+
+  // Dernière connexion : enregistrée à l'ouverture, au plus toutes les 5 minutes
+  let derniereVisite = 0;
+  function visite(){ if (Date.now() - derniereVisite < 300000) return; derniereVisite = Date.now(); sb.rpc("signaler_visite").then(()=>{}, ()=>{}); }
+  function quandTxt(iso){ if (!iso) return "jamais vu depuis la mise à jour"; const d = new Date(iso), m = Math.round((Date.now() - d) / 60000);
+    const heure = d.toLocaleTimeString("fr-BE", { hour: "2-digit", minute: "2-digit" });
+    const jour = d.toLocaleDateString("fr-BE", { weekday: "long", day: "numeric", month: "long" });
+    if (m < 5) return "en ligne en ce moment"; if (m < 60) return "vu il y a " + m + " min";
+    const auj = new Date(); auj.setHours(0,0,0,0); const hier = new Date(auj); hier.setDate(hier.getDate() - 1);
+    if (d >= auj) return "vu aujourd'hui à " + heure; if (d >= hier) return "vu hier à " + heure; return "vu " + jour + " à " + heure; }
+  window.__quandTxt = quandTxt;
 
   // ---------- Identité ----------
   const PROFILS = new Map();
@@ -186,15 +198,18 @@
       <p>Vous êtes connecté sur cet appareil en tant que <b>${esc(ACCES.nom || "?")}</b>${ACCES.role === "proprio" ? " (propriétaire)" : ""}.</p>
       <div class="addrow"><input id="acc-nom" type="text" maxlength="30" value="${esc(ACCES.nom || "")}" aria-label="Mon prénom"><button class="btn" id="acc-nom-ok" type="button">Changer mon prénom</button></div>`;
     if (ACCES.role === "proprio") {
-      const [{ data: code }, { data: devs }] = await Promise.all([sb.rpc("code_famille"), sb.from("acces").select("uid,nom,role,joined_at").order("joined_at")]);
+      const [{ data: code }, r1] = await Promise.all([sb.rpc("code_famille"), sb.from("acces").select("uid,nom,role,joined_at,vu_le").order("joined_at")]);
+      let devs = r1.data, avecVu = !r1.error;
+      if (r1.error) devs = (await sb.from("acces").select("uid,nom,role,joined_at").order("joined_at")).data;
+      if (avecVu && devs) devs.sort((a, b) => (b.vu_le || "").localeCompare(a.vu_le || ""));
       window.INVITE_URL = window.APP_URL_PUBLIC + "?code=" + encodeURIComponent(code || "");
       html += `<h3 class="shopray">Lien d'invitation</h3>
         <p class="note">Toute personne qui ouvre ce lien et indique son prénom peut voir et modifier les menus. Ne le partagez qu'avec la famille.</p>
         <div class="invite"><code id="acc-link">${esc(window.INVITE_URL)}</code><button class="btn primary" id="acc-copy" type="button">Copier le lien</button></div>
         <p class="note">Code famille : <b>${esc(code)}</b></p>
         <div class="addrow"><input id="acc-code" type="text" maxlength="40" placeholder="Nouveau code (6 caractères minimum)" aria-label="Nouveau code famille"><button class="btn" id="acc-code-ok" type="button">Changer le code</button></div>
-        <h3 class="shopray">Appareils connectés (${(devs||[]).length})</h3>
-        <div class="sorder">${(devs||[]).map(d => `<div class="sitem"><span class="srank">${esc((d.nom||"?").slice(0,1).toUpperCase())}</span><span class="sinfo"><b>${esc(d.nom||"Sans prénom")}${d.uid===UID?" (cet appareil)":""}</b><small>${d.role==="proprio"?"Propriétaire":"Membre"} · depuis le ${new Date(d.joined_at).toLocaleDateString("fr-BE")}</small></span>
+        <h3 class="shopray">Appareils connectés (${(devs||[]).length})</h3>${avecVu ? "" : `<p class="note">Pour voir les dernières connexions, exécutez le script « mise-a-jour-connexions.sql » dans Supabase.</p>`}
+        <div class="sorder">${(devs||[]).map(d => `<div class="sitem"><span class="srank">${esc((d.nom||"?").slice(0,1).toUpperCase())}</span><span class="sinfo"><b>${esc(d.nom||"Sans prénom")}${d.uid===UID?" (cet appareil)":""}</b><small>${avecVu ? esc(quandTxt(d.uid===UID ? new Date().toISOString() : d.vu_le)) + " · " : ""}${d.role==="proprio"?"Propriétaire":"Membre"} depuis le ${new Date(d.joined_at).toLocaleDateString("fr-BE")}</small></span>
           <span class="sbtns">${d.role==="proprio"?"":`<button class="sbtn wide" data-retirer="${d.uid}">Retirer</button>`}</span></div>`).join("")}</div>`;
     }
     box.innerHTML = html; box.hidden = false;
