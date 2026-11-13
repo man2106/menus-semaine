@@ -2236,7 +2236,7 @@ async function magasinsGoogle(R){ await chargerGoogle(); const {Place,SearchNear
   await Promise.all(enseignes.map(async e=>{ try{ const r=await Place.searchByText({textQuery:e+" supermarché",fields:champs,locationBias:{center,radius:Math.min(R,50000)},maxResultCount:5,language:"fr",region:"be"}); garder(r.places); }catch(err){} }));
   return out; }
 function setGoogleKey(k){ GKEY=k||null; gmLoad=null; GKEY_ERR=false; try{ k?localStorage.setItem(KEY+"-gkey",k):localStorage.removeItem(KEY+"-gkey"); }catch(e){} renderGkey(); }
-function renderGkey(){ const b=$("gkeybox"); if(!b) return;
+function renderGkey(){ const b=$("gkeybox"); if(!b) return; b.hidden=!GKEY; if(!GKEY){ b.innerHTML=""; return; }
   b.innerHTML=`<b>Google Maps</b> <span class="bdg ${GKEY?"b-eco":"b-plaisir"}">${GKEY?"activé":"pas encore activé"}</span>
     <p class="note">${GKEY?"Les adresses et les magasins viennent de Google Maps. OpenStreetMap sert de secours.":"Sans clé, les adresses et les magasins viennent d'OpenStreetMap, moins complet."}</p>
     <div class="owner-only"><div class="addrow"><input id="gkey" type="text" autocomplete="off" spellcheck="false" placeholder="Clé Google Maps (commence par AIza)" value="${GKEY?esc(GKEY):""}" aria-label="Clé Google Maps"><button class="btn primary" type="button" id="gkeyok">Enregistrer</button></div>
