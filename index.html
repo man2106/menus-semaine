@@ -1143,7 +1143,7 @@ const orderedStores = () => { const l=state.storeOrder.map(MAGBYID).filter(Boole
 function prefBonus(id){ const act=state.storeOrder, r=act.indexOf(id); return r<0?0:(act.length-1-r)*PREF_EUR; }
 const MAGNOM = new Proxy({}, {get:(_,id)=>{ const m=MAGASINS.find(x=>x.id===id); if(!m) return ENS[id]||id; const twin=(state&&state.storeOrder||[]).filter(x=>x!==id&&MAGASINS.find(y=>y.id===x&&y.nom===m.nom)).length; return twin? m.nom+" "+m.lieu.split(", ").pop() : m.nom; }});
 // Promotions relevées le 13/11/2026 (folders et PrijsProfeet). ing = ingrédient des recettes concerné
-const RELEVE = "13 novembre 2026";
+let RELEVE = "13 novembre 2026";
 const PROMOS = [
  {mag:"colruyt",produit:"Barilla Spaghettoni n°7",prix:0.99,avant:1.99,du:"2026-11-04",au:"2026-11-17",ing:"Spaghetti"},
  {mag:"colruyt",produit:"Champignons shimeji Boni",prix:0.99,avant:1.99,du:"2026-11-04",au:"2026-11-17",ing:"Champignons"},
@@ -1475,7 +1475,7 @@ function renderRecettes(){
 }
 
 function renderPromos(){
-  $("promodate").textContent=`Promotions relevées le ${RELEVE} dans les enseignes de la région de Mons. Vérifiez en magasin avant d'acheter.`;
+  $("promodate").textContent=`Promotions relevées le ${RELEVE} dans les enseignes autour de chez vous (mise à jour le lundi et le mercredi). Vérifiez en magasin avant d'acheter.`;
   const ranked=RECETTES.map(r=>({r,c:promoCount(r)})).filter(x=>x.c).sort((a,b)=>b.c-a.c||a.r.t-b.r.t);
   $("sugg").innerHTML=ranked.map(({r,c})=>{const days=state.week.map((id,d)=>id===r.id?JOURS[d]:null).filter(Boolean);
     const what=[...new Set(r.ing.map(([n])=>n).filter(n=>promosFor(n).length))].map(n=>n.toLowerCase()+" ("+promosFor(n).map(p=>ENS[p.mag]).join(", ")+")").join(", ");
@@ -1609,6 +1609,7 @@ function renderModal(){
       <div class="actions" style="margin-top:8px"><button class="btn" id="mcopy">Copier ces ingrédients</button></div></section>
     <section><h3><span>Préparation</span><span class="mtotal">${r.t} min</span></h3>${steps?`<ol class="steps">${steps}</ol>`:`<p class="note">Pas encore d'étapes pour cette recette.</p>`}</section>
     ${r.astuce?`<div class="mtip"><b>Astuce :</b> ${esc(r.astuce)}</div>`:""}
+    ${r.source?`<p class="note">Idée trouvée sur <a href="${esc(r.source.url)}" target="_blank" rel="noopener">${esc(r.source.titre||"le web")}</a>${r.ajoute?`, ajoutée le ${new Date(r.ajoute).toLocaleDateString("fr-BE")}`:""}.</p>`:""}
     ${avis}
     <p class="note">Sel, poivre, huile et ail sont à prendre au placard. Coût estimé selon la gamme ${GAMMES[state.gamme].nom.toLowerCase()}.</p>
     ${d===null?"":`<div class="links"><button class="chip" data-gotrip="${items.find(i=>i.t!==null)?.t??0}">Voir la liste de la course</button><button class="chip" data-goto="courses" data-el="economies">Voir les promos</button></div>
@@ -2999,6 +3000,36 @@ document.addEventListener("click",e=>{ const b=e.target.closest("[data-envqui],[
     toast(`Planning « ${pl[+D.envuse].t} » placé sur la semaine du ${weekLabel()}`,()=>{ goWeek(prev); },"Revenir"); }
 });
 
+// ===================== Données mises à jour par la tâche du lundi et du mercredi =====================
+// donnees/promos.json : promos relevées dans les folders ; donnees/recettes.json : nouvelles recettes de la bibliothèque
+const txtOk = (v,max) => typeof v==="string" ? cleanTxt(v).slice(0,max) : "";
+function accepterRecette(x){
+  if(!x||typeof x!=="object"||typeof x.id!=="string"||!/^[a-z][a-z0-9]{2,30}$/.test(x.id)||BYID[x.id]) return null;
+  const ing=(Array.isArray(x.ing)?x.ing:[]).filter(i=>Array.isArray(i)&&typeof i[0]==="string").slice(0,15)
+    .map(([n,q,u,ray])=>[txtOk(n,40),Math.max(0,+q||0),typeof u==="string"?txtOk(u,12):"",RAYKEYS.includes(ray)?ray:"epi"]).filter(i=>i[0]);
+  const etapes=(Array.isArray(x.etapes)?x.etapes:[]).map(e=>txtOk(e,400)).filter(Boolean).slice(0,8);
+  if(ing.length<2||etapes.length<2) return null;
+  return {id:x.id,nom:txtOk(x.nom,60)||"Recette",acc:txtOk(x.acc,60),t:Math.max(5,Math.min(30,+x.t||30)),
+    b:["eco","moyen","plaisir"].includes(x.b)?x.b:undefined,p:PROT[x.p]?x.p:undefined,f:FECU[x.f]?x.f:undefined,c:CUISINES[x.c]?x.c:undefined,
+    astuce:txtOk(x.astuce,200),ing,etapes,nouveau:true,
+    source:x.source&&typeof x.source.url==="string"&&/^https:\/\//.test(x.source.url)?{titre:txtOk(x.source.titre,80),url:x.source.url.slice(0,300)}:null,
+    ajoute:typeof x.ajoute==="string"&&/^\d{4}-\d\d-\d\d$/.test(x.ajoute)?x.ajoute:null};
+}
+async function chargerDonnees(){
+  const lire=async f=>{ try{ const r=await fetch(f+"?v="+Date.now(),{cache:"no-store"}); return r.ok?await r.json():null; }catch(e){ return null; } };
+  const [P,R]=await Promise.all([lire("donnees/promos.json"),lire("donnees/recettes.json")]); let ch=false;
+  if(P&&Array.isArray(P.promos)){
+    const l=P.promos.filter(x=>x&&ENS[x.mag]&&typeof x.ing==="string"&&+x.prix>0&&/^\d{4}-\d\d-\d\d$/.test(x.du||"")&&/^\d{4}-\d\d-\d\d$/.test(x.au||""))
+      .slice(0,400).map(x=>({mag:x.mag,produit:txtOk(x.produit,80),prix:+x.prix,avant:+x.avant>0?+x.avant:null,du:x.du,au:x.au,ing:txtOk(x.ing,40)}));
+    if(l.length){ PROMOS.length=0; PROMOS.push(...l); if(typeof P.releve==="string") RELEVE=txtOk(P.releve,40); ch=true; }
+  }
+  if(R&&Array.isArray(R.recettes)){
+    if(R.prix&&typeof R.prix==="object") Object.entries(R.prix).forEach(([k,v])=>{ if(!PRIX[k]&&Array.isArray(v)&&+v[0]>0&&["kg","L","u"].includes(v[1])) PRIX[k]=[+v[0],v[1]]; });
+    R.recettes.slice(0,1500).forEach(x=>{ const r=accepterRecette(x); if(!r) return; RECETTES.push(r); BYID[r.id]=r; ETAPES[r.id]=r.etapes; ch=true; });
+  }
+  if(ch){ render(); if(state.tab==="envies"&&typeof renderEnvies==="function") renderEnvies(); }
+}
+chargerDonnees();
 // démarrage du partage (silencieux si la page n'est pas partagée)
 (async()=>{
   try{
