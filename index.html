@@ -54,6 +54,15 @@
 .hpmv{font-size:12px;font-weight:700;padding:3px 8px;border-radius:999px;white-space:nowrap}
 .hpmv.up{background:var(--accent-soft);color:var(--accent)}.hpmv.down{background:var(--warm-soft);color:var(--warm)}
 .hpmv.same{color:var(--muted)}.hpmv.new{background:var(--warm-soft);color:var(--warm)}
+
+.bdg{display:inline-block;font-size:11px;font-weight:700;padding:1px 7px;border-radius:999px;vertical-align:1px}
+.bdg.b-eco{background:var(--accent-soft);color:var(--accent)}.bdg.b-moyen{background:var(--line);color:var(--ink)}.bdg.b-plaisir{background:var(--warm-soft);color:var(--warm)}
+.mixgrid{display:grid;gap:8px;margin:8px 0}
+.mixrow{display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:center;background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:12px;padding:8px 10px}
+.mixrow.b-moyen{border-left-color:var(--muted)}.mixrow.b-plaisir{border-left-color:var(--warm)}
+.mixrow>span:first-child{display:grid}.mixrow small{color:var(--muted);font-size:12px}
+.mixstep{display:flex;align-items:center;gap:8px}.mixstep b{font-family:var(--display);font-size:20px;min-width:18px;text-align:center}
+.mixnow{grid-column:1/-1;font-size:12px;color:var(--muted)}
 </style>
 <title>Menus de la semaine</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -784,8 +793,37 @@ const RECETTES = [
  {id:"pizza",nom:"Pizza maison",acc:"Salade verte",t:25,astuce:"La pâte toute prête évite la levée.",ing:[["Pâte à pizza",2,"rouleau","cre"],["Coulis de tomate",50,"cl","epi"],["Jambon cuit",200,"g","bou"],["Mozzarella",2,"boule","cre"],["Champignons",250,"g","fl"],["Laitue",1,"","fl"]]},
  {id:"poisson",nom:"Poisson pané et purée",acc:"Haricots verts",t:25,astuce:"Les surgelés gardent le budget bas et se cuisent sans décongeler.",ing:[["Poisson pané",15,"","sur"],["Pommes de terre",1200,"g","fl"],["Lait",20,"cl","cre"],["Beurre",50,"g","cre"],["Haricots verts",600,"g","sur"]]},
  {id:"soupe",nom:"Soupe de légumes et tartines",acc:"Tartines au fromage",t:30,astuce:"Faites-en plus : la soupe se garde trois jours au frigo.",ing:[["Poireaux",3,"","fl"],["Carottes",500,"g","fl"],["Pommes de terre",500,"g","fl"],["Oignons",1,"","fl"],["Baguettes",2,"","bl"],["Fromage en tranches",300,"g","cre"]]},
- {id:"curry",nom:"Curry de pois chiches",acc:"Riz",t:25,astuce:"Un soir sans viande, rassasiant et très économique.",ing:[["Pois chiches",3,"boîte","epi"],["Lait de coco",2,"boîte","epi"],["Tomates concassées",1,"boîte","epi"],["Oignons",1,"","fl"],["Épinards",450,"g","sur"],["Pâte de curry",1,"pot","epi"],["Riz",400,"g","epi"]]}
+ {id:"curry",nom:"Curry de pois chiches",acc:"Riz",t:25,astuce:"Un soir sans viande, rassasiant et très économique.",ing:[["Pois chiches",3,"boîte","epi"],["Lait de coco",2,"boîte","epi"],["Tomates concassées",1,"boîte","epi"],["Oignons",1,"","fl"],["Épinards",450,"g","sur"],["Pâte de curry",1,"pot","epi"],["Riz",400,"g","epi"]]},
+ {id:"dahl",nom:"Dahl de lentilles corail",acc:"Riz et yaourt",t:25,b:"eco",p:"vege",f:"riz",astuce:"Les lentilles corail cuisent en 15 minutes, sans trempage.",ing:[["Lentilles corail", 400, "g", "epi"], ["Lait de coco", 1, "boîte", "epi"], ["Tomates concassées", 1, "boîte", "epi"], ["Oignons", 2, "", "fl"], ["Pâte de curry", 1, "pot", "epi"], ["Riz", 400, "g", "epi"]]},
+ {id:"gratinpates",nom:"Gratin de pâtes au jambon",acc:"Salade verte",t:30,b:"eco",p:"porc",f:"pates",astuce:"Préparez-le la veille : il n'y a plus qu'à le passer au four.",ing:[["Macaroni", 600, "g", "epi"], ["Jambon cuit", 200, "g", "bou"], ["Crème fraîche", 25, "cl", "cre"], ["Lait", 20, "cl", "cre"], ["Fromage râpé", 150, "g", "cre"], ["Laitue", 1, "", "fl"]]},
+ {id:"bolo",nom:"Spaghetti bolognaise",acc:"Fromage râpé",t:30,b:"eco",p:"boeuf",f:"pates",astuce:"Doublez la sauce et congelez-en la moitié pour une lasagne plus tard.",ing:[["Spaghetti", 600, "g", "epi"], ["Haché porc-bœuf", 500, "g", "bou"], ["Tomates concassées", 2, "boîte", "epi"], ["Carottes", 200, "g", "fl"], ["Oignons", 1, "", "fl"], ["Fromage râpé", 80, "g", "cre"]]},
+ {id:"boudin",nom:"Boudin, compote et purée",acc:"Chou rouge ou salade",t:25,b:"eco",p:"porc",f:"pdt",astuce:"Le grand classique belge du soir, à petit prix.",ing:[["Boudin", 10, "", "bou"], ["Pommes de terre", 1200, "g", "fl"], ["Compote de pommes", 1, "pot", "epi"], ["Lait", 20, "cl", "cre"], ["Beurre", 50, "g", "cre"]]},
+ {id:"quesadillas",nom:"Quesadillas haricots et fromage",acc:"Tomates et maïs",t:20,b:"eco",p:"vege",f:"pain",astuce:"Coupées en triangles, elles se mangent avec les doigts.",ing:[["Tortillas", 10, "", "epi"], ["Haricots rouges", 2, "boîte", "epi"], ["Maïs", 1, "boîte", "epi"], ["Fromage râpé", 250, "g", "cre"], ["Poivrons", 1, "", "fl"], ["Tomates", 4, "", "fl"]]},
+ {id:"pesto",nom:"Pâtes au pesto et haricots verts",acc:"Tomates cerises",t:15,b:"eco",p:"vege",f:"pates",astuce:"Le plat le plus rapide de la liste : 15 minutes montre en main.",ing:[["Penne", 600, "g", "epi"], ["Pesto", 2, "pot", "epi"], ["Haricots verts", 400, "g", "sur"], ["Tomates cerises", 250, "g", "fl"], ["Fromage râpé", 60, "g", "cre"]]},
+ {id:"shakshuka",nom:"Œufs pochés à la tomate (shakshuka)",acc:"Pain grillé",t:25,b:"eco",p:"oeufs",f:"pain",astuce:"Les œufs cuisent directement dans la sauce : une seule poêle à laver.",ing:[["Œufs", 10, "", "cre"], ["Tomates concassées", 2, "boîte", "epi"], ["Poivrons", 2, "", "fl"], ["Oignons", 2, "", "fl"], ["Baguettes", 2, "", "bl"]]},
+ {id:"gnocchis",nom:"Gnocchis poêlés tomate et mozzarella",acc:"Salade verte",t:15,b:"eco",p:"vege",f:"pates",astuce:"Poêlés sans cuisson à l'eau, les gnocchis restent croustillants.",ing:[["Gnocchis", 1500, "g", "cre"], ["Coulis de tomate", 50, "cl", "epi"], ["Mozzarella", 2, "boule", "cre"], ["Laitue", 1, "", "fl"]]},
+ {id:"hotdog",nom:"Hot-dogs maison",acc:"Carottes râpées",t:15,b:"eco",p:"porc",f:"pain",astuce:"Les enfants garnissent eux-mêmes : succès garanti.",ing:[["Saucisses de Francfort", 10, "", "bou"], ["Pains à hot-dog", 10, "", "bl"], ["Oignons", 2, "", "fl"], ["Carottes", 500, "g", "fl"], ["Fromage râpé", 80, "g", "cre"]]},
+ {id:"parmentier",nom:"Hachis parmentier express",acc:"Salade verte",t:30,b:"eco",p:"boeuf",f:"pdt",astuce:"La purée maison se fait pendant que la viande cuit.",ing:[["Haché porc-bœuf", 500, "g", "bou"], ["Pommes de terre", 1200, "g", "fl"], ["Oignons", 1, "", "fl"], ["Lait", 20, "cl", "cre"], ["Beurre", 40, "g", "cre"], ["Fromage râpé", 80, "g", "cre"], ["Laitue", 1, "", "fl"]]},
+ {id:"couscous",nom:"Couscous express aux merguez",acc:"Harissa à part",t:30,b:"moyen",p:"boeuf",f:"semoule",astuce:"La semoule gonfle en 5 minutes hors du feu.",ing:[["Semoule", 500, "g", "epi"], ["Merguez", 10, "", "bou"], ["Pois chiches", 1, "boîte", "epi"], ["Courgettes", 2, "", "fl"], ["Carottes", 300, "g", "fl"], ["Tomates concassées", 1, "boîte", "epi"], ["Épices à couscous", 1, "sachet", "epi"]]},
+ {id:"pouletcurry",nom:"Poulet au curry et courgettes",acc:"Riz",t:25,b:"moyen",p:"volaille",f:"riz",astuce:"Version douce pour les enfants : ajoutez la crème avant de goûter.",ing:[["Blancs de poulet", 700, "g", "bou"], ["Courgettes", 2, "", "fl"], ["Oignons", 1, "", "fl"], ["Crème fraîche", 20, "cl", "cre"], ["Pâte de curry", 1, "pot", "epi"], ["Riz", 400, "g", "epi"]]},
+ {id:"nouilles",nom:"Nouilles sautées au poulet",acc:"Sauce soja",t:20,b:"moyen",p:"volaille",f:"pates",astuce:"Tout est coupé avant d'allumer le feu : la cuisson prend 8 minutes.",ing:[["Nouilles chinoises", 500, "g", "epi"], ["Blancs de poulet", 500, "g", "bou"], ["Poivrons", 2, "", "fl"], ["Carottes", 300, "g", "fl"], ["Oignons", 1, "", "fl"], ["Sauce soja", 1, "flacon", "epi"]]},
+ {id:"cordonbleu",nom:"Cordons bleus et pommes de terre sautées",acc:"Haricots verts",t:25,b:"moyen",p:"volaille",f:"pdt",astuce:"Les pommes de terre précuites en sachet font gagner 10 minutes.",ing:[["Cordons bleus", 5, "", "bou"], ["Pommes de terre", 1200, "g", "fl"], ["Haricots verts", 600, "g", "sur"], ["Beurre", 30, "g", "cre"]]},
+ {id:"cotesporc",nom:"Côtes de porc, compote et pommes de terre",acc:"Salade verte",t:25,b:"moyen",p:"porc",f:"pdt",astuce:"Une compote de pommes réchauffée accompagne très bien le porc.",ing:[["Côtes de porc", 750, "g", "bou"], ["Pommes de terre", 1200, "g", "fl"], ["Compote de pommes", 1, "pot", "epi"], ["Beurre", 30, "g", "cre"], ["Laitue", 1, "", "fl"]]},
+ {id:"escalopes",nom:"Escalopes de poulet panées et pâtes tomate",acc:"Salade verte",t:30,b:"moyen",p:"volaille",f:"pates",astuce:"Aplatissez les escalopes : elles cuisent deux fois plus vite.",ing:[["Blancs de poulet", 700, "g", "bou"], ["Chapelure", 1, "paquet", "epi"], ["Œufs", 2, "", "cre"], ["Spaghetti", 500, "g", "epi"], ["Coulis de tomate", 50, "cl", "epi"], ["Laitue", 1, "", "fl"]]},
+ {id:"pita",nom:"Pitas au poulet et tzatziki",acc:"Tomates et concombre",t:20,b:"moyen",p:"volaille",f:"pain",astuce:"Le tzatziki maison : yaourt, concombre râpé, sel, un peu d'ail.",ing:[["Blancs de poulet", 600, "g", "bou"], ["Pains pita", 10, "", "bl"], ["Yaourt grec", 500, "g", "cre"], ["Concombre", 1, "", "fl"], ["Tomates", 4, "", "fl"], ["Oignons", 1, "", "fl"]]},
+ {id:"volauvent",nom:"Vol-au-vent express",acc:"Frites au four",t:30,b:"moyen",p:"volaille",f:"pain",astuce:"Le plat du dimanche belge en version rapide de semaine.",ing:[["Blancs de poulet", 600, "g", "bou"], ["Champignons", 250, "g", "fl"], ["Bouchées feuilletées", 10, "", "bl"], ["Crème fraîche", 25, "cl", "cre"], ["Bouillon de volaille", 2, "cube", "epi"], ["Frites au four", 1500, "g", "sur"]]},
+ {id:"wok",nom:"Wok de bœuf aux légumes",acc:"Riz",t:20,b:"moyen",p:"boeuf",f:"riz",astuce:"Coupez la viande très fine : elle cuit en 2 minutes et reste tendre.",ing:[["Lanières de bœuf", 500, "g", "bou"], ["Brocoli", 500, "g", "sur"], ["Poivrons", 2, "", "fl"], ["Oignons", 1, "", "fl"], ["Sauce soja", 1, "flacon", "epi"], ["Riz", 400, "g", "epi"]]},
+ {id:"burger",nom:"Burgers maison et frites",acc:"Salade et tomates",t:25,b:"plaisir",p:"boeuf",f:"pain",astuce:"Les frites au four cuisent pendant que vous montez les burgers.",ing:[["Steaks hachés pur bœuf", 5, "", "bou"], ["Pains burger", 5, "", "bl"], ["Cheddar en tranches", 5, "", "cre"], ["Tomates", 3, "", "fl"], ["Laitue", 1, "", "fl"], ["Oignons", 1, "", "fl"], ["Frites au four", 1500, "g", "sur"]]},
+ {id:"steakfrites",nom:"Steak, frites, salade",acc:"Sauce au poivre ou béarnaise",t:25,b:"plaisir",p:"boeuf",f:"pdt",astuce:"Sortez les steaks du frigo 15 minutes avant : ils cuisent plus régulièrement.",ing:[["Steaks de bœuf", 750, "g", "bou"], ["Frites au four", 1500, "g", "sur"], ["Laitue", 1, "", "fl"], ["Tomates", 3, "", "fl"], ["Beurre", 40, "g", "cre"]]},
+ {id:"saumon",nom:"Saumon, riz et brocoli",acc:"Citron",t:20,b:"plaisir",p:"poisson",f:"riz",astuce:"Le saumon cuit au four sans surveillance, 12 minutes.",ing:[["Pavés de saumon", 5, "", "sur"], ["Riz", 400, "g", "epi"], ["Brocoli", 600, "g", "sur"], ["Citrons", 1, "", "fl"], ["Crème fraîche", 15, "cl", "cre"]]},
+ {id:"scampis",nom:"Scampis à l'ail et tagliatelles",acc:"Salade verte",t:20,b:"plaisir",p:"poisson",f:"pates",astuce:"Les scampis surgelés décongèlent en 10 minutes sous l'eau froide.",ing:[["Scampis", 600, "g", "sur"], ["Tagliatelles", 500, "g", "epi"], ["Crème fraîche", 25, "cl", "cre"], ["Persil", 1, "botte", "fl"], ["Laitue", 1, "", "fl"]]},
+ {id:"tagsaumon",nom:"Tagliatelles au saumon fumé",acc:"Salade verte",t:15,b:"plaisir",p:"poisson",f:"pates",astuce:"Ajoutez le saumon hors du feu : il reste tendre.",ing:[["Tagliatelles", 600, "g", "epi"], ["Saumon fumé", 200, "g", "cre"], ["Crème fraîche", 25, "cl", "cre"], ["Citrons", 1, "", "fl"], ["Laitue", 1, "", "fl"]]},
+ {id:"fajitas",nom:"Fajitas au bœuf",acc:"Guacamole",t:20,b:"plaisir",p:"boeuf",f:"pain",astuce:"Tout se pose au milieu de la table : chacun compose.",ing:[["Lanières de bœuf", 600, "g", "bou"], ["Tortillas", 10, "", "epi"], ["Poivrons", 3, "", "fl"], ["Oignons", 2, "", "fl"], ["Avocats", 2, "", "fl"], ["Crème fraîche", 15, "cl", "cre"], ["Fromage râpé", 100, "g", "cre"]]},
+ {id:"moules",nom:"Moules marinières et frites",acc:"Mayonnaise",t:25,b:"plaisir",p:"poisson",f:"pdt",astuce:"De septembre à avril, c'est la saison des moules de Zélande.",ing:[["Moules", 3000, "g", "bou"], ["Céleri", 1, "", "fl"], ["Oignons", 2, "", "fl"], ["Persil", 1, "botte", "fl"], ["Frites au four", 1500, "g", "sur"], ["Beurre", 30, "g", "cre"]]},
+ {id:"cabillaud",nom:"Cabillaud à la crème de poireaux",acc:"Riz",t:25,b:"plaisir",p:"poisson",f:"riz",astuce:"Le poisson cuit sur les poireaux, dans la même poêle.",ing:[["Dos de cabillaud", 750, "g", "sur"], ["Poireaux", 3, "", "fl"], ["Crème fraîche", 20, "cl", "cre"], ["Beurre", 30, "g", "cre"], ["Riz", 400, "g", "epi"]]}
 ];
+// Budget (eco, moyen, plaisir), protéine et féculent des recettes de départ, pour varier les menus
+Object.entries({"carbo": ["eco", "porc", "pates"], "omelette": ["eco", "oeufs", "pdt"], "wraps": ["moyen", "volaille", "pain"], "cantonais": ["eco", "porc", "riz"], "croque": ["eco", "porc", "pain"], "chili": ["moyen", "boeuf", "riz"], "quiche": ["eco", "porc", "tarte"], "stoemp": ["eco", "porc", "pdt"], "thon": ["eco", "poisson", "pates"], "boulettes": ["moyen", "boeuf", "riz"], "pizza": ["moyen", "porc", "tarte"], "poisson": ["eco", "poisson", "pdt"], "soupe": ["eco", "vege", "pain"], "curry": ["eco", "vege", "riz"]}).forEach(([id,[b,p,f]])=>{ const r=RECETTES.find(x=>x.id===id); if(r){ r.b=b; r.p=p; r.f=f; } });
 const BYID = Object.fromEntries(RECETTES.map(r=>[r.id,r]));
 const RAYKEYS=["fl","bou","cre","bl","epi","sur"];
 // Recette de la famille : quantités ramenées à 5 personnes, photo en data URL facultative
@@ -814,6 +852,33 @@ const photoSrc = id => { const r=BYID[id]; if(r&&r.perso) return r.photo||PLACEH
 const photoPage = id => PHOTOS[id]?"https://commons.wikimedia.org/wiki/File:"+encodeURIComponent(PHOTOS[id]):null;
 // Étapes de préparation
 const ETAPES = {
+ dahl:["Émincez les oignons et faites-les revenir 3 minutes dans une casserole huilée avec la pâte de curry.", "Ajoutez les lentilles rincées, les tomates, le lait de coco et 50 cl d'eau.", "Laissez mijoter 15 minutes en remuant : les lentilles doivent fondre. Salez.", "Pendant ce temps, cuisez le riz. Servez le dahl sur le riz."],
+ gratinpates:["Préchauffez le four à 220 °C et faites cuire les macaroni 2 minutes de moins que sur le paquet.", "Coupez le jambon en dés. Mélangez crème, lait, la moitié du fromage, sel et poivre.", "Mélangez pâtes, jambon et sauce dans un plat, couvrez du reste de fromage.", "Enfournez 12 minutes, jusqu'à ce que le dessus soit doré."],
+ bolo:["Émincez l'oignon et râpez les carottes.", "Faites dorer le haché 5 minutes, ajoutez oignon et carottes, puis les tomates. Salez, poivrez.", "Laissez mijoter 15 minutes à feu doux.", "Cuisez les spaghetti et servez avec la sauce et le fromage."],
+ boudin:["Épluchez les pommes de terre et cuisez-les 20 minutes à l'eau salée.", "Faites cuire le boudin 10 minutes à la poêle beurrée, à feu moyen, en le retournant.", "Écrasez les pommes de terre avec le lait chaud et le beurre.", "Servez avec la compote."],
+ quesadillas:["Égouttez haricots et maïs, coupez le poivron en petits dés.", "Écrasez grossièrement les haricots à la fourchette.", "Sur une tortilla : haricots, maïs, poivron, fromage, puis une deuxième tortilla.", "Dorez 2 minutes de chaque côté dans une poêle sèche. Coupez en parts."],
+ pesto:["Faites bouillir une grande casserole d'eau salée.", "Cuisez les pâtes, ajoutez les haricots verts 6 minutes avant la fin.", "Égouttez, mélangez avec le pesto.", "Servez avec les tomates cerises coupées en deux et le fromage."],
+ shakshuka:["Émincez oignons et poivrons, faites-les fondre 8 minutes dans une grande poêle huilée.", "Ajoutez les tomates, salez, poivrez (cumin ou paprika si vous en avez) et laissez réduire 5 minutes.", "Creusez 10 petits puits et cassez-y les œufs.", "Couvrez et laissez cuire 6 à 8 minutes, jusqu'à ce que les blancs soient pris. Servez avec le pain."],
+ gnocchis:["Faites dorer les gnocchis 8 minutes dans une grande poêle huilée.", "Ajoutez le coulis de tomate, salez, poivrez, laissez chauffer 3 minutes.", "Déchirez la mozzarella par-dessus et couvrez 2 minutes pour qu'elle fonde.", "Servez avec la salade."],
+ hotdog:["Émincez les oignons et faites-les dorer 8 minutes à la poêle.", "Réchauffez les saucisses 5 minutes dans l'eau frémissante (sans bouillir).", "Passez les pains 3 minutes au four.", "Garnissez : saucisse, oignons, fromage. Servez avec les carottes râpées."],
+ parmentier:["Cuisez les pommes de terre épluchées 20 minutes à l'eau salée. Préchauffez le grill.", "Faites revenir l'oignon puis le haché 8 minutes, salez, poivrez.", "Écrasez les pommes de terre avec le lait et le beurre.", "Haché au fond du plat, purée dessus, fromage, puis 5 minutes sous le grill."],
+ couscous:["Coupez carottes et courgettes en morceaux. Faites-les revenir 5 minutes dans une casserole huilée.", "Ajoutez tomates, pois chiches égouttés, épices et 50 cl d'eau. Laissez mijoter 15 minutes.", "Grillez les merguez 10 minutes à la poêle.", "Versez 50 cl d'eau bouillante salée sur la semoule, couvrez 5 minutes, égrenez à la fourchette."],
+ pouletcurry:["Lancez la cuisson du riz.", "Coupez le poulet en dés et les courgettes en demi-rondelles. Émincez l'oignon.", "Faites dorer le poulet 5 minutes, ajoutez oignon, courgettes et pâte de curry, puis 5 minutes de plus.", "Versez la crème, laissez mijoter 5 minutes. Servez avec le riz."],
+ nouilles:["Cuisez les nouilles 3 minutes à l'eau bouillante, égouttez et rincez à l'eau froide.", "Coupez poulet, poivrons et carottes en fines lanières, émincez l'oignon.", "Saisissez le poulet 4 minutes à feu vif, ajoutez les légumes 4 minutes.", "Ajoutez les nouilles et 5 cuillères de sauce soja, mélangez 2 minutes."],
+ cordonbleu:["Coupez les pommes de terre en dés et faites-les sauter 20 minutes dans une grande poêle huilée, à couvert les 10 premières minutes.", "Cuisez les haricots verts 8 minutes à l'eau salée.", "Faites dorer les cordons bleus 6 minutes de chaque côté dans le beurre.", "Servez le tout bien chaud."],
+ cotesporc:["Cuisez les pommes de terre en robe des champs 20 minutes.", "Salez et poivrez les côtes, faites-les cuire 5 à 6 minutes de chaque côté dans le beurre.", "Coupez les pommes de terre en deux et passez-les 3 minutes dans la poêle de la viande.", "Servez avec la compote et la salade."],
+ escalopes:["Coupez les blancs en escalopes fines. Passez-les dans l'œuf battu puis dans la chapelure.", "Cuisez les spaghetti et réchauffez le coulis de tomate.", "Faites dorer les escalopes 3 minutes de chaque côté dans une poêle bien huilée.", "Servez avec les pâtes et la salade."],
+ pita:["Coupez le poulet en lanières, saisissez-le 8 minutes avec un peu de paprika.", "Râpez la moitié du concombre, mélangez au yaourt avec sel et ail : c'est le tzatziki.", "Coupez tomates, oignon et le reste du concombre.", "Réchauffez les pitas et garnissez-les."],
+ volauvent:["Enfournez les frites selon le paquet.", "Faites pocher le poulet coupé en dés 10 minutes dans 40 cl d'eau avec les cubes de bouillon.", "Faites revenir les champignons, ajoutez poulet, 20 cl du bouillon et la crème. Laissez épaissir 5 minutes.", "Réchauffez les bouchées 5 minutes au four et garnissez-les."],
+ wok:["Lancez la cuisson du riz.", "Saisissez le bœuf 2 minutes à feu très vif, réservez.", "Faites sauter brocoli, poivrons et oignon 6 minutes.", "Remettez le bœuf, ajoutez 4 cuillères de sauce soja, mélangez 1 minute."],
+ burger:["Enfournez les frites selon le paquet.", "Coupez tomates et oignon en rondelles, lavez la salade.", "Cuisez les steaks 3 minutes de chaque côté, posez le cheddar dessus la dernière minute.", "Toastez les pains et montez les burgers."],
+ steakfrites:["Enfournez les frites selon le paquet.", "Préparez la salade et les tomates.", "Saisissez les steaks dans le beurre bien chaud : 2 à 3 minutes par face pour saignant.", "Laissez reposer 2 minutes avant de servir."],
+ saumon:["Préchauffez le four à 200 °C, lancez le riz.", "Posez les pavés dans un plat, salez, poivrez, un filet d'huile : 12 minutes au four.", "Cuisez le brocoli 6 minutes à l'eau ou à la vapeur.", "Mélangez la crème avec le jus du citron pour la sauce."],
+ scampis:["Décongelez les scampis sous l'eau froide. Cuisez les tagliatelles.", "Faites revenir 3 gousses d'ail hachées dans l'huile, ajoutez les scampis 3 minutes.", "Versez la crème, salez, poivrez, laissez chauffer 2 minutes.", "Mélangez avec les pâtes et le persil haché."],
+ tagsaumon:["Cuisez les tagliatelles.", "Chauffez doucement la crème avec le zeste du citron, salez peu, poivrez.", "Coupez le saumon en lanières.", "Hors du feu, mélangez pâtes, crème et saumon."],
+ fajitas:["Coupez poivrons et oignons en lanières.", "Écrasez les avocats avec sel et un peu de citron : c'est le guacamole.", "Saisissez le bœuf 3 minutes à feu vif avec les épices, ajoutez les légumes 5 minutes.", "Réchauffez les tortillas et servez avec crème, fromage et guacamole."],
+ moules:["Enfournez les frites. Rincez les moules et jetez celles qui restent ouvertes.", "Émincez céleri et oignons, faites-les fondre 5 minutes dans le beurre d'une grande casserole.", "Ajoutez les moules, couvrez et secouez : 6 à 8 minutes à feu vif, jusqu'à ce qu'elles s'ouvrent.", "Parsemez de persil et servez avec les frites."],
+ cabillaud:["Lancez le riz. Émincez finement les poireaux.", "Faites fondre les poireaux 10 minutes dans le beurre, ajoutez la crème.", "Posez le cabillaud sur les poireaux, salez, poivrez, couvrez : 8 minutes à feu doux.", "Servez avec le riz."],
  carbo:["Faites bouillir une grande casserole d'eau salée.","Faites dorer les lardons à sec dans une poêle pendant 5 minutes.","Battez les œufs avec la crème et la moitié du fromage râpé, poivrez.","Cuisez les spaghetti selon le temps du paquet et gardez un petit verre d'eau de cuisson.","Hors du feu, mélangez les pâtes égouttées, les lardons et le mélange œufs-crème. Ajoutez un peu d'eau de cuisson s'il le faut pour une sauce onctueuse.","Servez avec le reste du fromage et la salade."],
  omelette:["Épluchez les pommes de terre et coupez-les en fines rondelles. Émincez les oignons.","Cuisez pommes de terre et oignons dans une grande poêle huilée, à couvert, pendant 15 minutes en remuant de temps en temps.","Battez les œufs avec le lait, salez et poivrez.","Versez sur les pommes de terre et laissez prendre 5 à 6 minutes à feu doux, à couvert.","Servez en parts avec la salade vinaigrette."],
  wraps:["Coupez le poulet en lanières et les poivrons en bandes.","Saisissez le poulet 5 minutes dans une poêle huilée, ajoutez les poivrons et poursuivez 5 minutes. Salez, poivrez (un peu de paprika si vous en avez).","Râpez les carottes et coupez les tomates en dés.","Réchauffez les tortillas 20 secondes à la poêle ou au micro-ondes.","Posez tout sur la table : chacun garnit et roule son wrap."],
@@ -935,6 +1000,8 @@ if(!["sam","lun"].includes(state.trip1)) state.trip1="sam";
 if(![2,3,4].includes(state.trip2)) state.trip2=3;
 if(!Array.isArray(state.tripStore)||state.tripStore.length!==2) state.tripStore=[null,null];
 if(!["eco","equi","qual"].includes(state.gamme)) state.gamme="eco";
+const cleanMix=m=>(m&&typeof m==="object")?{plaisir:Math.max(0,Math.min(7,m.plaisir|0)),moyen:Math.max(0,Math.min(7,m.moyen|0))}:null;
+state.mix=cleanMix(state.mix)||{plaisir:1,moyen:2};
 if(![1,2].includes(state.maxStores)) state.maxStores=1;
 if(![1,2,3,5].includes(state.seuil)) state.seuil=2;
 if(!state.weeks||typeof state.weeks!=="object") state.weeks={};
@@ -985,7 +1052,7 @@ function applyWeekData(w){ state.week=[...w.menu]; state.cooks=(w.cooks&&w.cooks
 { const w=state.weeks[curIso()]; if(w&&Array.isArray(w.menu)&&w.menu.length===7&&w.menu.every(id=>BYID[id])) applyWeekData(w); }
 if(!Array.isArray(state.cooks)||state.cooks.length!==7) state.cooks=Array(7).fill(null);
 function save(){ saveLocal(); if(typeof shareSync==="function"){ shareSync(); familySync(); goutsSync(); } }
-function saveLocal(){ stashWeek(); try{localStorage.setItem(KEY,JSON.stringify({outDefault:state.outDefault,customStores:state.customStores,osmStores:state.osmStores,osmAt:state.osmAt,storeFix:state.storeFix,home:state.home,perso:state.perso,avis:state.avis,exclus:state.exclus,storeOrder:state.storeOrder,storeOff:state.storeOff,storeMode:state.storeMode,onboarded:state.onboarded,emails:state.emails,weekOffset:state.weekOffset,weeks:state.weeks,statut:state.statut,journal:state.journal,week:state.week,persons:state.persons,checked:state.checked,tab:state.tab,family:state.family,cooks:state.cooks,prices:state.prices,trip1:state.trip1,trip2:state.trip2,tripStore:state.tripStore,gamme:state.gamme,maxStores:state.maxStores,seuil:state.seuil}))}catch(e){}}
+function saveLocal(){ stashWeek(); try{localStorage.setItem(KEY,JSON.stringify({outDefault:state.outDefault,mix:state.mix,customStores:state.customStores,osmStores:state.osmStores,osmAt:state.osmAt,storeFix:state.storeFix,home:state.home,perso:state.perso,avis:state.avis,exclus:state.exclus,storeOrder:state.storeOrder,storeOff:state.storeOff,storeMode:state.storeMode,onboarded:state.onboarded,emails:state.emails,weekOffset:state.weekOffset,weeks:state.weeks,statut:state.statut,journal:state.journal,week:state.week,persons:state.persons,checked:state.checked,tab:state.tab,family:state.family,cooks:state.cooks,prices:state.prices,trip1:state.trip1,trip2:state.trip2,tripStore:state.tripStore,gamme:state.gamme,maxStores:state.maxStores,seuil:state.seuil}))}catch(e){}}
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 function cookSelect(d,extra=""){
   const v=state.cooks[d];
@@ -1049,7 +1116,7 @@ function renderDays(){
         <span class="dinfo">
           <span class="dday">${JOURS[d]} ${fmtShort(dayOffset(d))}${isToday?' <span class="tonight">Ce soir</span>':""}</span>
           <b class="dish">${esc(r.nom)}</b>
-          <span class="dmeta">${hc?`${r.t} min · ${hc} à table`:"Personne à table"}${state.cooks[d]?` · <span class="dcook">${esc(state.cooks[d])} cuisine</span>`:""}${pc&&hc?` · <span class="promo">promo</span>`:""}</span>
+          <span class="dmeta"><span class="bdg b-${budgetOf(r)}">${BUDGETS[budgetOf(r)].court}</span> ${hc?`${r.t} min · ${hc} à table`:"Personne à table"}${state.cooks[d]?` · <span class="dcook">${esc(state.cooks[d])} cuisine</span>`:""}${pc&&hc?` · <span class="promo">promo</span>`:""}</span>
           ${w.length&&hc?`<span class="dwarn">${esc(w.join(", "))} n'aime${w.length>1?"nt":""} pas ce plat</span>`:""}
         </span>
         <span class="dchev" aria-hidden="true">›</span>
@@ -1158,6 +1225,7 @@ function renderCourses(){
 // ---- Prix de revient (estimations) ----
 // Prix indicatifs en marque distributeur : [prix, unité] avec unité kg, L ou u (pièce)
 const PRIX = {
+ "Lentilles corail":[3, "kg"],"Macaroni":[1.4, "kg"],"Tagliatelles":[2.2, "kg"],"Maïs":[0.8, "u"],"Pesto":[1.8, "u"],"Tomates cerises":[6, "kg"],"Boudin":[0.6, "u"],"Compote de pommes":[1.6, "u"],"Gnocchis":[2.6, "kg"],"Saucisses de Francfort":[0.3, "u"],"Pains à hot-dog":[0.25, "u"],"Semoule":[1.6, "kg"],"Merguez":[0.6, "u"],"Courgettes":[0.8, "u"],"Épices à couscous":[1, "u"],"Nouilles chinoises":[3, "kg"],"Sauce soja":[1, "u"],"Cordons bleus":[1.2, "u"],"Côtes de porc":[8, "kg"],"Chapelure":[1.2, "u"],"Pains pita":[0.25, "u"],"Yaourt grec":[3.5, "kg"],"Concombre":[0.8, "u"],"Bouchées feuilletées":[0.5, "u"],"Bouillon de volaille":[0.2, "u"],"Frites au four":[2, "kg"],"Lanières de bœuf":[17, "kg"],"Brocoli":[2.5, "kg"],"Steaks hachés pur bœuf":[1.5, "u"],"Pains burger":[0.4, "u"],"Cheddar en tranches":[0.2, "u"],"Steaks de bœuf":[22, "kg"],"Pavés de saumon":[2.9, "u"],"Citrons":[0.45, "u"],"Scampis":[20, "kg"],"Persil":[0.9, "u"],"Saumon fumé":[38, "kg"],"Avocats":[0.9, "u"],"Moules":[5.5, "kg"],"Céleri":[1.3, "u"],"Dos de cabillaud":[18, "kg"],
  "Spaghetti":[1.4,"kg"],"Penne":[1.4,"kg"],"Lardons":[9,"kg"],"Œufs":[0.25,"u"],"Crème fraîche":[4.5,"L"],"Fromage râpé":[9,"kg"],
  "Laitue":[1,"u"],"Pommes de terre":[1,"kg"],"Oignons":[0.25,"u"],"Lait":[1,"L"],"Blancs de poulet":[9.5,"kg"],"Tortillas":[0.2,"u"],
  "Poivrons":[0.7,"u"],"Carottes":[1.2,"kg"],"Tomates":[0.4,"u"],"Riz":[1.8,"kg"],"Jambon cuit":[12,"kg"],"Petits pois":[2,"kg"],
@@ -1177,6 +1245,20 @@ function itemCost(n,u,q,ray,g){ const p=PRIX[n]; if(!p) return 0; const gm=GAMME
   const qty = u==="g"? q/1000 : u==="cl"? q/100 : q; return p[0]*qty*gm*promoFactor(n); }
 function recipeCost(r,g,d){ return r.ing.reduce((s,[n,q,u,ray])=>s+itemCost(n,u,scale(q,d),ray,g),0) + (r.prix? r.prix*headcount(d)/5*GAMMES[g||state.gamme].m.epi : 0); }
 function weekCost(g){ return state.week.reduce((s,id,d)=>s+recipeCost(BYID[id],g,d),0); }
+function renderMix(){ const home=[0,1,2,3,4,5,6].filter(d=>!isOut(d)), q=mixFor(home.length), now={eco:0,moyen:0,plaisir:0}, P={}, F={};
+  home.forEach(d=>{ const r=BYID[state.week[d]]; if(!r) return; now[budgetOf(r)]++; if(r.p) P[r.p]=(P[r.p]||0)+1; if(r.f) F[r.f]=(F[r.f]||0)+1; });
+  const step=(k,v,max)=>`<span class="mixstep"><button class="sbtn edit-only" data-mix="${k}" data-dv="-1" ${v<=0?"disabled":""} aria-label="Un de moins">−</button><b>${v}</b><button class="sbtn edit-only" data-mix="${k}" data-dv="1" ${max<=0?"disabled":""} aria-label="Un de plus">+</button></span>`;
+  const libre=home.length-q.plaisir-q.moyen;
+  return `<h3 class="shopray">Répartition des repas de la semaine</h3>
+    <p class="note">Les nouvelles propositions suivent cette règle, pour ${home.length} soirs à la maison. Elle vaut pour toute la famille.</p>
+    <div class="mixgrid">
+      <div class="mixrow b-eco"><span><b>${BUDGETS.eco.nom}</b><small>${BUDGETS.eco.desc}</small></span><span class="mixstep"><b>${q.eco}</b><small>le reste</small></span><span class="mixnow">${now.eco} cette semaine</span></div>
+      <div class="mixrow b-moyen"><span><b>${BUDGETS.moyen.nom}</b><small>${BUDGETS.moyen.desc}</small></span>${step("moyen",q.moyen,libre)}<span class="mixnow">${now.moyen} cette semaine</span></div>
+      <div class="mixrow b-plaisir"><span><b>${BUDGETS.plaisir.nom}</b><small>${BUDGETS.plaisir.desc}</small></span>${step("plaisir",q.plaisir,libre)}<span class="mixnow">${now.plaisir} cette semaine</span></div>
+    </div>
+    <p class="note">Variété de la semaine : ${Object.entries(P).map(([k,v])=>`${v} ${PROT[k]||k}`).join(", ")||"–"} · ${Object.entries(F).map(([k,v])=>`${v} ${FECU[k]||k}`).join(", ")||"–"}.
+      Règles : pas plus de 2 fois la même viande ni le même féculent, jamais deux soirs de suite, du poisson et un repas sans viande quand c'est possible, et pas les plats des deux dernières semaines.</p>
+    <div class="actions"><button class="btn edit-only" id="mixpropose">Proposer un menu avec cette répartition</button></div>`; }
 function renderBudget(){
   const couverts=totalCouverts()||1, per=v=>eur(v/couverts);
   const g=GAMMES[state.gamme], w=weekCost(state.gamme);
@@ -1185,6 +1267,7 @@ function renderBudget(){
     <div class="bigcost"><span>${eur(w)}</span><small>soit ${per(w)} par personne et par repas · ${totalCouverts()} couverts dans la semaine · gamme ${g.nom.toLowerCase()}</small></div>
     <div class="gammes" role="radiogroup" aria-label="Gamme de produits">${Object.entries(GAMMES).map(([k,x])=>{const c=weekCost(k);
       return `<button class="gamme" role="radio" aria-checked="${k===state.gamme}" data-gamme="${k}"><b>${x.nom}</b><span class="gc">${eur(c)}</span><small>${per(c)} / pers. / repas</small><small class="gd">${x.desc}</small><small class="gd">Où : ${x.ou}</small></button>`}).join("")}</div>
+    ${renderMix()}
     <p class="note">Le plus économique cette semaine : ${sorted[0].r.nom.toLowerCase()} (${eur(sorted[0].c)} par personne). Le plus cher : ${sorted[6].r.nom.toLowerCase()} (${eur(sorted[6].c)} par personne).</p>
     <p class="note">Estimation à partir de prix indicatifs, promos de la semaine déduites. Les ingrédients sont comptés à la quantité utilisée, pas au paquet entier.</p>`;
   const absN=Object.values(state.absents).reduce((s,a)=>s+a.length,0);
@@ -1422,6 +1505,8 @@ $("plan").addEventListener("change",e=>{
   if(e.target.id==="maxstores"){state.maxStores=+e.target.value;}
   else if(e.target.id==="seuil"){state.seuil=+e.target.value;}
   else return; save(); renderCourses();});
+$("budget").addEventListener("click",e=>{ const m=e.target.closest("[data-mix]"); if(m){ const k=m.dataset.mix, v=Math.max(0,(state.mix[k]|0)+(+m.dataset.dv)); state.mix={...state.mix,[k]:v}; save(); render(); toast("Répartition enregistrée : elle s'appliquera à la prochaine proposition"); return; }
+  if(e.target.closest("#mixpropose")){ $("propose")&&$("propose").click(); return; } });
 $("budget").addEventListener("click",e=>{const b=e.target.closest("[data-gamme]"); if(!b) return; state.gamme=b.dataset.gamme; save(); render();});
 $("uncheck").onclick=()=>{state.checked={};save();renderCourses();toast("Liste remise à zéro");};
 $("copy").onclick=()=>{
@@ -1437,18 +1522,51 @@ $("copy").onclick=()=>{
 // ======================= Semaines et partage familial =======================
 // Proposition automatique : évite les plats de la semaine précédente, privilégie les promos,
 // plats les plus rapides en semaine et ceux de 30 min le week-end.
+// ---- Règle des budgets et de la variété ----
+const BUDGETS={eco:{nom:"Économique",court:"Éco",desc:"Le quotidien à petit prix"},moyen:{nom:"Budget moyen",court:"Moyen",desc:"Un peu plus de viande ou de variété"},plaisir:{nom:"Pour se faire plaisir",court:"Plaisir",desc:"Le repas qu'on attend dans la semaine"}};
+const PROT={boeuf:"bœuf",porc:"porc",volaille:"volaille",poisson:"poisson",oeufs:"œufs",vege:"végétarien"};
+const FECU={pates:"pâtes",riz:"riz",pdt:"pommes de terre",pain:"pain ou galette",tarte:"pâte à tarte",semoule:"semoule"};
+// Recette de famille : budget déduit de son prix de revient par personne (gamme économique)
+function budgetOf(r){ if(r.b) return r.b; let c=0; try{ c=r.ing.reduce((s,[n,q,u,ray])=>s+itemCost(n,u,q,ray,"eco"),0)/5+(r.prix?r.prix/5:0); }catch(e){} return c<1.6?"eco":c<2.6?"moyen":"plaisir"; }
+function mixFor(n){ const m=state.mix||{plaisir:1,moyen:2}; let pl=Math.min(n,Math.max(0,m.plaisir|0)), mo=Math.min(n-pl,Math.max(0,m.moyen|0)); return {plaisir:pl,moyen:mo,eco:n-pl-mo}; }
+function recentIds(nbWeeks){ const ids=new Set(), src={...state.weeks,...(typeof SEMAINES==="object"?SEMAINES:{})};
+  for(let k=1;k<=nbWeeks;k++){ const iso=isoOf(new Date(MONDAY.getFullYear(),MONDAY.getMonth(),MONDAY.getDate()-7*k)); const w=src[iso]; if(w&&Array.isArray(w.menu)) w.menu.forEach(id=>ids.add(id)); } return ids; }
 function proposeMenu(){
-  const prevIso=isoOf(new Date(MONDAY.getFullYear(),MONDAY.getMonth(),MONDAY.getDate()-7));
-  const prev=(state.weeks[prevIso]&&state.weeks[prevIso].menu)||[];
-  const rnd=()=>Math.random()*0.8;
-  const score=r=>promoCount(r)+rnd()+likeScore(r)*0.6-dislikesFor(r,null).length*1.5+(typeof bonusRetours==="function"?bonusRetours(r):0);
-  let pool=RECETTES.filter(r=>!prev.includes(r.id)).map(r=>({r,s:score(r)})).sort((a,b)=>b.s-a.s).map(x=>x.r);
-  if(pool.length<7) pool=pool.concat(RECETTES.filter(r=>!pool.includes(r)).sort(()=>Math.random()-.5));
-  const pick=pool.slice(0,7);
-  const long=pick.filter(r=>r.t>=30), quick=pick.filter(r=>r.t<30).sort(()=>Math.random()-.5);
-  const order=[...quick.slice(0,5)]; const rest=[...quick.slice(5),...long];
-  while(order.length<5&&rest.length) order.push(rest.shift());
-  return [...order,...rest].slice(0,7).map(r=>r.id);
+  const out=outList(state.exterieur), home=[0,1,2,3,4,5,6].filter(d=>!out.includes(d)), quota=mixFor(home.length);
+  const recent1=recentIds(1), recent2=recentIds(2);
+  const base=r=>promoCount(r)*0.6+likeScore(r)*0.6-dislikesFor(r,null).length*1.5+(typeof bonusRetours==="function"?bonusRetours(r):0)-(recent1.has(r.id)?6:recent2.has(r.id)?2:0);
+  const S=Object.fromEntries(RECETTES.map(r=>[r.id,base(r)]));
+  // le plat plaisir de préférence le vendredi ou le dimanche, les plats de 30 minutes plutôt le week-end
+  const order=[...home].sort((x,y)=>([4,6,5,3,2,1,0].indexOf(x))-([4,6,5,3,2,1,0].indexOf(y)));
+  const sols=[];
+  for(let essai=0;essai<250;essai++){
+    const left={...quota}, used=new Set(), pick={}, cntP={}, cntF={}; let total=0, ok=true;
+    for(const d of order){
+      const want=left.plaisir>0?"plaisir":left.moyen>0&&Math.random()<left.moyen/(left.moyen+left.eco)?"moyen":left.eco>0?"eco":"moyen";
+      const cand=RECETTES.filter(r=>!used.has(r.id)&&budgetOf(r)===want).filter(r=>{
+        const p=r.p||"autre", f=r.f||"autre";
+        if((cntF[f]||0)>=2) return false;                                   // pas plus de 2 fois le même féculent
+        if(p!=="vege"&&(cntP[p]||0)>=2) return false;                       // pas plus de 2 fois la même viande
+        if(pick[d-1]&&(BYID[pick[d-1]].p===p&&p!=="vege"||BYID[pick[d-1]].f===f)) return false;   // pas deux soirs de suite pareil
+        if(pick[d+1]&&(BYID[pick[d+1]].p===p&&p!=="vege"||BYID[pick[d+1]].f===f)) return false;
+        if(r.t>=30&&(d<4)&&Math.random()<0.5) return false;                 // les plats plus longs plutôt en fin de semaine
+        return true; });
+      if(!cand.length){ ok=false; break; }
+      const sc=cand.map(r=>({r,s:S[r.id]+Math.random()*3})).sort((x,y)=>y.s-x.s)[0];
+      pick[d]=sc.r.id; used.add(sc.r.id); cntP[sc.r.p]=(cntP[sc.r.p]||0)+1; cntF[sc.r.f]=(cntF[sc.r.f]||0)+1; left[want]--; total+=sc.s;
+    }
+    if(!ok) continue;
+    const prots=Object.keys(cntP); if(prots.includes("poisson")) total+=1; if(prots.includes("vege")||prots.includes("oeufs")) total+=1.5; total+=prots.length*0.5;
+    sols.push({total,pick});
+  }
+  // on tire au hasard parmi les 25 meilleures combinaisons : les menus changent d'une proposition à l'autre
+  sols.sort((x,y)=>y.total-x.total); const best=sols.length?sols[Math.floor(Math.random()*Math.min(25,sols.length))]:null;
+  const res=Array(7).fill(null);
+  if(best) Object.entries(best.pick).forEach(([d,id])=>{ res[+d]=id; });
+  // jours à l'extérieur, ou si aucune combinaison ne respecte les règles : on complète simplement
+  const pool=RECETTES.map(r=>r.id).filter(id=>!res.includes(id)).sort((x,y)=>S[y]-S[x]);
+  for(let d=0;d<7;d++) if(!res[d]) res[d]=pool.shift()||RECETTES[d%RECETTES.length].id;
+  return res;
 }
 function weekLabel(){ const a=dayOffset(0), b=dayOffset(6);
   return `${a.getDate()} ${a.getMonth()!==b.getMonth()?a.toLocaleDateString("fr-BE",{month:"short"})+" ":""}au ${b.getDate()} ${b.toLocaleDateString("fr-BE",{month:"long"})}`; }
@@ -1689,11 +1807,11 @@ let delArm=null;
 
 // --- partage des goûts ---
 let unsubGouts=null, lastGouts=null, goutsWriting=false, goutsDirty=false;
-const goutsPayload=()=>({avis:state.avis,exclus:state.exclus,exterieurHabituel:state.outDefault});
+const goutsPayload=()=>({avis:state.avis,exclus:state.exclus,exterieurHabituel:state.outDefault,repartition:state.mix});
 function subscribeGouts(){ if(!DB) return; if(unsubGouts) unsubGouts();
   unsubGouts=DB.doc("famille/gouts").onSnapshot(snap=>{
     if(snap.exists&&!snap.metadata.hasPendingWrites){ const g=snap.data();
-      state.avis=(g.avis&&typeof g.avis==="object")?JSON.parse(JSON.stringify(g.avis)):{}; if(cleanDays(g.exterieurHabituel)) state.outDefault=cleanDays(g.exterieurHabituel); state.exclus=(g.exclus&&typeof g.exclus==="object")?JSON.parse(JSON.stringify(g.exclus)):{};
+      state.avis=(g.avis&&typeof g.avis==="object")?JSON.parse(JSON.stringify(g.avis)):{}; if(cleanDays(g.exterieurHabituel)) state.outDefault=cleanDays(g.exterieurHabituel); if(cleanMix(g.repartition)) state.mix=cleanMix(g.repartition); state.exclus=(g.exclus&&typeof g.exclus==="object")?JSON.parse(JSON.stringify(g.exclus)):{};
       lastGouts=JSON.stringify(goutsPayload()); saveLocal(); render(); if(modalCtx) renderModal(); if(sheetCtx&&sheetCtx.type==="gouts") renderSheet(); }
     else if(!snap.exists&&!snap.metadata.fromCache){ lastGouts=""; goutsSync(); }
   },()=>{}); }
@@ -1736,14 +1854,14 @@ window.addEventListener("keydown",e=>{ if(e.key==="Escape"&&sheetCtx){ e.stopPro
 // --- Galerie de plats ---
 function renderGallery(){ const c=sheetCtx, d=c.d;
   $("seyebrow").textContent=d===null?"Recettes":`${JOURS[d]} ${fmtShort(dayOffset(d))}`; $("stitle").textContent="Choisir le plat"; $("sextra").innerHTML="";
-  const F=[["tous","Tous"],["rapides","20 min max"],["promo","En promo"],["aimes","Aimés"],["famille","De la famille"]];
+  const F=[["tous","Tous"],["eco","Économiques"],["moyen","Budget moyen"],["plaisir","Plaisir"],["rapides","20 min max"],["promo","En promo"],["aimes","Aimés"],["vege","Sans viande"],["famille","De la famille"]];
   $("sbody").innerHTML=`<input class="gsearch" id="gq" type="search" placeholder="Rechercher un plat" value="${esc(c.q||"")}" aria-label="Rechercher un plat" autocomplete="off">
     <div class="gfilters">${F.map(([k,l])=>`<button class="chip${(c.filter||"tous")===k?" on":""}" data-gf="${k}">${l}</button>`).join("")}</div><div class="ggrid" id="ggrid"></div>`;
   $("sfoot").innerHTML=`<button class="btn edit-only" data-newrec="1">Ajouter une recette de famille</button>`;
   renderGalleryGrid(); }
 function renderGalleryGrid(){ const c=sheetCtx, d=c.d, q=(c.q||"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,""), f=c.filter||"tous";
   let list=RECETTES.filter(r=>!q||r.nom.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").includes(q));
-  if(f==="rapides") list=list.filter(r=>r.t<=20); if(f==="promo") list=list.filter(r=>promoCount(r)); if(f==="aimes") list=list.filter(r=>likeScore(r)>0); if(f==="famille") list=list.filter(r=>r.perso);
+  if(["eco","moyen","plaisir"].includes(f)) list=list.filter(r=>budgetOf(r)===f); if(f==="vege") list=list.filter(r=>r.p==="vege"||r.p==="oeufs"); if(f==="rapides") list=list.filter(r=>r.t<=20); if(f==="promo") list=list.filter(r=>promoCount(r)); if(f==="aimes") list=list.filter(r=>likeScore(r)>0); if(f==="famille") list=list.filter(r=>r.perso);
   list.sort((a,b)=>(dislikesFor(a,d).length-dislikesFor(b,d).length)||(likeScore(b)-likeScore(a))||(promoCount(b)-promoCount(a))||a.t-b.t);
   $("ggrid").innerHTML=list.length?list.map(r=>{const w=dislikesFor(r,d), cur=d!==null&&state.week[d]===r.id, other=state.week.map((id,i)=>id===r.id&&i!==d?JOURS[i].slice(0,3):null).filter(Boolean);
     return `<button class="gcard${cur?" cur":""}" data-pickrec="${r.id}"><img src="${photoSrc(r.id)}" alt="" loading="lazy"><span class="gname">${esc(r.nom)}</span>
