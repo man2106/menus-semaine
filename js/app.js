@@ -2203,6 +2203,7 @@ function htmlSuggestions(){ const qui=envQui||(window.__acces&&window.__acces()&
         <button class="sbtn owner-only" data-sgdel="${esc(id)}" type="button" aria-label="Supprimer cette proposition">×</button></div>`; }).join("")}</div>`:""}
   </div>`; }
 document.addEventListener("click",async e=>{ const o=e.target.closest("#suggbox [data-openrec]"); if(o){ openMeal(o.dataset.openrec,null); return; }
+  const o2=e.target.closest("[data-openrec2]"); if(o2){ openMeal(o2.dataset.openrec2,null); return; }
   const b=e.target.closest("[data-sgtype],[data-sgdel]"); if(!b) return;
   if(b.dataset.sgtype){ suggForm={type:b.dataset.sgtype,photo:null}; renderEnvies(); return; }
   if(b.dataset.sgdel){ const id=b.dataset.sgdel; if(!DB) { delete SUGG[id]; renderEnvies(); return; } try{ await DB.collection("suggestions").doc(id).delete(); toast("Proposition supprimée"); }catch(err){ toast("Seul le propriétaire peut supprimer une proposition"); } } });
@@ -2311,6 +2312,18 @@ function renderEnvies(){ const box=$("view-envies"); if(!box) return;
   html+=`</div>`;
   html+=htmlSuggestions();
   // --- 2. Les goûts de chacun ---
+  // Ce que disent les réponses au sondage, tous ensemble
+  const votes={}; fam.forEach(n=>Object.entries(sondageDe(n).envies).forEach(([id,v])=>{ if(!BYID[id]) return; (votes[id]=votes[id]||{plus:[],moins:[]}); if(v===1) votes[id].plus.push(n); if(v===-1) votes[id].moins.push(n); }));
+  const unan=Object.entries(votes).filter(([,v])=>v.plus.length>=Math.min(3,Math.max(2,repondu.length-1))&&!v.moins.length).sort((a,b)=>b[1].plus.length-a[1].plus.length);
+  const divise=Object.entries(votes).filter(([,v])=>v.plus.length&&v.moins.length).sort((a,b)=>(b[1].plus.length+b[1].moins.length)-(a[1].plus.length+a[1].moins.length));
+  const rejet=Object.entries(votes).filter(([,v])=>v.moins.length>=2&&v.moins.length>v.plus.length);
+  const pasRep=fam.filter(n=>!repondu.includes(n));
+  if(Object.keys(votes).length) html+=`<div class="panel"><h2>Ce que dit le sondage</h2>
+    <p class="note">${repondu.length} réponse${repondu.length>1?"s":""} sur ${fam.length}${pasRep.length?` · pas encore répondu : ${pasRep.map(esc).join(", ")}`:""}. Les menus proposés en tiennent compte.</p>
+    ${unan.length?`<h3 class="shopray">Font l'unanimité</h3><div class="envmine">${unan.slice(0,12).map(([id,v])=>`<button class="chip on" data-openrec2="${id}" type="button">😍 ${esc(BYID[id].nom)} · ${v.plus.length}</button>`).join("")}</div>`:""}
+    ${divise.length?`<h3 class="shopray">Divisent la famille</h3><div class="sondiv">${divise.slice(0,8).map(([id,v])=>`<div><b>${esc(BYID[id].nom)}</b><small>👍 ${v.plus.map(esc).join(", ")} · 👎 ${v.moins.map(esc).join(", ")}</small></div>`).join("")}</div><p class="note">À servir quand les amateurs sont là, ou avec une variante.</p>`:""}
+    ${rejet.length?`<h3 class="shopray">À éviter</h3><p>${rejet.map(([id,v])=>`${esc(BYID[id].nom)} (${v.moins.map(esc).join(", ")})`).join(" · ")}</p>`:""}
+  </div>`;
   html+=`<div class="panel"><h2>Les goûts de chacun</h2><p class="note">Ce profil se précise à chaque avis et chaque réponse au sondage.</p><div class="rtpeople">${fam.map(n=>{ const P=profil(n);
     const cu=Object.entries(P.cuis).filter(([,m])=>m>=3.8).sort((a,b)=>b[1]-a[1]).map(([k])=>CUISINES[k]); P.sd.prefs.cuisines.forEach(c=>{ if(!cu.includes(CUISINES[c])) cu.push(CUISINES[c]); });
     const aff=RECETTES.map(r=>({r,a:affinite(n,r,P)})).sort((a,b)=>b.a-a.a), top=aff.filter(x=>x.a>=0.8).slice(0,3), bas=aff.filter(x=>x.a<=-0.8).slice(-3).reverse();
