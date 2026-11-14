@@ -678,7 +678,7 @@ function renderCourses(){
         const tags=promosFor(i.n).map(p=>{const ok=validOn(p,date);
           const when= ok ? `jusqu'au ${fmtShort(isoDate(p.au))}` : (isoDate(p.du)>date ? `dès le ${fmtShort(isoDate(p.du))}, pas encore valable ce jour-là` : `terminée le ${fmtShort(isoDate(p.au))}`);
           return `<span class="ptag${ok&&p.mag===ensOf(mag)?"":" off"}">· Promo ${ENS[p.mag]} ${eur(p.prix)} ${when}</span>`}).join("");
-        return `<label class="item${c?" checked":""}"><input type="checkbox" data-k="${esc(i.ck)}"${c?" checked":""}><span class="iname"><b>${esc(i.n)}</b><small>${i.x?(i.par?"Ajouté par "+esc(nomDe(i.par)):"Ajouté à la main"):[...i.pour].join(", ")}${i.freeze?'<span class="ptag" style="color:var(--accent)">· à congeler à l\'achat</span>':""}${tags}</small></span><span class="qty"><button type="button" class="qtbtn" data-qedit="${esc(i.k)}" aria-label="Changer la quantité de ${esc(i.n)}" data-tip="Changer la quantité">${esc(qtyOf(i))||"qté"}${state.qtEdit&&state.qtEdit[i.k]&&!i.x?`<s>${esc(fmt(i.q,i.u))}</s>`:""}</button>${i.x?`<button type="button" class="xdel edit-only" data-xdel="${esc(i.id)}" aria-label="Retirer ${esc(i.n)} de la liste">×</button>`:`<button type="button" class="dejabtn edit-only" data-deja="${esc(i.n)}" aria-label="J'en ai déjà : ${esc(i.n)}" data-tip="J'en ai déjà à la maison : ne plus le mettre sur la liste">🏠</button>`}</span></label>`}).join("");
+        return `<label class="item${c?" checked":""}"><input type="checkbox" data-k="${esc(i.ck)}"${c?" checked":""}><span class="iname${produitDe(i.n)?" has-p":""}">${vignetteProduit(i.n)}<b>${esc(i.n)}</b><small>${i.x?(i.par?"Ajouté par "+esc(nomDe(i.par)):"Ajouté à la main"):[...i.pour].join(", ")}${i.freeze?'<span class="ptag" style="color:var(--accent)">· à congeler à l\'achat</span>':""}${tags}</small></span><span class="qty"><button type="button" class="qtbtn" data-qedit="${esc(i.k)}" aria-label="Changer la quantité de ${esc(i.n)}" data-tip="Changer la quantité">${esc(qtyOf(i))||"qté"}${state.qtEdit&&state.qtEdit[i.k]&&!i.x?`<s>${esc(fmt(i.q,i.u))}</s>`:""}</button>${i.x?`<button type="button" class="xdel edit-only" data-xdel="${esc(i.id)}" aria-label="Retirer ${esc(i.n)} de la liste">×</button>`:`<button type="button" class="dejabtn edit-only" data-deja="${esc(i.n)}" aria-label="J'en ai déjà : ${esc(i.n)}" data-tip="J'en ai déjà à la maison : ne plus le mettre sur la liste">🏠</button>`}</span></label>`}).join("");
       return `<div class="aisle"><h2><span>${RAYONS[ray]}</span><span>${its.length}</span></h2><div class="list">${rows}</div></div>`}).join("");
       return `<div class="stop"><div class="stophead"><span class="stopno">Arrêt ${si+1}</span><b>${esc(m.nom)}</b><small>${esc(m.lieu)} · ${sitems.length} article${sitems.length>1?"s":""}${nP?` · ${nP} en promo`:""} · ≈ ${eur(sitems.reduce((s,i)=>s+itemCost(i.n,i.u,i.q,i.ray),0))}</small></div>${groups}</div>`}).join("");
     return `<div class="trip${t===tripVue?" on":""}" id="trip-${t}"><div class="triphead"><div><div class="tripno">Courses de la semaine · ${fmtD(date)}</div><p class="note">${cover}</p></div>
@@ -870,7 +870,7 @@ function renderModal(){
       const tags = promosFor(i.n).map(p=>{const ok = date ? validOn(p,date) : true;
         return `<span class="ptag"${ok?"":' style="opacity:.6"'}>· Promo ${ENS[p.mag]} ${eur(p.prix)}${ok?"":" (pas valable ce jour-là)"}</span>`}).join("");
       const box = i.ck ? `<input type="checkbox" data-mk="${esc(i.ck)}"${c?" checked":""} aria-label="${esc(i.n)} acheté">` : `<span></span>`;
-      return `<label class="item${c?" checked":""}">${box}<span class="iname"><b>${esc(i.n)}</b><small>${plan?`<b style="color:var(--accent);font-weight:700">${MAGNOM[plan.assign[i.n+"|"+i.u]||plan.primary]}</b> · `:""}${RAYONS[i.ray]} · ≈ ${eur(i.cost)}${tags}</small></span><span class="qty">${qtyOf(i)}</span></label>`}).join("");
+      return `<label class="item${c?" checked":""}">${box}<span class="iname${produitDe(i.n)?" has-p":""}">${vignetteProduit(i.n)}<b>${esc(i.n)}</b><small>${plan?`<b style="color:var(--accent);font-weight:700">${MAGNOM[plan.assign[i.n+"|"+i.u]||plan.primary]}</b> · `:""}${RAYONS[i.ray]} · ≈ ${eur(i.cost)}${tags}</small></span><span class="qty">${qtyOf(i)}</span></label>`}).join("");
     return head+`<div class="list">${rows}</div>`}).join("");
   const steps = getSteps(id).map(s=>`<li><span>${esc(s)}</span></li>`).join("");
   const w=dislikesFor(r,d), pp=photoPage(id);
@@ -2490,12 +2490,56 @@ function accepterRecette(x){
     source:x.source&&typeof x.source.url==="string"&&/^https:\/\//.test(x.source.url)?{titre:txtOk(x.source.titre,80),url:x.source.url.slice(0,300)}:null,
     ajoute:typeof x.ajoute==="string"&&/^\d{4}-\d\d-\d\d$/.test(x.ajoute)?x.ajoute:null, proposePar:propre(x.propose_par,30)||null};
 }
+// ===================== Fiches produits (photo, description, prix) =====================
+const PRODUITS=new Map(), PRIX_DETAIL={};
+const MOIS=["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];
+function accepterProduit(x){ if(!x||typeof x!=="object") return null; const n=txtOk(x.n,50); if(!n) return null;
+  const ok=(a,u)=>Array.isArray(a)&&+a[0]>0&&+a[0]<500&&["kg","L","u"].includes(a[1]);
+  const photo=typeof x.photo==="string"&&/^photos\/produits\/[a-z0-9-]+\.(jpg|png|webp)$/.test(x.photo)?x.photo:null;
+  const credit=typeof x.credit==="string"&&/^https:\/\/commons\.wikimedia\.org\/wiki\/File:[^\s"'<>]+$/.test(x.credit)?x.credit:null;
+  const saison=Array.isArray(x.saison)&&x.saison.length===2&&x.saison.every(m=>Number.isInteger(m)&&m>=1&&m<=12)?x.saison:null;
+  const mags=Array.isArray(x.magasins)?x.magasins.filter(m=>m&&ENS[m.mag]&&+m.prix>0&&/^\d{4}-\d\d-\d\d$/.test(m.date||"")).slice(0,20).map(m=>({mag:m.mag,prix:+m.prix,format:txtOk(m.format,60),unitaire:ok(m.unitaire)?[+m.unitaire[0],m.unitaire[1]]:null,date:m.date,source:typeof m.source==="string"&&/^https:\/\/[^\s"'<>]+$/.test(m.source)?m.source:null})):[];
+  return {n,ray:RAYONS[x.ray]?x.ray:"epi",desc:txtOk(x.desc,300),format:txtOk(x.format,120),conserver:txtOk(x.conserver,160),saison,ref:ok(x.ref)?[+x.ref[0],x.ref[1]]:null,photo,credit:photo?credit:null,
+    alias:Array.isArray(x.alias)?x.alias.map(a=>txtOk(a,50)).filter(Boolean).slice(0,8):[],magasins:mags}; }
+function produitDe(n){ const k=norm(n); if(!k) return null; return PRODUITS.get(k)||PRODUITS.get(k.replace(/s$/,""))||PRODUITS.get(k+"s")||PRODUITS.get(k.replace(/x$/,""))||null; }
+function deSaison(p,m){ if(!p||!p.saison) return null; const [a,b]=p.saison; return a<=b ? (m>=a&&m<=b) : (m>=a||m<=b); }
+function vignetteProduit(n){ const p=produitDe(n); if(!p) return "";
+  return `<button type="button" class="pthumb" data-prod="${esc(n)}" aria-label="Fiche produit : ${esc(n)}" data-tip="Photo, description et prix">${p.photo?`<img src="${p.photo}" alt="" loading="lazy">`:`<span aria-hidden="true">i</span>`}</button>`; }
+const UNOM={kg:"kg",L:"litre",u:"pièce"};
+function ouvrirProduit(n){ const p=produitDe(n); if(!p) return; const nom=p.n, m=new Date().getMonth()+1;
+  const ref=PRIX[nom]||p.ref, reel=PRIX_DETAIL[nom]||[], promos=promosFor(nom).filter(x=>isoDate(x.au)>=TODAY);
+  const sais=deSaison(p,m);
+  const lignesReel=reel.slice(-8).reverse().map(r=>`<li><b>${r.mag?esc(ENS[r.mag]):"Magasin ?"}</b> · ${eur(r.p)} / ${UNOM[r.u]||r.u}<small>${r.produit?esc(r.produit)+" · ":""}ticket du ${fmtShort(isoDate(r.date))}</small></li>`).join("");
+  const lignesMag=p.magasins.map(x=>`<li><b>${esc(ENS[x.mag])}</b> · ${eur(x.prix)}${x.format?" ("+esc(x.format)+")":""}${x.unitaire?` · ${eur(x.unitaire[0])} / ${UNOM[x.unitaire[1]]}`:""}<small>relevé du ${fmtShort(isoDate(x.date))}${x.source?` · <a href="${esc(x.source)}" target="_blank" rel="noopener">source</a>`:""}</small></li>`).join("");
+  const lignesPromo=promos.map(x=>`<li><b>${esc(ENS[x.mag])}</b> · ${eur(x.prix)}${x.avant?` <s>${eur(x.avant)}</s>`:""}<small>${esc(x.produit||"")} · du ${fmtShort(isoDate(x.du))} au ${fmtShort(isoDate(x.au))}</small></li>`).join("");
+  $("ptitle").textContent=nom; $("peyebrow").textContent=RAYONS[p.ray]||"";
+  $("pbody").innerHTML=`${p.photo?`<figure class="mphoto pphoto"><img src="${p.photo}" alt="${esc(nom)}">${p.credit?`<figcaption>Photo d'illustration : <a href="${esc(p.credit)}" target="_blank" rel="noopener">Wikimedia Commons</a> (auteur et licence libre sur la page du fichier)</figcaption>`:""}</figure>`:""}
+    ${p.desc?`<p class="pdesc">${esc(p.desc)}</p>`:""}
+    <dl class="pinfo">${p.format?`<dt>Conditionnement courant</dt><dd>${esc(p.format)}</dd>`:""}${p.conserver?`<dt>Conservation</dt><dd>${esc(p.conserver)}</dd>`:""}
+    ${p.saison?`<dt>Saison</dt><dd>${(p.saison[0]===1&&p.saison[1]===12)||p.saison[1]===p.saison[0]-1?"Disponible toute l'année":`${sais?`<span class="pseason">De saison en ${MOIS[m-1]}</span> · `:`Pas de saison en ${MOIS[m-1]} · `}de ${MOIS[p.saison[0]-1]} à ${MOIS[p.saison[1]-1]}`}</dd>`:""}</dl>
+    <section><h3><span>Prix</span>${ref?`<span class="mtotal">≈ ${eur(ref[0])} / ${UNOM[ref[1]]||ref[1]}</span>`:""}</h3>
+      ${ref?`<p class="note">${PRIX_REELS[nom]?`Prix calculé d'après vos tickets de caisse (${PRIX_REELS[nom].n} relevé${PRIX_REELS[nom].n>1?"s":""}).`:"Prix de référence estimé (marque de distributeur) : il sera remplacé par vos prix réels dès qu'un ticket le contiendra."}</p>`:`<p class="note">Pas encore de prix connu pour ce produit.</p>`}
+      ${lignesPromo?`<h4>En promo</h4><ul class="plist">${lignesPromo}</ul>`:""}
+      ${lignesReel?`<h4>Sur vos tickets</h4><ul class="plist">${lignesReel}</ul>`:""}
+      ${lignesMag?`<h4>Prix relevés en magasin</h4><ul class="plist">${lignesMag}</ul>`:""}
+      ${!lignesReel?`<p class="note">Envoyez la photo de vos tickets (onglet Courses) : les prix de chaque enseigne s'afficheront ici.</p>`:""}
+    </section>`;
+  pLast=document.activeElement; $("poverlay").hidden=false; $("pclose").focus(); }
+let pLast=null;
+function fermerProduit(){ $("poverlay").hidden=true; if(pLast&&pLast.focus) try{pLast.focus()}catch(e){} }
+$("pclose").addEventListener("click",fermerProduit);
+$("poverlay").addEventListener("click",e=>{ if(e.target.id==="poverlay") fermerProduit(); });
+document.addEventListener("keydown",e=>{ if(e.key==="Escape"&&!$("poverlay").hidden){ e.stopPropagation(); fermerProduit(); } },true);
+document.addEventListener("click",e=>{ const b=e.target.closest&&e.target.closest("[data-prod]"); if(!b) return; e.preventDefault(); e.stopPropagation(); ouvrirProduit(b.dataset.prod); },true);
 async function chargerDonnees(){
   const lire=async f=>{ try{ const r=await fetch(f+"?v="+Date.now(),{cache:"no-store"}); return r.ok?await r.json():null; }catch(e){ return null; } };
-  const [P,R,X]=await Promise.all([lire("donnees/promos.json"),lire("donnees/recettes.json"),lire("donnees/prix.json")]); let ch=false;
+  const [P,R,X,D]=await Promise.all([lire("donnees/promos.json"),lire("donnees/recettes.json"),lire("donnees/prix.json"),lire("donnees/produits.json")]); let ch=false;
+  if(D&&Array.isArray(D.produits)){ D.produits.slice(0,3000).forEach(x=>{ const v=accepterProduit(x); if(!v) return; PRODUITS.set(norm(v.n),v); (v.alias||[]).forEach(a=>{ if(!PRODUITS.has(norm(a))) PRODUITS.set(norm(a),v); });
+      if(v.ref&&!PRIX[v.n]) PRIX[v.n]=v.ref; }); ch=true; }
   if(X&&Array.isArray(X.releves)){ const lim=new Date(TODAY); lim.setDate(lim.getDate()-120); const par={};
     X.releves.slice(-5000).forEach(r=>{ if(!r||typeof r.ing!=="string"||!(+r.prixUnitaire>0)||!["kg","L","u"].includes(r.unite)||!/^\d{4}-\d\d-\d\d$/.test(r.date||"")||isoDate(r.date)<lim) return;
-      const k=r.ing+"|"+r.unite; (par[k]=par[k]||[]).push({p:+r.prixUnitaire,mag:ENS[r.mag]?r.mag:null}); });
+      const k=r.ing+"|"+r.unite; (par[k]=par[k]||[]).push({p:+r.prixUnitaire,mag:ENS[r.mag]?r.mag:null});
+      (PRIX_DETAIL[r.ing]=PRIX_DETAIL[r.ing]||[]).push({mag:ENS[r.mag]?r.mag:null,p:Math.round(+r.prixUnitaire*100)/100,u:r.unite,date:r.date,produit:txtOk(r.produit,60)}); });
     Object.entries(par).forEach(([k,l])=>{ const [ing,un]=k.split("|"); const ref=PRIX[ing]; if(ref&&ref[1]!==un) return;
       const v=l.map(x=>x.p).sort((a,b)=>a-b), med=v[Math.floor(v.length/2)]; PRIX[ing]=[Math.round(med*100)/100,un]; PRIX_REELS[ing]={n:l.length,mags:[...new Set(l.map(x=>x.mag).filter(Boolean))]}; ch=true; }); }
   if(P&&Array.isArray(P.promos)){

@@ -1,0 +1,2878 @@
+{
+ "maj": "2026-11-14",
+ "note": "Descriptions rédigées pour l'application ; photos libres de Wikimedia Commons ; prix par enseigne relevés sur tickets, folders et sources citées.",
+ "produits": [
+  {
+   "n": "Oignons",
+   "ray": "fl",
+   "desc": "Oignon jaune, la base de presque tous les plats mijotés, sauces et poêlées.",
+   "format": "Filet de 1 kg (8 à 10 oignons) ou au détail",
+   "conserver": "Au sec, à l'abri de la lumière, hors du frigo : 3 à 4 semaines",
+   "saison": [
+    1,
+    12
+   ],
+   "photo": "photos/produits/oignons.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Onion_on_White.JPG"
+  },
+  {
+   "n": "Laitue",
+   "ray": "fl",
+   "desc": "Salade verte tendre (laitue, batavia), pour accompagner les plats du soir.",
+   "format": "À la pièce",
+   "conserver": "Au frigo dans le bac à légumes, enveloppée d'un essuie humide : 3 à 4 jours",
+   "saison": [
+    5,
+    10
+   ],
+   "photo": "photos/produits/laitue.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Lettuce_Mini_Heads_(7331119710).jpg"
+  },
+  {
+   "n": "Pommes de terre",
+   "ray": "fl",
+   "desc": "Pommes de terre à tout faire ; choisir « farineuses » pour la purée et les frites, « fermes » pour les sautées et la salade.",
+   "format": "Sac de 2,5 kg ou 5 kg",
+   "conserver": "Au frais, au sec et dans le noir (pas au frigo) : 2 à 3 semaines",
+   "saison": [
+    1,
+    12
+   ],
+   "photo": "photos/produits/pommes-de-terre.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Patates.jpg"
+  },
+  {
+   "n": "Carottes",
+   "ray": "fl",
+   "desc": "Carottes de pleine terre, pour la soupe, le stoemp, les poêlées ou râpées crues.",
+   "format": "Sachet de 1 kg ou botte",
+   "conserver": "Au frigo, sans les fanes : 2 à 3 semaines",
+   "saison": [
+    1,
+    12
+   ],
+   "photo": "photos/produits/carottes.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Vegetable-Carrot-Bundle-wStalks.jpg"
+  },
+  {
+   "n": "Tomates",
+   "ray": "fl",
+   "desc": "Tomates rondes ou en grappe, pour salades, sauces et plats au four.",
+   "format": "Barquette de 6 ou au kilo",
+   "conserver": "À température ambiante, pas au frigo (elles perdent leur goût) : 3 à 5 jours",
+   "saison": [
+    6,
+    10
+   ],
+   "photo": "photos/produits/tomates.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Tomato_je.jpg"
+  },
+  {
+   "n": "Poivrons",
+   "ray": "fl",
+   "desc": "Poivrons rouges, jaunes ou verts ; les rouges sont les plus doux.",
+   "format": "Lot de 3 couleurs ou à la pièce",
+   "conserver": "Au frigo : 1 semaine",
+   "saison": [
+    7,
+    10
+   ],
+   "photo": "photos/produits/poivrons.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Red_capsicum_and_cross_section.jpg"
+  },
+  {
+   "n": "Haricots verts",
+   "ray": "fl",
+   "desc": "Haricots verts fins ou extra-fins, à cuire 8 à 10 minutes à l'eau salée.",
+   "format": "Barquette de 400 à 500 g, ou surgelés en sachet de 1 kg",
+   "conserver": "Frais : 3 jours au frigo ; surgelés : plusieurs mois",
+   "saison": [
+    6,
+    9
+   ],
+   "photo": "photos/produits/haricots-verts.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Green_beans.jpg"
+  },
+  {
+   "n": "Poireaux",
+   "ray": "fl",
+   "desc": "Poireaux pour la soupe, la fondue de poireaux ou la quiche ; le blanc est le plus tendre.",
+   "format": "À la pièce ou en lot de 3",
+   "conserver": "Au frigo : 1 semaine",
+   "saison": [
+    9,
+    4
+   ],
+   "photo": "photos/produits/poireaux.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Leek.jpg"
+  },
+  {
+   "n": "Concombre",
+   "ray": "fl",
+   "desc": "Concombre à croquer en salade, en tzatziki ou en bâtonnets.",
+   "format": "À la pièce",
+   "conserver": "Au frigo : 1 semaine",
+   "saison": [
+    5,
+    9
+   ],
+   "photo": "photos/produits/concombre.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:ARS_cucumber.jpg"
+  },
+  {
+   "n": "Citrons",
+   "ray": "fl",
+   "desc": "Citrons jaunes pour le jus et le zeste ; choisir « non traités » si on utilise le zeste.",
+   "format": "Filet de 4 à 6 ou à la pièce",
+   "conserver": "À température ambiante ou au frigo : 2 semaines",
+   "saison": [
+    1,
+    12
+   ],
+   "photo": "photos/produits/citrons.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Lemon.jpg"
+  },
+  {
+   "n": "Champignons",
+   "ray": "fl",
+   "desc": "Champignons de Paris blancs ou bruns, pour les sauces à la crème, le risotto, les pizzas.",
+   "format": "Barquette de 250 ou 500 g",
+   "conserver": "Au frigo dans leur emballage papier ou carton : 3 à 4 jours",
+   "saison": [
+    1,
+    12
+   ],
+   "photo": "photos/produits/champignons.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Champignons_Agaricus.jpg"
+  },
+  {
+   "n": "Roquette",
+   "ray": "fl",
+   "desc": "Petites feuilles au goût poivré, pour les salades et les pizzas.",
+   "format": "Sachet de 100 à 125 g",
+   "conserver": "Au frigo : 2 à 3 jours",
+   "saison": [
+    5,
+    10
+   ]
+  },
+  {
+   "n": "Tomates cerises",
+   "ray": "fl",
+   "desc": "Petites tomates sucrées, à croquer ou à rôtir.",
+   "format": "Barquette de 250 ou 500 g",
+   "conserver": "À température ambiante : 3 à 5 jours",
+   "saison": [
+    6,
+    10
+   ]
+  },
+  {
+   "n": "Brocoli",
+   "ray": "fl",
+   "desc": "Brocoli à cuire 5 à 6 minutes à l'eau ou à la vapeur ; les tiges épluchées se mangent aussi.",
+   "format": "À la pièce (environ 500 g)",
+   "conserver": "Au frigo : 4 à 5 jours",
+   "saison": [
+    6,
+    11
+   ],
+   "photo": "photos/produits/brocoli.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Broccoli_and_cross_section_edit.jpg"
+  },
+  {
+   "n": "Courgettes",
+   "ray": "fl",
+   "desc": "Courgettes vertes, à poêler, gratiner ou cuire en soupe.",
+   "format": "À la pièce ou au kilo",
+   "conserver": "Au frigo : 1 semaine",
+   "saison": [
+    6,
+    10
+   ],
+   "photo": "photos/produits/courgettes.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Zucchini.jpg"
+  },
+  {
+   "n": "Persil",
+   "ray": "fl",
+   "desc": "Persil plat ou frisé, pour finir les plats et les sauces.",
+   "format": "Botte ou pot",
+   "conserver": "Au frigo, tiges dans un verre d'eau : 1 semaine",
+   "saison": [
+    1,
+    12
+   ],
+   "photo": "photos/produits/persil.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Parsley.jpg"
+  },
+  {
+   "n": "Avocats",
+   "ray": "fl",
+   "desc": "Avocats Hass ; mûrs quand ils cèdent légèrement sous le doigt.",
+   "format": "À la pièce ou filet de 2 à 4",
+   "conserver": "À température ambiante pour mûrir, puis au frigo : 2 à 3 jours",
+   "saison": [
+    1,
+    12
+   ],
+   "photo": "photos/produits/avocats.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Avocado_Hass_-_single_and_halved.jpg"
+  },
+  {
+   "n": "Épinards",
+   "ray": "fl",
+   "desc": "Épinards frais en feuilles ou en branches surgelées, pour les gratins et les sauces.",
+   "format": "Sachet de 300 g (frais) ou 1 kg (surgelés)",
+   "conserver": "Frais : 2 jours au frigo",
+   "saison": [
+    3,
+    11
+   ],
+   "photo": "photos/produits/epinards.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Spinach_leaves.jpg"
+  },
+  {
+   "n": "Pommes",
+   "ray": "fl",
+   "desc": "Pommes belges (Jonagold, Boskoop, Elstar…), à croquer ou en compote.",
+   "format": "Sachet de 1 à 2 kg ou au détail",
+   "conserver": "Au frigo ou en cave fraîche : plusieurs semaines",
+   "saison": [
+    8,
+    4
+   ],
+   "photo": "photos/produits/pommes.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Pink_lady_and_cross_section.jpg"
+  },
+  {
+   "n": "Potiron",
+   "ray": "fl",
+   "desc": "Potiron à chair orange, pour les soupes et les purées d'automne.",
+   "format": "À la pièce ou en tranche",
+   "conserver": "Entier : plusieurs semaines au frais ; entamé : 3 jours au frigo",
+   "saison": [
+    9,
+    12
+   ],
+   "photo": "photos/produits/potiron.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Pumpkin.jpg"
+  },
+  {
+   "n": "Choux de Bruxelles",
+   "ray": "fl",
+   "desc": "Petits choux belges, meilleurs après les premières gelées ; à cuire 10 à 12 minutes.",
+   "format": "Barquette de 500 g ou filet de 1 kg",
+   "conserver": "Au frigo : 4 à 5 jours",
+   "saison": [
+    10,
+    3
+   ],
+   "photo": "photos/produits/choux-de-bruxelles.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Brussels_Sprouts.jpg"
+  },
+  {
+   "n": "Chou de Milan",
+   "ray": "fl",
+   "desc": "Chou vert frisé, pour le stoemp, les potées et les poêlées.",
+   "format": "À la pièce",
+   "conserver": "Au frigo : 1 semaine",
+   "saison": [
+    9,
+    3
+   ],
+   "photo": "photos/produits/chou-de-milan.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Savoy_cabbage.jpg"
+  },
+  {
+   "n": "Céleri-rave",
+   "ray": "fl",
+   "desc": "Grosse racine au goût de céleri, en purée, en soupe ou râpée en salade.",
+   "format": "À la pièce",
+   "conserver": "Au frigo : 2 semaines",
+   "saison": [
+    9,
+    3
+   ]
+  },
+  {
+   "n": "Patates douces",
+   "ray": "fl",
+   "desc": "Tubercule à chair orange et sucrée, au four, en purée ou en frites.",
+   "format": "Au kilo ou à la pièce",
+   "conserver": "Au sec, hors du frigo : 2 semaines",
+   "saison": [
+    1,
+    12
+   ],
+   "photo": "photos/produits/patates-douces.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Ipomoea_batatas_006.JPG"
+  },
+  {
+   "n": "Navets",
+   "ray": "fl",
+   "desc": "Petits navets blancs et violets, en potée ou glacés.",
+   "format": "Botte ou au kilo",
+   "conserver": "Au frigo : 1 semaine",
+   "saison": [
+    10,
+    3
+   ],
+   "photo": "photos/produits/navets.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Turnip_2622027.jpg"
+  },
+  {
+   "n": "Mâche",
+   "ray": "fl",
+   "desc": "Petites feuilles douces, salade d'hiver par excellence.",
+   "format": "Barquette de 100 à 150 g",
+   "conserver": "Au frigo : 2 à 3 jours",
+   "saison": [
+    10,
+    3
+   ]
+  },
+  {
+   "n": "Citrons verts",
+   "ray": "fl",
+   "desc": "Citrons verts, plus parfumés que les jaunes ; pour les plats asiatiques et mexicains.",
+   "format": "À la pièce ou filet",
+   "conserver": "Au frigo : 2 semaines",
+   "saison": [
+    1,
+    12
+   ],
+   "photo": "photos/produits/citrons-verts.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Lime-Whole-Split.jpg"
+  },
+  {
+   "n": "Potimarron",
+   "ray": "fl",
+   "desc": "Petite courge à peau orange qui se cuit avec la peau ; goût de châtaigne.",
+   "format": "À la pièce (environ 1 kg)",
+   "conserver": "Entier : plusieurs semaines au frais",
+   "saison": [
+    9,
+    12
+   ],
+   "photo": "photos/produits/potiron.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Pumpkin.jpg"
+  },
+  {
+   "n": "Chicons",
+   "ray": "fl",
+   "desc": "Chicons (endives) belges, braisés, au gratin ou crus en salade.",
+   "format": "Sachet de 1 kg ou barquette",
+   "conserver": "Au frigo, à l'abri de la lumière (ils verdissent et deviennent amers) : 1 semaine",
+   "saison": [
+    10,
+    4
+   ]
+  },
+  {
+   "n": "Céleri",
+   "ray": "fl",
+   "desc": "Céleri vert en branches, pour les soupes, les bouillons et le waterzooi.",
+   "format": "À la pièce",
+   "conserver": "Au frigo : 1 semaine",
+   "saison": [
+    1,
+    12
+   ],
+   "photo": "photos/produits/celeri.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Celery_1.jpg"
+  },
+  {
+   "n": "Germes de soja",
+   "ray": "fl",
+   "desc": "Pousses de haricot mungo croquantes, à ajouter en fin de cuisson au wok.",
+   "format": "Barquette de 200 à 300 g",
+   "conserver": "Au frigo : 2 jours",
+   "saison": [
+    1,
+    12
+   ],
+   "photo": "photos/produits/germes-de-soja.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Mung_bean_sprouts.jpg"
+  },
+  {
+   "n": "Pousses d'épinards",
+   "ray": "fl",
+   "desc": "Jeunes feuilles d'épinard, crues en salade ou fondues à la poêle.",
+   "format": "Sachet de 100 à 200 g",
+   "conserver": "Au frigo : 2 à 3 jours",
+   "saison": [
+    3,
+    11
+   ],
+   "photo": "photos/produits/epinards.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Spinach_leaves.jpg"
+  },
+  {
+   "n": "Butternut",
+   "ray": "fl",
+   "desc": "Courge butternut à chair orange et douce ; s'épluche facilement.",
+   "format": "À la pièce (1 à 1,5 kg)",
+   "conserver": "Entière : plusieurs semaines au frais",
+   "saison": [
+    9,
+    1
+   ],
+   "photo": "photos/produits/butternut.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Butternut_Squash.jpg"
+  },
+  {
+   "n": "Pleurotes",
+   "ray": "fl",
+   "desc": "Champignons en éventail, à poêler vivement.",
+   "format": "Barquette de 150 à 200 g",
+   "conserver": "Au frigo : 2 à 3 jours",
+   "saison": [
+    9,
+    3
+   ]
+  },
+  {
+   "n": "Aubergines",
+   "ray": "fl",
+   "desc": "Aubergines violettes, à rôtir, griller ou en sauce.",
+   "format": "À la pièce",
+   "conserver": "Au frigo : 1 semaine",
+   "saison": [
+    6,
+    10
+   ],
+   "photo": "photos/produits/aubergines.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Solanum_melongena_24_08_2012_(1).JPG"
+  },
+  {
+   "n": "Chou blanc râpé",
+   "ray": "fl",
+   "desc": "Chou blanc finement émincé, prêt pour les salades et le coleslaw.",
+   "format": "Sachet de 250 à 400 g",
+   "conserver": "Au frigo : 3 à 4 jours",
+   "saison": [
+    1,
+    12
+   ]
+  },
+  {
+   "n": "Bananes",
+   "ray": "fl",
+   "desc": "Bananes à croquer ; on peut écraser les très mûres dans des crêpes ou un gâteau.",
+   "format": "Régime ou au kilo",
+   "conserver": "À température ambiante, loin des autres fruits",
+   "saison": [
+    1,
+    12
+   ],
+   "photo": "photos/produits/bananes.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Bananas_white_background_DS.jpg"
+  },
+  {
+   "n": "Poires",
+   "ray": "fl",
+   "desc": "Poires belges (Conférence, Doyenné), à croquer ou cuites.",
+   "format": "Au kilo",
+   "conserver": "À température ambiante pour mûrir, puis au frigo",
+   "saison": [
+    8,
+    3
+   ],
+   "photo": "photos/produits/poires.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Pears.jpg"
+  },
+  {
+   "n": "Oranges",
+   "ray": "fl",
+   "desc": "Oranges à jus ou de table.",
+   "format": "Filet de 2 kg ou au kilo",
+   "conserver": "À température ambiante : 1 semaine ; au frigo : 2 semaines",
+   "saison": [
+    11,
+    4
+   ],
+   "photo": "photos/produits/oranges.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Orange-Whole-&-Split.jpg"
+  },
+  {
+   "n": "Clémentines",
+   "ray": "fl",
+   "desc": "Petits agrumes sans pépins faciles à éplucher, le fruit de l'hiver.",
+   "format": "Filet de 1 à 2 kg ou cagette",
+   "conserver": "Au frais : 1 à 2 semaines",
+   "saison": [
+    11,
+    2
+   ]
+  },
+  {
+   "n": "Kiwis",
+   "ray": "fl",
+   "desc": "Kiwis riches en vitamine C ; mûrs quand ils cèdent légèrement.",
+   "format": "Barquette ou à la pièce",
+   "conserver": "Au frigo : 2 à 3 semaines",
+   "saison": [
+    11,
+    5
+   ],
+   "photo": "photos/produits/kiwis.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Kiwi_aka.jpg"
+  },
+  {
+   "n": "Raisins",
+   "ray": "fl",
+   "desc": "Raisins blancs ou noirs, sans pépins de préférence.",
+   "format": "Barquette de 500 g",
+   "conserver": "Au frigo : 4 à 5 jours",
+   "saison": [
+    8,
+    11
+   ],
+   "photo": "photos/produits/raisins.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Table_grapes_on_white.jpg"
+  },
+  {
+   "n": "Fraises",
+   "ray": "fl",
+   "desc": "Fraises belges, à manger le jour même de préférence.",
+   "format": "Barquette de 250 ou 500 g",
+   "conserver": "Au frigo, sans les laver : 2 jours",
+   "saison": [
+    4,
+    9
+   ],
+   "photo": "photos/produits/fraises.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Garden_strawberry_(Fragaria_×_ananassa)_single2.jpg"
+  },
+  {
+   "n": "Salade",
+   "ray": "fl",
+   "desc": "Salade verte du moment (laitue, batavia, feuille de chêne).",
+   "format": "À la pièce",
+   "conserver": "Au frigo : 3 à 4 jours",
+   "saison": [
+    5,
+    10
+   ],
+   "photo": "photos/produits/laitue.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Lettuce_Mini_Heads_(7331119710).jpg"
+  },
+  {
+   "n": "Ail",
+   "ray": "fl",
+   "desc": "Ail blanc ou rosé, pour parfumer presque tous les plats.",
+   "format": "Filet de 3 têtes ou à la pièce",
+   "conserver": "Au sec, hors du frigo : plusieurs semaines",
+   "saison": [
+    1,
+    12
+   ],
+   "photo": "photos/produits/ail.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Garlic_bulbs.jpg"
+  },
+  {
+   "n": "Échalotes",
+   "ray": "fl",
+   "desc": "Plus fines et douces que l'oignon, pour les sauces et vinaigrettes.",
+   "format": "Filet de 250 à 500 g",
+   "conserver": "Au sec : plusieurs semaines",
+   "saison": [
+    1,
+    12
+   ]
+  },
+  {
+   "n": "Ciboulette",
+   "ray": "fl",
+   "desc": "Herbe fine au goût d'oignon doux, pour les œufs, le fromage blanc, les salades.",
+   "format": "Botte ou pot",
+   "conserver": "Au frigo : 4 à 5 jours",
+   "saison": [
+    3,
+    10
+   ],
+   "photo": "photos/produits/ciboulette.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Chives.jpg"
+  },
+  {
+   "n": "Basilic",
+   "ray": "fl",
+   "desc": "Herbe parfumée des plats italiens ; ajouter à la fin de la cuisson.",
+   "format": "Pot ou sachet",
+   "conserver": "Pot : sur l'appui de fenêtre, pas au frigo",
+   "saison": [
+    5,
+    9
+   ],
+   "photo": "photos/produits/basilic.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Basil-Basilico-Ocimum_basilicum-albahaca.jpg"
+  },
+  {
+   "n": "Radis",
+   "ray": "fl",
+   "desc": "Radis roses croquants, à croquer avec du beurre et du sel.",
+   "format": "Botte",
+   "conserver": "Au frigo, sans les fanes : 4 à 5 jours",
+   "saison": [
+    4,
+    9
+   ]
+  },
+  {
+   "n": "Chou-fleur",
+   "ray": "fl",
+   "desc": "Chou-fleur pour le gratin, la soupe ou rôti au four.",
+   "format": "À la pièce",
+   "conserver": "Au frigo : 1 semaine",
+   "saison": [
+    6,
+    11
+   ],
+   "photo": "photos/produits/chou-fleur.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Chou-fleur_02.jpg"
+  },
+  {
+   "n": "Melon",
+   "ray": "fl",
+   "desc": "Melon charentais ; mûr quand il sent bon et que le pédoncule se détache.",
+   "format": "À la pièce",
+   "conserver": "À température ambiante, puis au frigo une fois coupé",
+   "saison": [
+    6,
+    9
+   ],
+   "photo": "photos/produits/melon.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Cantaloupe.jpg"
+  },
+  {
+   "n": "Ananas",
+   "ray": "fl",
+   "desc": "Ananas frais, mûr quand une feuille du centre s'arrache facilement.",
+   "format": "À la pièce",
+   "conserver": "À température ambiante : 3 à 4 jours",
+   "saison": [
+    1,
+    12
+   ],
+   "photo": "photos/produits/ananas.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Pineapple_and_cross_section.jpg"
+  },
+  {
+   "n": "Mangues",
+   "ray": "fl",
+   "desc": "Mangues mûres à point, en dessert ou en salade.",
+   "format": "À la pièce",
+   "conserver": "À température ambiante pour mûrir",
+   "saison": [
+    1,
+    12
+   ],
+   "photo": "photos/produits/mangues.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Hapus_Mango.jpg"
+  },
+  {
+   "n": "Myrtilles",
+   "ray": "fl",
+   "desc": "Petites baies bleues, pour les yaourts, les crêpes et les desserts.",
+   "format": "Barquette de 125 à 250 g",
+   "conserver": "Au frigo : 4 à 5 jours",
+   "saison": [
+    6,
+    9
+   ],
+   "photo": "photos/produits/myrtilles.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Vaccinium_corymbosum(01).jpg"
+  },
+  {
+   "n": "Pommes de terre grenaille",
+   "ray": "fl",
+   "desc": "Petites pommes de terre à rôtir entières avec la peau.",
+   "format": "Sachet de 750 g à 1 kg",
+   "conserver": "Au frais et dans le noir",
+   "saison": [
+    1,
+    12
+   ]
+  },
+  {
+   "n": "Blancs de poulet",
+   "ray": "bou",
+   "desc": "Filets de poulet sans peau ni os, maigres et rapides à cuire (6 à 8 minutes à la poêle).",
+   "format": "Barquette de 500 g à 1 kg",
+   "conserver": "Au frigo : 2 jours ; se congèle bien"
+  },
+  {
+   "n": "Haché porc-bœuf",
+   "ray": "bou",
+   "desc": "Haché mixte porc et bœuf, le plus utilisé en Belgique pour boulettes, bolognaise et hachis.",
+   "format": "Barquette de 500 g ou 1 kg",
+   "conserver": "Au frigo : 1 à 2 jours ; à congeler le jour de l'achat sinon",
+   "photo": "photos/produits/hache-porc-b-uf.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Hackfleisch-1.jpg"
+  },
+  {
+   "n": "Lardons",
+   "ray": "bou",
+   "desc": "Petits dés de lard fumé ou nature, pour carbonara, quiche et salade liégeoise.",
+   "format": "Barquette de 2 × 100 g ou 200 g",
+   "conserver": "Au frigo : jusqu'à la date indiquée ; entamés, 3 jours"
+  },
+  {
+   "n": "Jambon cuit",
+   "ray": "bou",
+   "desc": "Jambon cuit (jambon blanc) en tranches.",
+   "format": "Barquette de 6 à 10 tranches",
+   "conserver": "Au frigo : 3 jours après ouverture"
+  },
+  {
+   "n": "Jambon cru",
+   "ray": "bou",
+   "desc": "Jambon sec (type Ardennes ou Serrano) en fines tranches.",
+   "format": "Barquette de 80 à 150 g",
+   "conserver": "Au frigo : 3 jours après ouverture"
+  },
+  {
+   "n": "Saucisses",
+   "ray": "bou",
+   "desc": "Saucisses de porc ou mixtes à cuire à la poêle.",
+   "format": "Barquette de 4 à 8",
+   "conserver": "Au frigo : 2 jours ; se congèlent bien"
+  },
+  {
+   "n": "Saucisses fumées",
+   "ray": "bou",
+   "desc": "Saucisses fumées à réchauffer, pour le stoemp et les potées.",
+   "format": "Paquet de 4 à 6",
+   "conserver": "Au frigo : jusqu'à la date indiquée"
+  },
+  {
+   "n": "Escalopes de dinde",
+   "ray": "bou",
+   "desc": "Fines tranches de dinde, à poêler 3 minutes de chaque côté.",
+   "format": "Barquette de 4 à 6",
+   "conserver": "Au frigo : 2 jours"
+  },
+  {
+   "n": "Haché pur bœuf",
+   "ray": "bou",
+   "desc": "Haché 100 % bœuf, pour les burgers, le chili et l'américain maison.",
+   "format": "Barquette de 500 g",
+   "conserver": "Au frigo : 1 jour",
+   "photo": "photos/produits/hache-porc-b-uf.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Hackfleisch-1.jpg"
+  },
+  {
+   "n": "Charcuterie assortie",
+   "ray": "bou",
+   "desc": "Assortiment de charcuteries tranchées (salami, jambon, pâté) pour les soirs de tartines ou de raclette.",
+   "format": "Plateau de 200 à 400 g",
+   "conserver": "Au frigo : 3 jours après ouverture"
+  },
+  {
+   "n": "Saumon frais",
+   "ray": "bou",
+   "desc": "Pavés ou filet de saumon frais, à cuire au four ou à la poêle.",
+   "format": "Barquette de 2 à 4 pavés",
+   "conserver": "Au frigo : 1 à 2 jours"
+  },
+  {
+   "n": "Pavés de saumon",
+   "ray": "bou",
+   "desc": "Portions de saumon d'environ 125 g, avec ou sans peau.",
+   "format": "Barquette de 2 ou 4, ou surgelés",
+   "conserver": "Frais : 1 à 2 jours au frigo"
+  },
+  {
+   "n": "Saumon fumé",
+   "ray": "bou",
+   "desc": "Saumon fumé en tranches, pour les pâtes, les wraps et les tartines.",
+   "format": "Paquet de 100 à 200 g",
+   "conserver": "Au frigo : 2 jours après ouverture"
+  },
+  {
+   "n": "Filet de porc",
+   "ray": "bou",
+   "desc": "Morceau maigre et tendre, à cuire entier au four ou en médaillons.",
+   "format": "Pièce de 500 g à 1 kg",
+   "conserver": "Au frigo : 2 jours"
+  },
+  {
+   "n": "Lanières de bœuf",
+   "ray": "bou",
+   "desc": "Bœuf déjà coupé en fines lanières, prêt pour le wok et les fajitas.",
+   "format": "Barquette de 300 à 500 g",
+   "conserver": "Au frigo : 1 à 2 jours"
+  },
+  {
+   "n": "Cuisses de poulet désossées",
+   "ray": "bou",
+   "desc": "Morceaux de cuisse sans os, plus moelleux et moins chers que le filet.",
+   "format": "Barquette de 500 g à 1 kg",
+   "conserver": "Au frigo : 2 jours"
+  },
+  {
+   "n": "Filets de colin",
+   "ray": "bou",
+   "desc": "Poisson blanc doux et économique, frais ou surgelé.",
+   "format": "Barquette ou sachet surgelé de 400 g à 1 kg",
+   "conserver": "Frais : 1 jour au frigo"
+  },
+  {
+   "n": "Filets de canard",
+   "ray": "bou",
+   "desc": "Magrets ou filets de canard, à cuire côté peau d'abord.",
+   "format": "Barquette de 2",
+   "conserver": "Au frigo : 2 jours"
+  },
+  {
+   "n": "Escalopes de veau",
+   "ray": "bou",
+   "desc": "Escalopes fines de veau, à poêler très rapidement.",
+   "format": "Barquette de 2 à 4",
+   "conserver": "Au frigo : 1 à 2 jours"
+  },
+  {
+   "n": "Steaks de thon",
+   "ray": "bou",
+   "desc": "Tranches de thon, à saisir 1 à 2 minutes par face.",
+   "format": "Barquette de 2 ou surgelés",
+   "conserver": "Frais : 1 jour au frigo"
+  },
+  {
+   "n": "Gambas",
+   "ray": "bou",
+   "desc": "Grosses crevettes crues ou cuites, souvent surgelées.",
+   "format": "Sachet surgelé de 400 g à 1 kg",
+   "conserver": "Surgelées : plusieurs mois ; décongeler au frigo"
+  },
+  {
+   "n": "Filets de cabillaud",
+   "ray": "bou",
+   "desc": "Poisson blanc aux gros feuillets, cuisson douce au four ou à la poêle.",
+   "format": "Barquette ou surgelés",
+   "conserver": "Frais : 1 jour au frigo"
+  },
+  {
+   "n": "Dos de cabillaud",
+   "ray": "bou",
+   "desc": "La partie la plus épaisse et la plus tendre du cabillaud.",
+   "format": "Barquette de 2 à 4 portions",
+   "conserver": "Frais : 1 jour au frigo"
+  },
+  {
+   "n": "Aiguillettes de poulet",
+   "ray": "bou",
+   "desc": "Petits filets de poulet (sous le blanc), très tendres et rapides à cuire.",
+   "format": "Barquette de 500 g",
+   "conserver": "Au frigo : 2 jours"
+  },
+  {
+   "n": "Bœuf à carbonnades",
+   "ray": "bou",
+   "desc": "Morceaux de bœuf à mijoter (paleron, joue) pour les carbonnades.",
+   "format": "Barquette de 500 g à 1 kg",
+   "conserver": "Au frigo : 2 jours"
+  },
+  {
+   "n": "Américain préparé",
+   "ray": "bou",
+   "desc": "Filet américain belge : bœuf cru haché très fin et assaisonné. À manger le jour même.",
+   "format": "Barquette de 250 à 500 g",
+   "conserver": "Au frigo, à consommer le jour de l'achat"
+  },
+  {
+   "n": "Boudin",
+   "ray": "bou",
+   "desc": "Boudin noir ou blanc à poêler ; avec compote et purée, un classique belge.",
+   "format": "Paquet de 2 à 6",
+   "conserver": "Au frigo : jusqu'à la date indiquée"
+  },
+  {
+   "n": "Saucisses de Francfort",
+   "ray": "bou",
+   "desc": "Saucisses fines à réchauffer 5 minutes dans l'eau chaude, pour les hot-dogs.",
+   "format": "Bocal ou paquet de 6 à 10",
+   "conserver": "Fermé : plusieurs semaines ; ouvert : 3 jours au frigo"
+  },
+  {
+   "n": "Merguez",
+   "ray": "bou",
+   "desc": "Saucisses épicées de bœuf et mouton, pour le couscous et le barbecue.",
+   "format": "Barquette de 6 à 12",
+   "conserver": "Au frigo : 2 jours"
+  },
+  {
+   "n": "Cordons bleus",
+   "ray": "bou",
+   "desc": "Escalopes panées farcies au jambon et fromage, prêtes à cuire.",
+   "format": "Barquette de 2 à 4",
+   "conserver": "Au frigo : jusqu'à la date indiquée"
+  },
+  {
+   "n": "Côtes de porc",
+   "ray": "bou",
+   "desc": "Côtes ou côtelettes de porc avec os, à poêler ou griller.",
+   "format": "Barquette de 2 à 4",
+   "conserver": "Au frigo : 2 jours"
+  },
+  {
+   "n": "Steaks hachés pur bœuf",
+   "ray": "bou",
+   "desc": "Steaks hachés façonnés, prêts pour les burgers.",
+   "format": "Barquette de 4 à 8",
+   "conserver": "Au frigo : 1 jour ; se congèlent bien"
+  },
+  {
+   "n": "Steaks de bœuf",
+   "ray": "bou",
+   "desc": "Steaks à poêler (rumsteck, faux-filet, pavé).",
+   "format": "Barquette de 2 à 4",
+   "conserver": "Au frigo : 2 jours"
+  },
+  {
+   "n": "Scampis",
+   "ray": "bou",
+   "desc": "Crevettes décortiquées (souvent surgelées), à poêler à l'ail.",
+   "format": "Sachet surgelé de 300 à 500 g",
+   "conserver": "Surgelés : plusieurs mois"
+  },
+  {
+   "n": "Moules",
+   "ray": "bou",
+   "desc": "Moules de Zélande, servies avec des frites ; jeter celles qui restent ouvertes avant cuisson.",
+   "format": "Sac ou seau de 1 à 2 kg (comptez 1 kg par adulte)",
+   "conserver": "Au frigo, à cuisiner le jour même",
+   "photo": "photos/produits/moules.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Cooked_mussels_DSC09244.JPG"
+  },
+  {
+   "n": "Croquettes de crevettes",
+   "ray": "bou",
+   "desc": "Croquettes belges aux crevettes grises, à frire ou cuire au four.",
+   "format": "Boîte de 4 à 8, souvent surgelées",
+   "conserver": "Surgelées : plusieurs mois"
+  },
+  {
+   "n": "Filets de poisson panés",
+   "ray": "bou",
+   "desc": "Filets de poisson blanc panés, au four ou à la poêle.",
+   "format": "Boîte surgelée de 4 à 10",
+   "conserver": "Surgelés : plusieurs mois"
+  },
+  {
+   "n": "Jambon",
+   "ray": "bou",
+   "desc": "Jambon cuit en tranches pour les tartines.",
+   "format": "Barquette de 6 à 10 tranches",
+   "conserver": "Au frigo : 3 jours après ouverture"
+  },
+  {
+   "n": "Saucisson",
+   "ray": "bou",
+   "desc": "Saucisson sec à trancher.",
+   "format": "À la pièce (200 à 300 g)",
+   "conserver": "Au sec ou au frigo"
+  },
+  {
+   "n": "Salami",
+   "ray": "bou",
+   "desc": "Salami en tranches pour les tartines et les pizzas.",
+   "format": "Barquette de 100 à 200 g",
+   "conserver": "Au frigo : 3 à 5 jours après ouverture"
+  },
+  {
+   "n": "Pâté",
+   "ray": "bou",
+   "desc": "Pâté de campagne ou de foie, pour les tartines.",
+   "format": "Barquette ou terrine de 150 à 300 g",
+   "conserver": "Au frigo : 3 jours après ouverture"
+  },
+  {
+   "n": "Filet de dinde",
+   "ray": "bou",
+   "desc": "Charcuterie de dinde en fines tranches, maigre.",
+   "format": "Barquette de 100 à 200 g",
+   "conserver": "Au frigo : 3 jours après ouverture"
+  },
+  {
+   "n": "Filet de poulet",
+   "ray": "bou",
+   "desc": "Charcuterie de poulet en tranches pour les tartines.",
+   "format": "Barquette de 100 à 200 g",
+   "conserver": "Au frigo : 3 jours après ouverture"
+  },
+  {
+   "n": "Haché",
+   "ray": "bou",
+   "desc": "Viande hachée (mixte porc-bœuf le plus souvent).",
+   "format": "Barquette de 500 g ou 1 kg",
+   "conserver": "Au frigo : 1 à 2 jours",
+   "photo": "photos/produits/hache-porc-b-uf.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Hackfleisch-1.jpg"
+  },
+  {
+   "n": "Américain",
+   "ray": "bou",
+   "desc": "Filet américain : bœuf cru haché assaisonné. À manger le jour même.",
+   "format": "Barquette de 250 à 500 g",
+   "conserver": "À consommer le jour de l'achat"
+  },
+  {
+   "n": "Boulettes",
+   "ray": "bou",
+   "desc": "Boulettes de haché prêtes à cuire.",
+   "format": "Barquette de 6 à 12",
+   "conserver": "Au frigo : 1 à 2 jours"
+  },
+  {
+   "n": "Poulet entier",
+   "ray": "bou",
+   "desc": "Poulet prêt à cuire, à rôtir au four (1 h 15 environ).",
+   "format": "À la pièce (1,2 à 1,8 kg)",
+   "conserver": "Au frigo : 2 jours"
+  },
+  {
+   "n": "Côtelettes de porc",
+   "ray": "bou",
+   "desc": "Côtelettes avec os, à poêler ou griller.",
+   "format": "Barquette de 2 à 4",
+   "conserver": "Au frigo : 2 jours"
+  },
+  {
+   "n": "Steaks",
+   "ray": "bou",
+   "desc": "Steaks de bœuf à poêler.",
+   "format": "Barquette de 2 à 4",
+   "conserver": "Au frigo : 2 jours"
+  },
+  {
+   "n": "Crème fraîche",
+   "ray": "cre",
+   "desc": "Crème liquide ou épaisse pour les sauces, les quiches et les gratins ; la version légère (15 %) suffit souvent.",
+   "format": "Brique de 20 cl ou pot de 25 à 50 cl",
+   "conserver": "Fermée : jusqu'à la date ; ouverte : 3 à 4 jours au frigo"
+  },
+  {
+   "n": "Œufs",
+   "ray": "cre",
+   "desc": "Œufs frais de poules élevées en plein air ou au sol (le code commence par 0 pour bio, 1 plein air, 2 au sol).",
+   "format": "Boîte de 6, 10 ou 12",
+   "conserver": "Au frigo, pointe vers le bas : jusqu'à la date indiquée",
+   "photo": "photos/produits/ufs.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Chicken_eggs.jpg"
+  },
+  {
+   "n": "Fromage râpé",
+   "ray": "cre",
+   "desc": "Emmental ou mélange râpé, pour gratiner les pâtes et les gratins.",
+   "format": "Sachet de 150 à 500 g",
+   "conserver": "Ouvert : 5 jours au frigo ; se congèle bien"
+  },
+  {
+   "n": "Beurre",
+   "ray": "cre",
+   "desc": "Beurre doux pour cuire et tartiner (le demi-sel pour les tartines).",
+   "format": "Plaquette de 250 g",
+   "conserver": "Au frigo : plusieurs semaines",
+   "photo": "photos/produits/beurre.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Western-pack-butter.jpg"
+  },
+  {
+   "n": "Parmesan",
+   "ray": "cre",
+   "desc": "Fromage italien affiné, à râper sur les pâtes et le risotto.",
+   "format": "Morceau de 150 à 250 g ou râpé en sachet",
+   "conserver": "En morceau : plusieurs semaines au frigo",
+   "photo": "photos/produits/parmesan.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Parmigiano_reggiano_piece.jpg"
+  },
+  {
+   "n": "Lait",
+   "ray": "cre",
+   "desc": "Lait demi-écrémé (le plus courant) ou entier.",
+   "format": "Brique de 1 L ou pack de 6",
+   "conserver": "Fermé : à température ambiante ; ouvert : 3 jours au frigo",
+   "photo": "photos/produits/lait.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Milk_glass.jpg"
+  },
+  {
+   "n": "Mozzarella",
+   "ray": "cre",
+   "desc": "Boule de mozzarella en saumure, pour pizzas, salades caprese et gratins.",
+   "format": "Sachet de 125 g (parfois en lot de 3)",
+   "conserver": "Fermée : jusqu'à la date ; ouverte : 2 jours",
+   "photo": "photos/produits/mozzarella.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Mozzarella_cheese.jpg"
+  },
+  {
+   "n": "Feta",
+   "ray": "cre",
+   "desc": "Fromage grec de brebis en saumure, à émietter en salade.",
+   "format": "Bloc de 150 à 200 g",
+   "conserver": "Ouverte, dans sa saumure : 4 à 5 jours",
+   "photo": "photos/produits/feta.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Feta_Cheese.jpg"
+  },
+  {
+   "n": "Yaourt grec",
+   "ray": "cre",
+   "desc": "Yaourt épais et crémeux, pour le tzatziki et les desserts.",
+   "format": "Pot de 500 g ou 1 kg",
+   "conserver": "Ouvert : 3 à 4 jours au frigo"
+  },
+  {
+   "n": "Fromage en tranches",
+   "ray": "cre",
+   "desc": "Gouda ou autre fromage jeune en tranches, pour croques et tartines.",
+   "format": "Barquette de 10 à 20 tranches",
+   "conserver": "Ouvert : 5 jours au frigo"
+  },
+  {
+   "n": "Fromage à raclette",
+   "ray": "cre",
+   "desc": "Fromage à fondre en tranches pour la raclette (comptez 200 g par personne).",
+   "format": "Barquette de 400 g à 1 kg",
+   "conserver": "Ouvert : 4 à 5 jours au frigo"
+  },
+  {
+   "n": "Fromage à fondue",
+   "ray": "cre",
+   "desc": "Mélange de fromages râpés pour fondue savoyarde.",
+   "format": "Sachet de 400 à 800 g",
+   "conserver": "Jusqu'à la date indiquée"
+  },
+  {
+   "n": "Reblochon",
+   "ray": "cre",
+   "desc": "Fromage savoyard à pâte molle pour la tartiflette.",
+   "format": "À la pièce (450 g)",
+   "conserver": "Au frigo : jusqu'à la date"
+  },
+  {
+   "n": "Ricotta",
+   "ray": "cre",
+   "desc": "Fromage frais italien doux et léger, pour farcir les pâtes ou les lasagnes.",
+   "format": "Pot de 250 g",
+   "conserver": "Ouverte : 3 jours au frigo"
+  },
+  {
+   "n": "Burrata",
+   "ray": "cre",
+   "desc": "Mozzarella au cœur crémeux, à servir nature avec des tomates.",
+   "format": "À la pièce (125 g)",
+   "conserver": "À consommer rapidement"
+  },
+  {
+   "n": "Cheddar en tranches",
+   "ray": "cre",
+   "desc": "Cheddar orange fondant, pour les burgers.",
+   "format": "Paquet de 8 à 12 tranches",
+   "conserver": "Ouvert : 5 jours au frigo"
+  },
+  {
+   "n": "Margarine",
+   "ray": "cre",
+   "desc": "Matière grasse végétale à tartiner ou pour la cuisson.",
+   "format": "Pot de 250 à 500 g",
+   "conserver": "Au frigo"
+  },
+  {
+   "n": "Yaourts",
+   "ray": "cre",
+   "desc": "Yaourts nature ou sucrés.",
+   "format": "Pack de 4, 8 ou 12",
+   "conserver": "Au frigo : jusqu'à la date",
+   "photo": "photos/produits/yaourts.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Turkish_strained_yogurt.jpg"
+  },
+  {
+   "n": "Yaourts aux fruits",
+   "ray": "cre",
+   "desc": "Yaourts aux morceaux de fruits.",
+   "format": "Pack de 4 à 12",
+   "conserver": "Au frigo : jusqu'à la date",
+   "photo": "photos/produits/yaourts.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Turkish_strained_yogurt.jpg"
+  },
+  {
+   "n": "Fromage blanc",
+   "ray": "cre",
+   "desc": "Fromage frais lisse, nature ou aux herbes.",
+   "format": "Pot de 500 g ou 1 kg",
+   "conserver": "Ouvert : 3 à 4 jours au frigo"
+  },
+  {
+   "n": "Skyr",
+   "ray": "cre",
+   "desc": "Fromage frais islandais très riche en protéines.",
+   "format": "Pot de 450 g ou 1 kg",
+   "conserver": "Ouvert : 3 à 4 jours au frigo"
+  },
+  {
+   "n": "Gouda",
+   "ray": "cre",
+   "desc": "Fromage hollandais jeune ou vieux, en tranches ou en morceau.",
+   "format": "Morceau de 400 g ou tranches",
+   "conserver": "Au frigo : 2 à 3 semaines en morceau"
+  },
+  {
+   "n": "Emmental râpé",
+   "ray": "cre",
+   "desc": "Emmental râpé pour gratiner.",
+   "format": "Sachet de 150 à 500 g",
+   "conserver": "Ouvert : 5 jours au frigo"
+  },
+  {
+   "n": "Brie",
+   "ray": "cre",
+   "desc": "Fromage à pâte molle et croûte fleurie.",
+   "format": "Pointe ou boîte",
+   "conserver": "Au frigo : jusqu'à la date",
+   "photo": "photos/produits/brie.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Brie_01.jpg"
+  },
+  {
+   "n": "Fromage à tartiner",
+   "ray": "cre",
+   "desc": "Fromage frais à tartiner (type Philadelphia, Boursin).",
+   "format": "Barquette de 150 à 300 g",
+   "conserver": "Ouvert : 5 jours au frigo"
+  },
+  {
+   "n": "Desserts lactés",
+   "ray": "cre",
+   "desc": "Crèmes dessert, mousses, riz au lait…",
+   "format": "Pack de 4 à 8",
+   "conserver": "Au frigo : jusqu'à la date"
+  },
+  {
+   "n": "Lait d'avoine",
+   "ray": "cre",
+   "desc": "Boisson végétale à l'avoine.",
+   "format": "Brique de 1 L",
+   "conserver": "Ouverte : 5 jours au frigo"
+  },
+  {
+   "n": "Crème soja",
+   "ray": "cre",
+   "desc": "Alternative végétale à la crème pour la cuisine.",
+   "format": "Brique de 20 à 25 cl",
+   "conserver": "Ouverte : 3 jours au frigo"
+  },
+  {
+   "n": "Lait entier",
+   "ray": "cre",
+   "desc": "Lait entier, plus crémeux, pour les enfants et les desserts.",
+   "format": "Brique de 1 L",
+   "conserver": "Ouvert : 3 jours au frigo",
+   "photo": "photos/produits/lait.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Milk_glass.jpg"
+  },
+  {
+   "n": "Riz",
+   "ray": "epi",
+   "desc": "Riz long grain (basmati ou thaï pour plus de parfum) ; compter 60 à 70 g cru par personne.",
+   "format": "Paquet de 1 kg ou sachets cuisson",
+   "conserver": "Au sec, bien fermé : plus d'un an",
+   "photo": "photos/produits/riz.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:White_rice.jpg"
+  },
+  {
+   "n": "Sauce soja",
+   "ray": "epi",
+   "desc": "Sauce salée asiatique, pour les wok, le riz cantonais et les marinades.",
+   "format": "Bouteille de 15 à 50 cl",
+   "conserver": "Ouverte : plusieurs mois, au frigo de préférence",
+   "photo": "photos/produits/sauce-soja.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Soy_sauce.jpg"
+  },
+  {
+   "n": "Tomates concassées",
+   "ray": "epi",
+   "desc": "Tomates en morceaux en boîte, la base des sauces rapides.",
+   "format": "Boîte de 400 g",
+   "conserver": "Fermée : 2 ans ; ouverte : 3 jours au frigo dans un bol"
+  },
+  {
+   "n": "Coulis de tomate",
+   "ray": "epi",
+   "desc": "Purée de tomates lisse (passata), pour la bolognaise et la pizza.",
+   "format": "Bouteille ou brique de 500 g à 700 g",
+   "conserver": "Ouvert : 4 jours au frigo"
+  },
+  {
+   "n": "Moutarde",
+   "ray": "epi",
+   "desc": "Moutarde forte de Dijon ou moutarde belge douce.",
+   "format": "Pot de 200 à 400 g",
+   "conserver": "Ouverte : au frigo"
+  },
+  {
+   "n": "Penne",
+   "ray": "epi",
+   "desc": "Pâtes courtes striées qui retiennent bien la sauce.",
+   "format": "Paquet de 500 g ou 1 kg",
+   "conserver": "Au sec : 2 ans"
+  },
+  {
+   "n": "Spaghetti",
+   "ray": "epi",
+   "desc": "Pâtes longues pour la bolognaise et la carbonara ; compter 100 g par adulte.",
+   "format": "Paquet de 500 g ou 1 kg",
+   "conserver": "Au sec : 2 ans",
+   "photo": "photos/produits/spaghetti.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Spaghetti_spiral,_2008.jpg"
+  },
+  {
+   "n": "Tagliatelles",
+   "ray": "epi",
+   "desc": "Pâtes plates aux œufs, idéales avec les sauces à la crème.",
+   "format": "Paquet de 500 g (nids)",
+   "conserver": "Au sec : 1 à 2 ans",
+   "photo": "photos/produits/tagliatelles.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Tagliatelle.jpg"
+  },
+  {
+   "n": "Macaroni",
+   "ray": "epi",
+   "desc": "Petites pâtes coudées pour les gratins.",
+   "format": "Paquet de 500 g ou 1 kg",
+   "conserver": "Au sec : 2 ans"
+  },
+  {
+   "n": "Coquillettes",
+   "ray": "epi",
+   "desc": "Petites pâtes appréciées des enfants, cuisson 8 à 9 minutes.",
+   "format": "Paquet de 500 g",
+   "conserver": "Au sec : 2 ans"
+  },
+  {
+   "n": "Orzo",
+   "ray": "epi",
+   "desc": "Pâtes en forme de grains de riz, en soupe ou façon risotto.",
+   "format": "Paquet de 500 g",
+   "conserver": "Au sec : 2 ans"
+  },
+  {
+   "n": "Feuilles de lasagne",
+   "ray": "epi",
+   "desc": "Plaques de lasagne à précuire ou « sans précuisson ».",
+   "format": "Boîte de 250 à 500 g",
+   "conserver": "Au sec : 2 ans"
+  },
+  {
+   "n": "Nouilles chinoises",
+   "ray": "epi",
+   "desc": "Nouilles aux œufs à cuire 3 à 4 minutes, pour le wok.",
+   "format": "Paquet de 250 à 500 g",
+   "conserver": "Au sec : 1 an"
+  },
+  {
+   "n": "Nouilles de riz",
+   "ray": "epi",
+   "desc": "Nouilles fines de riz à réhydrater, pour les plats thaïs et vietnamiens.",
+   "format": "Paquet de 200 à 400 g",
+   "conserver": "Au sec : 1 an"
+  },
+  {
+   "n": "Semoule",
+   "ray": "epi",
+   "desc": "Semoule de blé moyenne pour le couscous ; prête en 5 minutes hors du feu.",
+   "format": "Paquet de 500 g ou 1 kg",
+   "conserver": "Au sec : 1 an",
+   "photo": "photos/produits/semoule.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Couscous.jpg"
+  },
+  {
+   "n": "Riz à risotto",
+   "ray": "epi",
+   "desc": "Riz rond (arborio, carnaroli) qui libère son amidon pour un risotto crémeux.",
+   "format": "Paquet de 500 g ou 1 kg",
+   "conserver": "Au sec : 1 an",
+   "photo": "photos/produits/riz.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:White_rice.jpg"
+  },
+  {
+   "n": "Bouillon de légumes",
+   "ray": "epi",
+   "desc": "Cubes ou bouillon en poudre pour soupes, risotto et sauces.",
+   "format": "Boîte de 10 à 12 cubes",
+   "conserver": "Au sec : 1 an"
+  },
+  {
+   "n": "Bouillon de volaille",
+   "ray": "epi",
+   "desc": "Cubes de bouillon de poulet.",
+   "format": "Boîte de 10 à 12 cubes",
+   "conserver": "Au sec : 1 an"
+  },
+  {
+   "n": "Bouillon de bœuf",
+   "ray": "epi",
+   "desc": "Cubes de bouillon de bœuf pour les carbonnades et les sauces brunes.",
+   "format": "Boîte de 10 à 12 cubes",
+   "conserver": "Au sec : 1 an"
+  },
+  {
+   "n": "Maïs",
+   "ray": "epi",
+   "desc": "Maïs doux en grains, en boîte.",
+   "format": "Boîte de 300 g (ou lot de 3)",
+   "conserver": "Fermée : 2 ans ; ouverte : 2 jours au frigo"
+  },
+  {
+   "n": "Tortillas",
+   "ray": "epi",
+   "desc": "Galettes de blé souples pour les wraps et les fajitas.",
+   "format": "Paquet de 6 à 8 (25 cm)",
+   "conserver": "Ouvert : 3 à 4 jours"
+  },
+  {
+   "n": "Petites tortillas",
+   "ray": "epi",
+   "desc": "Petites galettes de blé ou de maïs pour les tacos.",
+   "format": "Paquet de 8 à 12",
+   "conserver": "Ouvert : 3 à 4 jours"
+  },
+  {
+   "n": "Épices pour tacos",
+   "ray": "epi",
+   "desc": "Mélange d'épices mexicaines (cumin, paprika, piment) pour la viande des tacos.",
+   "format": "Sachet de 25 à 40 g",
+   "conserver": "Au sec : 1 an"
+  },
+  {
+   "n": "Épices pour chili",
+   "ray": "epi",
+   "desc": "Mélange pour chili con carne.",
+   "format": "Sachet de 25 à 40 g",
+   "conserver": "Au sec : 1 an"
+  },
+  {
+   "n": "Épices à couscous",
+   "ray": "epi",
+   "desc": "Ras el hanout ou mélange pour couscous.",
+   "format": "Pot ou sachet de 30 à 50 g",
+   "conserver": "Au sec : 1 an"
+  },
+  {
+   "n": "Garam masala",
+   "ray": "epi",
+   "desc": "Mélange d'épices indien chaud (cannelle, cardamome, girofle, cumin).",
+   "format": "Pot de 30 à 50 g",
+   "conserver": "Au sec : 1 an"
+  },
+  {
+   "n": "Pâte de curry",
+   "ray": "epi",
+   "desc": "Pâte de curry rouge, verte ou jaune pour les currys au lait de coco.",
+   "format": "Pot de 100 à 200 g",
+   "conserver": "Ouverte : 1 mois au frigo"
+  },
+  {
+   "n": "Mayonnaise",
+   "ray": "epi",
+   "desc": "Mayonnaise belge, indispensable avec les frites.",
+   "format": "Pot ou tube de 300 à 500 ml",
+   "conserver": "Ouverte : au frigo, 1 à 2 mois"
+  },
+  {
+   "n": "Ketchup",
+   "ray": "epi",
+   "desc": "Sauce tomate sucrée.",
+   "format": "Flacon de 500 ml à 1 L",
+   "conserver": "Ouvert : au frigo"
+  },
+  {
+   "n": "Compote de pommes",
+   "ray": "epi",
+   "desc": "Compote sans sucres ajoutés ou classique, avec le boudin ou en dessert.",
+   "format": "Bocal de 700 g ou gourdes",
+   "conserver": "Ouverte : 5 jours au frigo"
+  },
+  {
+   "n": "Chapelure",
+   "ray": "epi",
+   "desc": "Pain sec réduit en poudre, pour paner et gratiner.",
+   "format": "Paquet de 250 à 500 g",
+   "conserver": "Au sec : 1 an"
+  },
+  {
+   "n": "Haricots rouges",
+   "ray": "epi",
+   "desc": "Haricots rouges cuits en boîte, pour le chili.",
+   "format": "Boîte de 400 g",
+   "conserver": "Fermée : 2 ans",
+   "photo": "photos/produits/haricots-rouges.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Kidney_beans.jpg"
+  },
+  {
+   "n": "Haricots noirs",
+   "ray": "epi",
+   "desc": "Haricots noirs cuits en boîte, pour les plats mexicains.",
+   "format": "Boîte de 400 g",
+   "conserver": "Fermée : 2 ans"
+  },
+  {
+   "n": "Haricots blancs",
+   "ray": "epi",
+   "desc": "Haricots blancs cuits, nature ou à la tomate.",
+   "format": "Boîte de 400 g",
+   "conserver": "Fermée : 2 ans"
+  },
+  {
+   "n": "Pois chiches",
+   "ray": "epi",
+   "desc": "Pois chiches cuits en boîte, pour le curry, le houmous et les salades.",
+   "format": "Boîte de 400 g",
+   "conserver": "Fermée : 2 ans"
+  },
+  {
+   "n": "Lentilles corail",
+   "ray": "epi",
+   "desc": "Lentilles orange qui cuisent en 15 minutes sans trempage, pour le dahl.",
+   "format": "Paquet de 500 g",
+   "conserver": "Au sec : 1 an"
+  },
+  {
+   "n": "Lentilles vertes",
+   "ray": "epi",
+   "desc": "Lentilles qui gardent leur forme, cuisson 20 à 25 minutes.",
+   "format": "Paquet de 500 g",
+   "conserver": "Au sec : 1 an",
+   "photo": "photos/produits/lentilles-vertes.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Green_lentils.jpg"
+  },
+  {
+   "n": "Lait de coco",
+   "ray": "epi",
+   "desc": "Lait de coco en boîte pour les currys.",
+   "format": "Boîte de 400 ml",
+   "conserver": "Ouvert : 3 jours au frigo"
+  },
+  {
+   "n": "Thon au naturel",
+   "ray": "epi",
+   "desc": "Thon en boîte au naturel, pour les pâtes et les salades.",
+   "format": "Boîte de 140 à 160 g (ou lot de 3)",
+   "conserver": "Fermée : 3 ans"
+  },
+  {
+   "n": "Maquereau en conserve",
+   "ray": "epi",
+   "desc": "Filets de maquereau à la tomate ou à la moutarde.",
+   "format": "Boîte de 120 à 170 g",
+   "conserver": "Fermée : 3 ans"
+  },
+  {
+   "n": "Pesto",
+   "ray": "epi",
+   "desc": "Pesto vert au basilic (ou rouge aux tomates séchées).",
+   "format": "Pot de 190 g",
+   "conserver": "Ouvert : 1 semaine au frigo, recouvert d'huile"
+  },
+  {
+   "n": "Olives",
+   "ray": "epi",
+   "desc": "Olives vertes ou noires dénoyautées.",
+   "format": "Bocal ou barquette de 150 à 350 g",
+   "conserver": "Ouvertes : 2 semaines au frigo dans leur jus"
+  },
+  {
+   "n": "Cornichons",
+   "ray": "epi",
+   "desc": "Petits cornichons au vinaigre, pour la raclette et les sandwichs.",
+   "format": "Bocal de 350 à 700 g",
+   "conserver": "Ouverts : au frigo"
+  },
+  {
+   "n": "Sésame",
+   "ray": "epi",
+   "desc": "Graines de sésame à griller à sec, pour les plats asiatiques.",
+   "format": "Sachet de 100 à 250 g",
+   "conserver": "Au sec : 1 an"
+  },
+  {
+   "n": "Cacahuètes",
+   "ray": "epi",
+   "desc": "Cacahuètes grillées, nature ou salées.",
+   "format": "Sachet de 200 à 500 g",
+   "conserver": "Au sec : quelques mois"
+  },
+  {
+   "n": "Miel",
+   "ray": "epi",
+   "desc": "Miel liquide ou crémeux.",
+   "format": "Pot de 250 à 500 g",
+   "conserver": "À température ambiante : très longtemps",
+   "photo": "photos/produits/miel.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Runny_hunny.jpg"
+  },
+  {
+   "n": "Vinaigre",
+   "ray": "epi",
+   "desc": "Vinaigre de vin ou balsamique pour les vinaigrettes.",
+   "format": "Bouteille de 50 cl à 1 L",
+   "conserver": "Très longue conservation"
+  },
+  {
+   "n": "Sauce teriyaki",
+   "ray": "epi",
+   "desc": "Sauce japonaise sucrée-salée pour laquer le poulet ou le saumon.",
+   "format": "Bouteille de 250 ml",
+   "conserver": "Ouverte : au frigo"
+  },
+  {
+   "n": "Sirop de Liège",
+   "ray": "epi",
+   "desc": "Sirop de pommes et poires très épais, pour la sauce lapin et les boulets à la liégeoise.",
+   "format": "Pot de 300 à 450 g",
+   "conserver": "Très longue conservation"
+  },
+  {
+   "n": "Pain d'épices",
+   "ray": "epi",
+   "desc": "Pain d'épices belge, pour épaissir et parfumer les carbonnades.",
+   "format": "Paquet tranché de 300 à 500 g",
+   "conserver": "Fermé : plusieurs semaines"
+  },
+  {
+   "n": "Pruneaux",
+   "ray": "epi",
+   "desc": "Prunes séchées, pour les plats mijotés sucrés-salés.",
+   "format": "Sachet de 250 à 500 g",
+   "conserver": "Au sec : plusieurs mois"
+  },
+  {
+   "n": "Ananas en morceaux",
+   "ray": "epi",
+   "desc": "Ananas au sirop ou au jus, en boîte.",
+   "format": "Boîte de 340 à 560 g",
+   "conserver": "Fermée : 2 ans"
+  },
+  {
+   "n": "Pêches au sirop",
+   "ray": "epi",
+   "desc": "Demi-pêches au sirop en boîte.",
+   "format": "Boîte de 410 à 820 g",
+   "conserver": "Fermée : 2 ans"
+  },
+  {
+   "n": "Bouchées feuilletées",
+   "ray": "epi",
+   "desc": "Croûtes de vol-au-vent prêtes à garnir, à réchauffer 5 minutes.",
+   "format": "Boîte de 4 à 6",
+   "conserver": "Au sec : plusieurs mois"
+  },
+  {
+   "n": "Pâte brisée",
+   "ray": "epi",
+   "desc": "Pâte à tarte prête à dérouler, pour quiches et tartes.",
+   "format": "Rouleau de 230 à 280 g",
+   "conserver": "Au frigo : jusqu'à la date"
+  },
+  {
+   "n": "Pâte à pizza",
+   "ray": "epi",
+   "desc": "Pâte à pizza prête à dérouler.",
+   "format": "Rouleau de 400 g",
+   "conserver": "Au frigo : jusqu'à la date"
+  },
+  {
+   "n": "Houmous",
+   "ray": "epi",
+   "desc": "Purée de pois chiches au sésame, à tartiner ou en dip.",
+   "format": "Pot de 200 à 300 g",
+   "conserver": "Ouvert : 4 jours au frigo"
+  },
+  {
+   "n": "Tofu",
+   "ray": "epi",
+   "desc": "Pâte de soja ferme, à couper en dés et dorer à la poêle.",
+   "format": "Bloc de 200 à 400 g",
+   "conserver": "Ouvert : 3 jours dans l'eau au frigo"
+  },
+  {
+   "n": "Falafels",
+   "ray": "epi",
+   "desc": "Boulettes de pois chiches épicées, à réchauffer au four.",
+   "format": "Barquette de 8 à 12",
+   "conserver": "Au frigo : jusqu'à la date"
+  },
+  {
+   "n": "Gyozas",
+   "ray": "epi",
+   "desc": "Raviolis japonais à poêler puis cuire à la vapeur.",
+   "format": "Sachet surgelé de 12 à 20",
+   "conserver": "Surgelés : plusieurs mois"
+  },
+  {
+   "n": "Gnocchis",
+   "ray": "epi",
+   "desc": "Petites quenelles de pomme de terre, poêlées ou cuites 2 minutes à l'eau.",
+   "format": "Sachet de 500 g",
+   "conserver": "Fermés : jusqu'à la date ; ouverts : 2 jours au frigo",
+   "photo": "photos/produits/gnocchis.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Gnocchi.jpg"
+  },
+  {
+   "n": "Tortellini",
+   "ray": "epi",
+   "desc": "Pâtes farcies (viande ou fromage), cuisson 2 à 3 minutes.",
+   "format": "Sachet de 250 à 500 g",
+   "conserver": "Au frigo : jusqu'à la date"
+  },
+  {
+   "n": "Soupe de tomates",
+   "ray": "epi",
+   "desc": "Soupe de tomates prête à réchauffer.",
+   "format": "Brique de 1 L",
+   "conserver": "Ouverte : 3 jours au frigo"
+  },
+  {
+   "n": "Origan",
+   "ray": "epi",
+   "desc": "Herbe séchée méditerranéenne, pour les pizzas et la sauce tomate.",
+   "format": "Pot de 10 à 20 g",
+   "conserver": "Au sec : 1 an"
+  },
+  {
+   "n": "Café",
+   "ray": "epi",
+   "desc": "Café moulu ou en grains.",
+   "format": "Paquet de 250 g à 1 kg",
+   "conserver": "Bien fermé, au sec",
+   "ref": [
+    3.5,
+    "u"
+   ],
+   "photo": "photos/produits/cafe.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Roasted_coffee_beans.jpg"
+  },
+  {
+   "n": "Café en grains",
+   "ray": "epi",
+   "desc": "Café en grains pour machine à grains.",
+   "format": "Paquet de 500 g ou 1 kg",
+   "conserver": "Bien fermé, au sec",
+   "ref": [
+    8.0,
+    "u"
+   ],
+   "photo": "photos/produits/cafe.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Roasted_coffee_beans.jpg"
+  },
+  {
+   "n": "Dosettes de café",
+   "ray": "epi",
+   "desc": "Dosettes ou capsules compatibles.",
+   "format": "Boîte de 16 à 36",
+   "conserver": "Au sec",
+   "ref": [
+    3.5,
+    "u"
+   ]
+  },
+  {
+   "n": "Thé",
+   "ray": "epi",
+   "desc": "Thé noir, vert ou infusion, en sachets.",
+   "format": "Boîte de 20 à 50 sachets",
+   "conserver": "Au sec",
+   "ref": [
+    2.0,
+    "u"
+   ]
+  },
+  {
+   "n": "Sucre",
+   "ray": "epi",
+   "desc": "Sucre blanc cristallisé ou cassonade.",
+   "format": "Paquet de 1 kg",
+   "conserver": "Au sec : illimité",
+   "ref": [
+    1.3,
+    "u"
+   ]
+  },
+  {
+   "n": "Farine",
+   "ray": "epi",
+   "desc": "Farine de blé pour sauces, crêpes et gâteaux.",
+   "format": "Paquet de 1 kg",
+   "conserver": "Au sec : 1 an",
+   "ref": [
+    1.0,
+    "u"
+   ]
+  },
+  {
+   "n": "Sel",
+   "ray": "epi",
+   "desc": "Sel de cuisine fin ou gros.",
+   "format": "Paquet de 500 g à 1 kg",
+   "conserver": "Illimité",
+   "ref": [
+    0.6,
+    "u"
+   ]
+  },
+  {
+   "n": "Poivre",
+   "ray": "epi",
+   "desc": "Poivre noir moulu ou en grains (moulin).",
+   "format": "Pot ou moulin de 30 à 100 g",
+   "conserver": "Au sec",
+   "ref": [
+    2.5,
+    "u"
+   ]
+  },
+  {
+   "n": "Huile d'olive",
+   "ray": "epi",
+   "desc": "Huile d'olive vierge extra pour la cuisine et les salades.",
+   "format": "Bouteille de 50 cl à 1 L",
+   "conserver": "À l'abri de la lumière",
+   "ref": [
+    8.0,
+    "u"
+   ]
+  },
+  {
+   "n": "Huile de tournesol",
+   "ray": "epi",
+   "desc": "Huile neutre pour la cuisson.",
+   "format": "Bouteille de 1 L",
+   "conserver": "À l'abri de la lumière",
+   "ref": [
+    2.5,
+    "u"
+   ]
+  },
+  {
+   "n": "Confiture",
+   "ray": "epi",
+   "desc": "Confiture de fraises, abricots ou fruits rouges.",
+   "format": "Pot de 370 à 450 g",
+   "conserver": "Ouverte : au frigo, 1 mois",
+   "ref": [
+    2.2,
+    "u"
+   ]
+  },
+  {
+   "n": "Choco",
+   "ray": "epi",
+   "desc": "Pâte à tartiner au chocolat, un classique belge du petit-déjeuner.",
+   "format": "Pot de 400 g à 1 kg",
+   "conserver": "À température ambiante",
+   "ref": [
+    3.0,
+    "u"
+   ]
+  },
+  {
+   "n": "Céréales",
+   "ray": "epi",
+   "desc": "Céréales du petit-déjeuner.",
+   "format": "Boîte de 375 à 750 g",
+   "conserver": "Au sec, bien fermée",
+   "ref": [
+    2.8,
+    "u"
+   ]
+  },
+  {
+   "n": "Flocons d'avoine",
+   "ray": "epi",
+   "desc": "Flocons pour le porridge, le muesli et les crumbles.",
+   "format": "Paquet de 500 g à 1 kg",
+   "conserver": "Au sec : 1 an",
+   "ref": [
+    1.2,
+    "u"
+   ]
+  },
+  {
+   "n": "Biscuits",
+   "ray": "epi",
+   "desc": "Biscuits pour les collations.",
+   "format": "Paquet de 150 à 300 g",
+   "conserver": "Au sec",
+   "ref": [
+    1.8,
+    "u"
+   ]
+  },
+  {
+   "n": "Speculoos",
+   "ray": "epi",
+   "desc": "Biscuits belges à la cannelle et à la cassonade.",
+   "format": "Paquet de 250 à 500 g",
+   "conserver": "Au sec",
+   "ref": [
+    2.0,
+    "u"
+   ]
+  },
+  {
+   "n": "Gaufres",
+   "ray": "epi",
+   "desc": "Gaufres de Liège ou de Bruxelles emballées.",
+   "format": "Paquet de 6 à 10",
+   "conserver": "Au sec : jusqu'à la date",
+   "ref": [
+    2.5,
+    "u"
+   ],
+   "photo": "photos/produits/gaufres.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Belgian_waffle.jpg"
+  },
+  {
+   "n": "Chocolat",
+   "ray": "epi",
+   "desc": "Tablette de chocolat au lait, noir ou blanc.",
+   "format": "Tablette de 100 à 200 g",
+   "conserver": "Au sec, au frais",
+   "ref": [
+    1.8,
+    "u"
+   ]
+  },
+  {
+   "n": "Chips",
+   "ray": "epi",
+   "desc": "Chips nature, paprika ou pickles.",
+   "format": "Sachet de 150 à 250 g",
+   "conserver": "Au sec",
+   "ref": [
+    1.8,
+    "u"
+   ]
+  },
+  {
+   "n": "Pâtes",
+   "ray": "epi",
+   "desc": "Pâtes sèches (penne, spaghetti, fusilli…).",
+   "format": "Paquet de 500 g ou 1 kg",
+   "conserver": "Au sec : 2 ans",
+   "ref": [
+    1.2,
+    "u"
+   ]
+  },
+  {
+   "n": "Sauce tomate",
+   "ray": "epi",
+   "desc": "Sauce tomate cuisinée, prête à l'emploi.",
+   "format": "Bocal de 400 à 700 g",
+   "conserver": "Ouverte : 4 jours au frigo",
+   "ref": [
+    1.8,
+    "u"
+   ]
+  },
+  {
+   "n": "Thon",
+   "ray": "epi",
+   "desc": "Thon en boîte au naturel ou à l'huile.",
+   "format": "Boîte de 140 à 160 g",
+   "conserver": "Fermée : 3 ans",
+   "ref": [
+    1.5,
+    "u"
+   ]
+  },
+  {
+   "n": "Compote",
+   "ray": "epi",
+   "desc": "Compote de pommes ou de fruits.",
+   "format": "Bocal de 700 g ou gourdes",
+   "conserver": "Ouverte : 5 jours au frigo",
+   "ref": [
+    1.6,
+    "u"
+   ]
+  },
+  {
+   "n": "Bouillon",
+   "ray": "epi",
+   "desc": "Cubes de bouillon.",
+   "format": "Boîte de 10 à 12 cubes",
+   "conserver": "Au sec : 1 an",
+   "ref": [
+    1.2,
+    "u"
+   ]
+  },
+  {
+   "n": "Épices",
+   "ray": "epi",
+   "desc": "Épices et herbes séchées.",
+   "format": "Pot de 20 à 50 g",
+   "conserver": "Au sec : 1 an",
+   "ref": [
+    1.5,
+    "u"
+   ]
+  },
+  {
+   "n": "Levure",
+   "ray": "epi",
+   "desc": "Levure chimique ou boulangère.",
+   "format": "Sachets",
+   "conserver": "Au sec",
+   "ref": [
+    1.2,
+    "u"
+   ]
+  },
+  {
+   "n": "Cacao",
+   "ray": "epi",
+   "desc": "Cacao en poudre pour boissons et gâteaux.",
+   "format": "Boîte de 250 à 500 g",
+   "conserver": "Au sec",
+   "ref": [
+    3.0,
+    "u"
+   ]
+  },
+  {
+   "n": "Lait UHT",
+   "ray": "epi",
+   "desc": "Lait longue conservation.",
+   "format": "Brique de 1 L ou pack de 6",
+   "conserver": "Fermé : plusieurs mois ; ouvert : 3 jours au frigo",
+   "ref": [
+    1.0,
+    "u"
+   ],
+   "photo": "photos/produits/lait.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Milk_glass.jpg"
+  },
+  {
+   "n": "Croquettes pour chat",
+   "ray": "epi",
+   "desc": "Aliment sec pour chats.",
+   "format": "Sac de 1 à 4 kg",
+   "conserver": "Au sec, sac refermé",
+   "ref": [
+    6.0,
+    "u"
+   ]
+  },
+  {
+   "n": "Croquettes pour chien",
+   "ray": "epi",
+   "desc": "Aliment sec pour chiens.",
+   "format": "Sac de 3 à 15 kg",
+   "conserver": "Au sec, sac refermé",
+   "ref": [
+    12.0,
+    "u"
+   ]
+  },
+  {
+   "n": "Chou rouge cuisiné",
+   "ray": "epi",
+   "desc": "Chou rouge déjà cuit aux pommes, à réchauffer ; parfait avec le gibier, le boudin ou les saucisses.",
+   "format": "Bocal de 350 à 700 g",
+   "conserver": "Ouvert : 4 jours au frigo"
+  },
+  {
+   "n": "Pain de campagne",
+   "ray": "bl",
+   "desc": "Pain à la croûte épaisse, pour les tartines et les soupes.",
+   "format": "Pain de 800 g, tranché",
+   "conserver": "1 à 2 jours dans un sac en tissu ; se congèle tranché"
+  },
+  {
+   "n": "Pain de mie",
+   "ray": "bl",
+   "desc": "Pain moelleux en tranches, pour les croques et les toasts.",
+   "format": "Paquet de 500 g (environ 20 tranches)",
+   "conserver": "Fermé : jusqu'à la date"
+  },
+  {
+   "n": "Baguettes",
+   "ray": "bl",
+   "desc": "Baguette française croustillante.",
+   "format": "À la pièce (250 g)",
+   "conserver": "À manger le jour même ; se congèle",
+   "photo": "photos/produits/baguettes.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Baguette.jpg"
+  },
+  {
+   "n": "Pains pita",
+   "ray": "bl",
+   "desc": "Petits pains plats à garnir (gyros, falafels).",
+   "format": "Paquet de 4 à 6",
+   "conserver": "Fermés : jusqu'à la date ; se congèlent"
+  },
+  {
+   "n": "Pains burger",
+   "ray": "bl",
+   "desc": "Pains ronds moelleux au sésame pour les burgers.",
+   "format": "Paquet de 4 à 6",
+   "conserver": "Fermés : jusqu'à la date"
+  },
+  {
+   "n": "Pains à hot-dog",
+   "ray": "bl",
+   "desc": "Petits pains allongés pour les hot-dogs.",
+   "format": "Paquet de 4 à 6",
+   "conserver": "Fermés : jusqu'à la date"
+  },
+  {
+   "n": "Focaccia",
+   "ray": "bl",
+   "desc": "Pain italien moelleux à l'huile d'olive et au romarin.",
+   "format": "À la pièce (300 à 400 g)",
+   "conserver": "2 jours"
+  },
+  {
+   "n": "Piadine",
+   "ray": "bl",
+   "desc": "Galettes italiennes fines à garnir et à plier.",
+   "format": "Paquet de 3 à 4",
+   "conserver": "Fermées : jusqu'à la date"
+  },
+  {
+   "n": "Naans",
+   "ray": "bl",
+   "desc": "Pains indiens moelleux, à réchauffer à la poêle.",
+   "format": "Paquet de 2 à 4",
+   "conserver": "Fermés : jusqu'à la date"
+  },
+  {
+   "n": "Galettes de sarrasin",
+   "ray": "bl",
+   "desc": "Galettes bretonnes au blé noir, à garnir de jambon, œuf et fromage.",
+   "format": "Paquet de 6 à 8",
+   "conserver": "Fermées : jusqu'à la date"
+  },
+  {
+   "n": "Pinsa",
+   "ray": "bl",
+   "desc": "Base de pizza romaine aérée, précuite.",
+   "format": "Paquet de 2",
+   "conserver": "Fermée : jusqu'à la date"
+  },
+  {
+   "n": "Pain",
+   "ray": "bl",
+   "desc": "Pain du jour, tranché.",
+   "format": "Pain de 800 g",
+   "conserver": "1 à 2 jours ; se congèle",
+   "ref": [
+    2.2,
+    "u"
+   ],
+   "photo": "photos/produits/pain.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Korb_mit_Brötchen.JPG"
+  },
+  {
+   "n": "Pain gris",
+   "ray": "bl",
+   "desc": "Pain complet ou demi-gris belge.",
+   "format": "Pain de 800 g",
+   "conserver": "1 à 2 jours ; se congèle",
+   "ref": [
+    2.4,
+    "u"
+   ]
+  },
+  {
+   "n": "Pain blanc",
+   "ray": "bl",
+   "desc": "Pain blanc tranché.",
+   "format": "Pain de 800 g",
+   "conserver": "1 à 2 jours ; se congèle",
+   "ref": [
+    2.0,
+    "u"
+   ]
+  },
+  {
+   "n": "Baguette",
+   "ray": "bl",
+   "desc": "Baguette croustillante.",
+   "format": "À la pièce",
+   "conserver": "Le jour même",
+   "ref": [
+    1.0,
+    "u"
+   ],
+   "photo": "photos/produits/baguettes.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Baguette.jpg"
+  },
+  {
+   "n": "Pistolets",
+   "ray": "bl",
+   "desc": "Petits pains ronds belges du dimanche matin.",
+   "format": "Sachet de 6 à 10",
+   "conserver": "Le jour même ; se congèlent",
+   "ref": [
+    0.35,
+    "u"
+   ],
+   "photo": "photos/produits/pain.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Korb_mit_Brötchen.JPG"
+  },
+  {
+   "n": "Croissants",
+   "ray": "bl",
+   "desc": "Croissants au beurre.",
+   "format": "Sachet de 4 à 8",
+   "conserver": "Le jour même",
+   "ref": [
+    0.6,
+    "u"
+   ],
+   "photo": "photos/produits/croissants.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Croissant-Petr_Kratochvil.jpg"
+  },
+  {
+   "n": "Couques",
+   "ray": "bl",
+   "desc": "Couques au beurre, au chocolat ou aux raisins.",
+   "format": "Sachet de 4 à 8",
+   "conserver": "Le jour même",
+   "ref": [
+    0.7,
+    "u"
+   ]
+  },
+  {
+   "n": "Cramique",
+   "ray": "bl",
+   "desc": "Pain brioché aux raisins, spécialité belge.",
+   "format": "À la pièce (400 à 500 g)",
+   "conserver": "2 à 3 jours",
+   "ref": [
+    3.0,
+    "u"
+   ]
+  },
+  {
+   "n": "Sandwichs",
+   "ray": "bl",
+   "desc": "Petits pains mous (sandwichs belges) pour les tartines.",
+   "format": "Sachet de 6 à 10",
+   "conserver": "1 à 2 jours",
+   "ref": [
+    0.4,
+    "u"
+   ],
+   "photo": "photos/produits/pain.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Korb_mit_Brötchen.JPG"
+  },
+  {
+   "n": "Frites au four",
+   "ray": "sur",
+   "desc": "Frites surgelées à cuire au four, sans friteuse.",
+   "format": "Sachet de 1 à 2,5 kg",
+   "conserver": "Congélateur : plusieurs mois",
+   "photo": "photos/produits/frites-au-four.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:French_Fries.JPG"
+  },
+  {
+   "n": "Petits pois",
+   "ray": "sur",
+   "desc": "Petits pois surgelés, plus tendres que ceux en boîte.",
+   "format": "Sachet de 1 kg",
+   "conserver": "Congélateur : plusieurs mois"
+  },
+  {
+   "n": "Poisson pané",
+   "ray": "sur",
+   "desc": "Bâtonnets ou filets de poisson panés à cuire à la poêle ou au four.",
+   "format": "Boîte de 10 à 20",
+   "conserver": "Congélateur : plusieurs mois"
+  },
+  {
+   "n": "Frites surgelées",
+   "ray": "sur",
+   "desc": "Frites précuites pour friteuse ou four.",
+   "format": "Sachet de 1 à 2,5 kg",
+   "conserver": "Congélateur : plusieurs mois",
+   "ref": [
+    2.5,
+    "u"
+   ],
+   "photo": "photos/produits/frites-au-four.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:French_Fries.JPG"
+  },
+  {
+   "n": "Glace",
+   "ray": "sur",
+   "desc": "Glace vanille, chocolat ou en cônes.",
+   "format": "Bac de 1 à 2 L",
+   "conserver": "Congélateur",
+   "ref": [
+    3.5,
+    "u"
+   ]
+  },
+  {
+   "n": "Légumes surgelés",
+   "ray": "sur",
+   "desc": "Mélanges de légumes surgelés (wok, poêlée, soupe).",
+   "format": "Sachet de 750 g à 1 kg",
+   "conserver": "Congélateur : plusieurs mois",
+   "ref": [
+    2.0,
+    "u"
+   ]
+  },
+  {
+   "n": "Pizza surgelée",
+   "ray": "sur",
+   "desc": "Pizza à cuire au four.",
+   "format": "À la pièce (350 à 450 g)",
+   "conserver": "Congélateur",
+   "ref": [
+    2.5,
+    "u"
+   ]
+  },
+  {
+   "n": "Épinards surgelés",
+   "ray": "sur",
+   "desc": "Épinards hachés ou en branches, en galets.",
+   "format": "Sachet de 750 g à 1 kg",
+   "conserver": "Congélateur : plusieurs mois",
+   "ref": [
+    1.8,
+    "u"
+   ],
+   "photo": "photos/produits/epinards.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Spinach_leaves.jpg"
+  },
+  {
+   "n": "Croquettes de pommes de terre",
+   "ray": "sur",
+   "desc": "Croquettes belges à cuire au four ou en friteuse.",
+   "format": "Sachet de 600 g à 1 kg",
+   "conserver": "Congélateur : plusieurs mois",
+   "ref": [
+    2.2,
+    "u"
+   ]
+  },
+  {
+   "n": "Fruits rouges surgelés",
+   "ray": "sur",
+   "desc": "Mélange de baies pour desserts et smoothies.",
+   "format": "Sachet de 300 à 750 g",
+   "conserver": "Congélateur : plusieurs mois",
+   "ref": [
+    3.0,
+    "u"
+   ]
+  },
+  {
+   "n": "Bière brune",
+   "ray": "boi",
+   "desc": "Bière brune belge (type Leffe brune, Chimay, ou bière d'abbaye) pour les carbonnades.",
+   "format": "Bouteille de 33 cl ou pack de 6",
+   "conserver": "Au frais, à l'abri de la lumière"
+  },
+  {
+   "n": "Eau plate",
+   "ray": "boi",
+   "desc": "Eau minérale ou de source plate.",
+   "format": "Pack de 6 × 1,5 L",
+   "conserver": "Au frais",
+   "ref": [
+    0.4,
+    "u"
+   ]
+  },
+  {
+   "n": "Eau pétillante",
+   "ray": "boi",
+   "desc": "Eau gazeuse.",
+   "format": "Pack de 6 × 1,5 L",
+   "conserver": "Au frais",
+   "ref": [
+    0.5,
+    "u"
+   ]
+  },
+  {
+   "n": "Jus d'orange",
+   "ray": "boi",
+   "desc": "Jus d'orange 100 % (avec ou sans pulpe).",
+   "format": "Brique de 1 L",
+   "conserver": "Ouvert : 5 jours au frigo",
+   "ref": [
+    1.8,
+    "u"
+   ]
+  },
+  {
+   "n": "Jus de pomme",
+   "ray": "boi",
+   "desc": "Jus de pomme 100 %, souvent belge.",
+   "format": "Bouteille ou brique de 1 L",
+   "conserver": "Ouvert : 5 jours au frigo",
+   "ref": [
+    1.5,
+    "u"
+   ]
+  },
+  {
+   "n": "Limonade",
+   "ray": "boi",
+   "desc": "Boisson sucrée pétillante.",
+   "format": "Bouteille de 1,5 L",
+   "conserver": "Ouverte : 3 jours au frigo",
+   "ref": [
+    1.2,
+    "u"
+   ]
+  },
+  {
+   "n": "Soda",
+   "ray": "boi",
+   "desc": "Boisson gazeuse sucrée.",
+   "format": "Bouteille de 1,5 L ou canettes",
+   "conserver": "Au frais",
+   "ref": [
+    1.3,
+    "u"
+   ]
+  },
+  {
+   "n": "Coca",
+   "ray": "boi",
+   "desc": "Cola, classique ou zéro.",
+   "format": "Bouteille de 1,5 L ou pack de canettes",
+   "conserver": "Au frais",
+   "ref": [
+    2.0,
+    "u"
+   ]
+  },
+  {
+   "n": "Ice tea",
+   "ray": "boi",
+   "desc": "Thé glacé pétillant ou plat.",
+   "format": "Bouteille de 1,5 L",
+   "conserver": "Au frais",
+   "ref": [
+    1.5,
+    "u"
+   ]
+  },
+  {
+   "n": "Sirop",
+   "ray": "boi",
+   "desc": "Sirop de grenadine, menthe ou fruits, à diluer.",
+   "format": "Bouteille de 75 cl",
+   "conserver": "Ouvert : plusieurs semaines",
+   "ref": [
+    2.5,
+    "u"
+   ]
+  },
+  {
+   "n": "Bière",
+   "ray": "boi",
+   "desc": "Bière blonde belge (pils).",
+   "format": "Pack de 6 à 24",
+   "conserver": "Au frais",
+   "ref": [
+    0.8,
+    "u"
+   ]
+  },
+  {
+   "n": "Bières spéciales",
+   "ray": "boi",
+   "desc": "Bières belges d'abbaye, trappistes ou blanches.",
+   "format": "Bouteille de 33 cl ou pack de 4 à 6",
+   "conserver": "Au frais",
+   "ref": [
+    1.6,
+    "u"
+   ]
+  },
+  {
+   "n": "Vin",
+   "ray": "boi",
+   "desc": "Vin de table.",
+   "format": "Bouteille de 75 cl",
+   "conserver": "Couché, au frais",
+   "ref": [
+    6.0,
+    "u"
+   ]
+  },
+  {
+   "n": "Vin rouge",
+   "ray": "boi",
+   "desc": "Vin rouge.",
+   "format": "Bouteille de 75 cl",
+   "conserver": "Couché, au frais",
+   "ref": [
+    6.0,
+    "u"
+   ]
+  },
+  {
+   "n": "Vin blanc",
+   "ray": "boi",
+   "desc": "Vin blanc, servi frais.",
+   "format": "Bouteille de 75 cl",
+   "conserver": "Couché, au frais",
+   "ref": [
+    6.0,
+    "u"
+   ]
+  },
+  {
+   "n": "Vin rosé",
+   "ray": "boi",
+   "desc": "Vin rosé, servi frais.",
+   "format": "Bouteille de 75 cl",
+   "conserver": "Couché, au frais",
+   "ref": [
+    6.0,
+    "u"
+   ]
+  },
+  {
+   "n": "Chocolat chaud",
+   "ray": "boi",
+   "desc": "Poudre chocolatée pour boisson chaude.",
+   "format": "Boîte de 400 g à 1 kg",
+   "conserver": "Au sec",
+   "ref": [
+    3.0,
+    "u"
+   ]
+  },
+  {
+   "n": "Papier toilette",
+   "ray": "dro",
+   "desc": "Rouleaux de papier toilette.",
+   "format": "Paquet de 8 à 24 rouleaux",
+   "conserver": "Au sec",
+   "ref": [
+    4.0,
+    "u"
+   ]
+  },
+  {
+   "n": "Essuie-tout",
+   "ray": "dro",
+   "desc": "Rouleaux d'essuie-tout (papier ménage).",
+   "format": "Paquet de 2 à 8 rouleaux",
+   "conserver": "Au sec",
+   "ref": [
+    3.0,
+    "u"
+   ]
+  },
+  {
+   "n": "Mouchoirs",
+   "ray": "dro",
+   "desc": "Mouchoirs en papier.",
+   "format": "Boîte ou paquet de 10 étuis",
+   "conserver": "Au sec",
+   "ref": [
+    2.0,
+    "u"
+   ]
+  },
+  {
+   "n": "Liquide vaisselle",
+   "ray": "dro",
+   "desc": "Produit vaisselle à la main.",
+   "format": "Flacon de 500 ml à 1 L",
+   "ref": [
+    1.8,
+    "u"
+   ]
+  },
+  {
+   "n": "Tablettes lave-vaisselle",
+   "ray": "dro",
+   "desc": "Tablettes tout-en-un pour lave-vaisselle.",
+   "format": "Boîte de 30 à 90",
+   "conserver": "Au sec",
+   "ref": [
+    6.0,
+    "u"
+   ]
+  },
+  {
+   "n": "Sel lave-vaisselle",
+   "ray": "dro",
+   "desc": "Sel régénérant pour adoucir l'eau du lave-vaisselle.",
+   "format": "Paquet de 1,5 à 4 kg",
+   "conserver": "Au sec",
+   "ref": [
+    2.0,
+    "u"
+   ]
+  },
+  {
+   "n": "Lessive",
+   "ray": "dro",
+   "desc": "Lessive liquide, en poudre ou en capsules.",
+   "format": "Bidon ou boîte pour 20 à 50 lavages",
+   "conserver": "Au sec",
+   "ref": [
+    8.0,
+    "u"
+   ]
+  },
+  {
+   "n": "Adoucissant",
+   "ray": "dro",
+   "desc": "Adoucissant textile.",
+   "format": "Bouteille pour 30 à 60 lavages",
+   "ref": [
+    3.0,
+    "u"
+   ]
+  },
+  {
+   "n": "Sacs poubelle",
+   "ray": "dro",
+   "desc": "Sacs poubelle (vérifier les sacs officiels de la commune pour les déchets ménagers).",
+   "format": "Rouleau de 10 à 30",
+   "conserver": "Au sec",
+   "ref": [
+    2.5,
+    "u"
+   ]
+  },
+  {
+   "n": "Éponges",
+   "ray": "dro",
+   "desc": "Éponges grattoirs.",
+   "format": "Paquet de 3 à 10",
+   "ref": [
+    1.5,
+    "u"
+   ]
+  },
+  {
+   "n": "Papier aluminium",
+   "ray": "dro",
+   "desc": "Rouleau d'aluminium.",
+   "format": "Rouleau de 10 à 30 m",
+   "ref": [
+    2.5,
+    "u"
+   ]
+  },
+  {
+   "n": "Film alimentaire",
+   "ray": "dro",
+   "desc": "Film étirable.",
+   "format": "Rouleau de 20 à 50 m",
+   "ref": [
+    1.8,
+    "u"
+   ]
+  },
+  {
+   "n": "Sacs congélation",
+   "ray": "dro",
+   "desc": "Sacs à zip pour le congélateur.",
+   "format": "Boîte de 15 à 50",
+   "ref": [
+    2.0,
+    "u"
+   ]
+  },
+  {
+   "n": "Dentifrice",
+   "ray": "dro",
+   "desc": "Dentifrice au fluor.",
+   "format": "Tube de 75 ml",
+   "ref": [
+    1.8,
+    "u"
+   ]
+  },
+  {
+   "n": "Brosses à dents",
+   "ray": "dro",
+   "desc": "Brosses à dents manuelles.",
+   "format": "Lot de 2 à 4",
+   "ref": [
+    2.5,
+    "u"
+   ]
+  },
+  {
+   "n": "Shampoing",
+   "ray": "dro",
+   "desc": "Shampoing.",
+   "format": "Flacon de 250 à 500 ml",
+   "ref": [
+    3.0,
+    "u"
+   ]
+  },
+  {
+   "n": "Après-shampoing",
+   "ray": "dro",
+   "desc": "Après-shampoing.",
+   "format": "Flacon de 200 à 500 ml",
+   "ref": [
+    3.0,
+    "u"
+   ]
+  },
+  {
+   "n": "Gel douche",
+   "ray": "dro",
+   "desc": "Gel douche.",
+   "format": "Flacon de 250 à 750 ml",
+   "ref": [
+    2.5,
+    "u"
+   ]
+  },
+  {
+   "n": "Savon",
+   "ray": "dro",
+   "desc": "Savon liquide pour les mains ou savon en pain.",
+   "format": "Flacon pompe de 250 à 500 ml",
+   "ref": [
+    1.5,
+    "u"
+   ]
+  },
+  {
+   "n": "Déodorant",
+   "ray": "dro",
+   "desc": "Déodorant en spray ou stick.",
+   "format": "À la pièce",
+   "ref": [
+    3.0,
+    "u"
+   ]
+  },
+  {
+   "n": "Coton-tiges",
+   "ray": "dro",
+   "desc": "Bâtonnets ouatés.",
+   "format": "Boîte de 100 à 300",
+   "ref": [
+    1.2,
+    "u"
+   ]
+  },
+  {
+   "n": "Cotons démaquillants",
+   "ray": "dro",
+   "desc": "Disques de coton.",
+   "format": "Paquet de 80 à 120",
+   "ref": [
+    1.5,
+    "u"
+   ]
+  },
+  {
+   "n": "Rasoirs",
+   "ray": "dro",
+   "desc": "Rasoirs jetables ou lames.",
+   "format": "Paquet de 4 à 10",
+   "ref": [
+    5.0,
+    "u"
+   ]
+  },
+  {
+   "n": "Serviettes hygiéniques",
+   "ray": "dro",
+   "desc": "Serviettes hygiéniques.",
+   "format": "Paquet de 10 à 20",
+   "ref": [
+    3.0,
+    "u"
+   ]
+  },
+  {
+   "n": "Couches",
+   "ray": "dro",
+   "desc": "Couches pour bébé (vérifier la taille).",
+   "format": "Paquet de 30 à 90",
+   "ref": [
+    12.0,
+    "u"
+   ]
+  },
+  {
+   "n": "Lingettes",
+   "ray": "dro",
+   "desc": "Lingettes pour bébé ou nettoyantes.",
+   "format": "Paquet de 50 à 80",
+   "ref": [
+    2.0,
+    "u"
+   ]
+  },
+  {
+   "n": "Produit WC",
+   "ray": "dro",
+   "desc": "Gel nettoyant détartrant pour toilettes.",
+   "format": "Flacon de 750 ml",
+   "ref": [
+    2.0,
+    "u"
+   ]
+  },
+  {
+   "n": "Nettoyant multi-usage",
+   "ray": "dro",
+   "desc": "Nettoyant ménager pour toutes les surfaces.",
+   "format": "Flacon de 1 L",
+   "ref": [
+    2.0,
+    "u"
+   ]
+  },
+  {
+   "n": "Eau de Javel",
+   "ray": "dro",
+   "desc": "Javel pour désinfecter (ne jamais mélanger avec d'autres produits).",
+   "format": "Bouteille de 1 à 2 L",
+   "ref": [
+    1.5,
+    "u"
+   ]
+  },
+  {
+   "n": "Piles",
+   "ray": "dro",
+   "desc": "Piles alcalines AA ou AAA.",
+   "format": "Paquet de 4 à 12",
+   "ref": [
+    5.0,
+    "u"
+   ]
+  },
+  {
+   "n": "Ampoules",
+   "ray": "dro",
+   "desc": "Ampoules LED.",
+   "format": "À la pièce ou lot de 2 à 3",
+   "ref": [
+    4.0,
+    "u"
+   ]
+  }
+ ]
+}

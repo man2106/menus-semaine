@@ -85,3 +85,21 @@ Les membres envoient la photo de leurs tickets depuis l'onglet Courses.
 ## Inspiration des nouvelles recettes
 
 Source principale : Marmiton (marmiton.org), recettes bien notées, rapides et de saison. Chercher avec la recherche web (par exemple « marmiton recette rapide poireaux ») et ouvrir les liens des résultats. Rédiger les étapes avec nos propres mots et mettre la page Marmiton en `source`.
+
+## Fiches produits (donnees/produits.json)
+
+Chaque produit des recettes et de la liste de courses a une fiche, ouverte en touchant sa vignette dans la liste.
+
+```json
+{"n": "Carottes", "ray": "fl", "desc": "Carottes de pleine terre, pour la soupe, le stoemp…", "format": "Sachet de 1 kg ou botte",
+ "conserver": "Au frigo, sans les fanes : 2 à 3 semaines", "saison": [1, 12], "ref": [1.2, "kg"],
+ "photo": "photos/produits/carottes.jpg", "credit": "https://commons.wikimedia.org/wiki/File:Carrots.jpg",
+ "magasins": [{"mag": "colruyt", "prix": 1.39, "format": "1 kg", "unitaire": [1.39, "kg"], "date": "2026-11-16", "source": "https://..."}]}
+```
+
+- `n` : nom EXACT du produit (le même que dans l'inventaire ou le catalogue). Ne jamais supprimer une fiche.
+- `desc` : 1 ou 2 phrases utiles (ce que c'est, comment le choisir), rédigées avec nos propres mots.
+- `ref` : prix de référence marque de distributeur, seulement pour un produit qui n'a pas déjà un prix dans l'inventaire.
+- `saison` : mois de début et de fin (fruits et légumes).
+- `photo` : uniquement des photos libres de droits de Wikimedia Commons, réduites à 400 px de large et moins de 120 Ko, enregistrées dans `photos/produits/` ; `credit` = la page du fichier sur Commons. Jamais de photo copiée d'un site d'enseigne (droits d'auteur). Téléchargement : `https://upload.wikimedia.org/wikipedia/commons/thumb/<a>/<ab>/<Fichier>/330px-<Fichier>` où `<ab>` sont les 2 premiers caractères du MD5 du nom de fichier (avec des `_` à la place des espaces).
+- `magasins` : prix réellement relevés (page produit d'une enseigne, comparateur, article de presse), avec la date et le lien source. Ne jamais inventer ni estimer un prix ici ; garder au plus 20 relevés par produit, les plus récents.

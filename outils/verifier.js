@@ -57,5 +57,25 @@ if (X) {
     ok(!/\d{4}\s?\d{2}\*{2,}|\*{4}\s?\d{4}/.test(JSON.stringify(r)), q + " : aucune donnée de paiement ne doit être enregistrée");
   });
 }
+let D;
+try { D = JSON.parse(fs.readFileSync(path.join(racine, "donnees/produits.json"), "utf8")); } catch (e) { err.push("produits.json illisible : " + e.message); }
+if (D) {
+  ok(Array.isArray(D.produits), "produits.json : liste « produits » manquante");
+  const vus = new Set(), RAY = ["fl", "bou", "cre", "bl", "epi", "boi", "sur", "dro"];
+  (D.produits || []).forEach((x, i) => { const q = "produit n°" + (i + 1) + " (" + (x && x.n) + ")";
+    ok(typeof x.n === "string" && x.n.length > 0 && x.n.length <= 50, q + " : nom « n » manquant ou trop long");
+    ok(!vus.has(String(x.n).toLowerCase()), q + " : produit en double"); vus.add(String(x.n).toLowerCase());
+    ok(RAY.includes(x.ray), q + " : rayon inconnu « " + x.ray + " »");
+    ok(typeof x.desc === "string" && x.desc.length >= 10 && x.desc.length <= 300, q + " : description de 10 à 300 caractères");
+    if (x.ref !== undefined) ok(Array.isArray(x.ref) && +x.ref[0] > 0 && ["kg", "L", "u"].includes(x.ref[1]), q + " : ref = [prix, kg|L|u]");
+    if (x.saison !== undefined) ok(Array.isArray(x.saison) && x.saison.length === 2 && x.saison.every(m => Number.isInteger(m) && m >= 1 && m <= 12), q + " : saison = [mois début, mois fin]");
+    if (x.photo !== undefined) { ok(/^photos\/produits\/[a-z0-9-]+\.(jpg|png|webp)$/.test(x.photo), q + " : photo = photos/produits/nom.jpg");
+      ok(fs.existsSync(path.join(racine, x.photo)), q + " : fichier photo absent " + x.photo);
+      ok(fs.existsSync(path.join(racine, x.photo)) && fs.statSync(path.join(racine, x.photo)).size < 120000, q + " : photo trop lourde (120 Ko maximum)");
+      ok(/^https:\/\/commons\.wikimedia\.org\/wiki\/File:[^\s"'<>]+$/.test(x.credit || ""), q + " : « credit » = page Wikimedia Commons de la photo"); }
+    (x.magasins || []).forEach(m => { ok(ENS.includes(m.mag), q + " : enseigne inconnue « " + m.mag + " »"); ok(+m.prix > 0, q + " : prix magasin positif");
+      ok(jour.test(m.date || ""), q + " : date du relevé AAAA-MM-JJ"); ok(/^https:\/\//.test(m.source || ""), q + " : source (lien) du prix relevé"); });
+  });
+}
 if (err.length) { console.error("PROBLÈMES (" + err.length + ") :\n- " + err.join("\n- ")); process.exit(1); }
-console.log("Tout est correct : " + (P ? P.promos.length : 0) + " promos, " + (R ? R.recettes.length : 0) + " recettes ajoutées, " + (X ? X.releves.length : 0) + " prix relevés sur tickets.");
+console.log("Tout est correct : " + (P ? P.promos.length : 0) + " promos, " + (R ? R.recettes.length : 0) + " recettes ajoutées, " + (X ? X.releves.length : 0) + " prix relevés sur tickets, " + (D ? D.produits.length : 0) + " fiches produits (" + (D ? D.produits.filter(p => p.photo).length : 0) + " avec photo).");
