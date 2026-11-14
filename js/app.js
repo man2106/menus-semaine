@@ -505,7 +505,8 @@ function renderCalendrier(){ const box=$("calendrier"), liste=$("days"); if(!box
     ${state.statut!=="valide"&&decompte(limiteDate())?`<small>Réponses avant ${esc(limiteTxt())} · il reste <b data-compte="${limiteDate().getTime()}">${decompte(limiteDate())}</b></small>`:""}
     <b style="color:${m.length?"var(--warm)":"var(--accent)"}">${m.length?"À compléter : "+esc(manquesTexte(m)):"✓ Prêt à être validé"}</b></span></div>`);
   box.innerHTML=cases.join("")+`<p class="calleg"><span><i style="background:var(--warm)"></i>à compléter</span><span><i style="background:var(--muted)"></i>pas de repas à la maison</span><span><i style="background:var(--accent)"></i>prêt</span></p>`; }
-document.addEventListener("click",e=>{ const v=e.target.closest("[data-vue]"); if(v){ state.vueMenu=v.dataset.vue; saveLocal(); renderCalendrier(); return; }
+document.addEventListener("click",e=>{ const pd=e.target.closest("[data-pdfdirect]"); if(pd){ const t=pd.textContent; exportMenuPdf(pd).finally(()=>{ pd.disabled=false; pd.textContent=t; }); return; }
+  const v=e.target.closest("[data-vue]"); if(v){ state.vueMenu=v.dataset.vue; saveLocal(); renderCalendrier(); return; }
   const pk=e.target.closest("[data-cpick]"); if(pk){ openSheet({type:"gallery",d:+pk.dataset.cpick}); return; }
   if(e.target.closest("select,button,a")) return; const c=e.target.closest("[data-copen]"); if(c) openMeal(state.week[+c.dataset.copen],+c.dataset.copen); });
 document.addEventListener("keydown",e=>{ if(e.key!=="Enter") return; const c=e.target.closest&&e.target.closest("[data-copen]"); if(c&&e.target===c) openMeal(state.week[+c.dataset.copen],+c.dataset.copen); });
@@ -1143,11 +1144,11 @@ function renderWeekbar(){
     <div class="actions wact">
       <button class="btn primary" id="share" data-tip="Prépare un message avec le menu et le lien de l'application, à envoyer par WhatsApp ou SMS">Envoyer à la famille</button>
       <button class="btn edit-only owner-only${!valide&&manques().length?" incomplet":""}" id="valider" data-tip="${valide?"Permet à nouveau de changer les plats et les cuisiniers":manques().length?"Impossible pour l'instant : "+esc(manquesTexte(manques()))+". Complétez d'abord ces soirs.":"Fige le menu de la semaine : il devient le menu officiel"}">${valide?"Rouvrir aux modifications":"Valider le menu"}</button>
+      <button class="btn" id="exportmenu" data-tip="Calendrier de la semaine en PDF (ou en texte), avec les plats, les cuisiniers et les couverts">📄 Menu en PDF</button>
       <button class="btn edit-only" id="propose" data-tip="Tire un nouveau menu selon la répartition des budgets, la variété et les goûts de chacun">Nouvelle proposition</button>
       ${state.weekOffset===0?`<button class="btn" data-week="1" data-tip="Passe à la semaine prochaine pour préparer son menu à l'avance">Préparer la semaine suivante →</button>`:""}
     </div>
     ${renderApprovals()}
-    <div class="actions wact"><button class="btn" id="exportmenu" data-tip="Calendrier de la semaine en PDF ou en texte, avec les cuisiniers et les couverts">Exporter le menu</button></div>
     <div class="sharebox" id="sharebox"${shareOpen?"":" hidden"}>
       <ol class="sharesteps">
         <li>${window.INVITE_URL?`Envoyez ce lien d'invitation à chaque membre de la famille. En l'ouvrant, chacun indique son prénom et peut tout de suite modifier les menus.<div class="invite"><code>${esc(window.INVITE_URL)}</code><button class="btn" id="copyinvite" type="button">Copier le lien</button></div>`:`Demandez le lien d'invitation au propriétaire de l'application (Réglages, Accès de la famille).`}</li>
@@ -1170,6 +1171,7 @@ function limiteDate(){ return state.limite? new Date(state.limite) : limiteParDe
 function renderCompteHaut(){ const box=$("comptehaut"); if(!box) return; const L=limiteDate();
   if(!state.family.length||!L||isNaN(L)){ box.hidden=true; return; } box.hidden=false; const t=decompte(L);
   if(state.statut==="valide"){ box.className="comptehaut"; box.innerHTML=`<small>Menu validé</small><b>✓</b><small>Semaine du ${esc(weekLabel())}</small>`; return; }
+  const {ok}=approvalStats(); if(ok.length===state.family.length){ box.className="comptehaut"; box.innerHTML=`<small>Toute la famille a validé</small><b>${ok.length}/${state.family.length} ✓</b><small>${IS_OWNER?"Il reste à valider le menu final":"En attente de la validation finale"}</small>`; return; }
   box.className="comptehaut"+(!t?" fini":(L-Date.now())<24*36e5?" urgent":"");
   box.innerHTML=t?`<small>Validation du menu : il reste</small><b role="timer" data-compte="${L.getTime()}">${t}</b><small>avant ${esc(limiteTxt())}</small>`:`<small>Validation du menu</small><b>Délai dépassé</b><small>depuis ${esc(limiteTxt())}</small>`; }
 // Décompte : « 1 j 12 h 05 min », mis à jour en continu dans tout élément portant data-compte

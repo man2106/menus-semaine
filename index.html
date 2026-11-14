@@ -647,7 +647,7 @@ body.notowner .owner-only{display:none!important}
 .sginfo{display:grid;gap:2px;min-width:0}.sginfo b{overflow-wrap:anywhere}.sginfo small{color:var(--muted);font-size:12px}.sginfo a{color:var(--accent)}
 #suggform textarea{width:100%;box-sizing:border-box;font:inherit;padding:10px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);resize:vertical}
 
-.vuebar{display:flex;gap:6px;margin-bottom:10px}
+.vuebar{display:flex;gap:6px;margin-bottom:10px}.vuebar .vuepdf{margin-left:auto}
 .calsem{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 @media (min-width:700px){ .calsem{grid-template-columns:repeat(4,minmax(0,1fr))} }
 .cbox{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;min-height:250px;text-align:left;color:var(--ink);font:inherit;padding:0;cursor:pointer}
@@ -773,7 +773,7 @@ body.notowner .owner-only{display:none!important}
     <details class="panel sum" id="budgetbox"><summary id="budgetsum"></summary><div id="budget"></div></details>
     </div>
     <div class="col-b">
-    <div class="vuebar" role="group" aria-label="Affichage des repas"><button class="chip" data-vue="liste" type="button" data-tip="Les repas en liste, jour par jour">Liste</button><button class="chip" data-vue="cal" type="button" data-tip="La semaine en calendrier, comme dans l'export PDF : les cases à compléter ressortent en orange">Calendrier</button></div>
+    <div class="vuebar" role="group" aria-label="Affichage des repas"><button class="chip" data-vue="liste" type="button" data-tip="Les repas en liste, jour par jour">Liste</button><button class="chip" data-vue="cal" type="button" data-tip="La semaine en calendrier, comme dans l'export PDF : les cases à compléter ressortent en orange">Calendrier</button><button class="chip vuepdf" type="button" data-pdfdirect="1" data-tip="Crée tout de suite le PDF du menu de la semaine">📄 PDF</button></div>
     <div class="calsem" id="calendrier" hidden></div>
     <div class="days" id="days"></div>
     <footer><button class="link edit-only" id="reset" data-tip="Remet le menu proposé au départ">Revenir au menu proposé</button></footer>
@@ -962,10 +962,10 @@ body.notowner .owner-only{display:none!important}
   <div class="sfoot" id="sfoot"></div>
 </div>
 
-<script src="vendor/jspdf-2.5.1.umd.min.js?v=29"></script>
-<script src="vendor/supabase-js-2.45.4.js?v=29"></script>
-<script src="js/partage.js?v=29"></script>
-<script src="js/app.js?v=29"></script>
+<script src="vendor/jspdf-2.5.1.umd.min.js?v=30"></script>
+<script src="vendor/supabase-js-2.45.4.js?v=30"></script>
+<script src="js/partage.js?v=30"></script>
+<script src="js/app.js?v=30"></script>
 
 </body>
 </html>
