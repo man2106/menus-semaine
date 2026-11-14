@@ -2705,4 +2705,14 @@ $("aisles").addEventListener("click",e=>{ const b=e.target.closest("[data-xdel]"
   toast(`${x.n} retiré de la liste`,()=>{ state.extras=[...state.extras,x]; save(); renderCourses(); },"Annuler"); });
 
 { const h=location.hash.slice(1); if(VUES.includes(h)) state.tab=h; }
+// Garde-fou : un affichage relancé en boucle (plus de 40 fois en 2 secondes) est mis en pause
+// 1,5 seconde au lieu de figer l'appareil ; le dernier affichage demandé est fait ensuite.
+function gardeBoucle(nom,fn){ let n=0,t0=0,attente=null,dernier=null;
+  return function(...a){ const now=performance.now(); if(now-t0>2000){ t0=now; n=0; } n++;
+    if(n>40){ dernier=[this,a]; if(!attente){ console.warn("Boucle d'affichage évitée : "+nom); window.__boucles=(window.__boucles||0)+1;
+        attente=setTimeout(()=>{ attente=null; n=0; t0=performance.now(); const [t,x]=dernier; try{ fn.apply(t,x); }catch(e){} },1500); }
+      return; }
+    return fn.apply(this,a); }; }
+render=gardeBoucle("render",render); renderCourses=gardeBoucle("renderCourses",renderCourses); renderTicket=gardeBoucle("renderTicket",renderTicket);
+renderHabituels=gardeBoucle("renderHabituels",renderHabituels); renderDejaLa=gardeBoucle("renderDejaLa",renderDejaLa); renderEnvies=gardeBoucle("renderEnvies",renderEnvies);
 render(); setTab(state.tab);
