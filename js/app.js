@@ -425,13 +425,15 @@ if(!Array.isArray(state.invites)||state.invites.length!==7) state.invites=[0,0,0
 // semaine affichée au démarrage
 function setMonday(off){ MONDAY=new Date(BASE_MONDAY); MONDAY.setDate(BASE_MONDAY.getDate()+7*off); }
 setMonday(state.weekOffset);
-function stashWeek(){ state.weeks[curIso()]={menu:[...state.week],cooks:[...state.cooks],checked:{...state.checked},statut:state.statut,journal:state.journal.slice(0,15),approbations:JSON.parse(JSON.stringify(state.approbations)),limite:state.limite,exterieur:state.exterieur,absents:JSON.parse(JSON.stringify(state.absents)),invites:[...state.invites],extras:JSON.parse(JSON.stringify(state.extras||[])),quantites:{...(state.qtEdit||{})},tickets:JSON.parse(JSON.stringify(state.tickets||[]))};
+function stashWeek(){ state.weeks[curIso()]={lieux:{...(state.lieux||{})},menu:[...state.week],cooks:[...state.cooks],checked:{...state.checked},statut:state.statut,journal:state.journal.slice(0,15),approbations:JSON.parse(JSON.stringify(state.approbations)),limite:state.limite,exterieur:state.exterieur,absents:JSON.parse(JSON.stringify(state.absents)),invites:[...state.invites],extras:JSON.parse(JSON.stringify(state.extras||[])),quantites:{...(state.qtEdit||{})},tickets:JSON.parse(JSON.stringify(state.tickets||[]))};
   // ne garder que les semaines récentes
   const limit=new Date(BASE_MONDAY); limit.setDate(limit.getDate()-14); Object.keys(state.weeks).forEach(k=>{ if(isoDate(k)<limit) delete state.weeks[k]; }); }
 function applyValidation(){ if(DB){ state.statut = VALID[curIso()]==="valide" ? "valide" : "proposition"; state.limite = LIMITES[curIso()]||null; } }
 function applyWeekData(w){ state.week=[...w.menu]; state.cooks=(Array.isArray(w.cooks)&&w.cooks.length===7)?w.cooks.map(x=>propre(x,30)||null):Array(7).fill(null); state.checked={...(w.checked||{})}; state.statut=w.statut||"proposition"; state.journal=Array.isArray(w.journal)?w.journal:[];
   state.approbations=(w.approbations&&typeof w.approbations==="object")?JSON.parse(JSON.stringify(w.approbations)):{}; state.limite=typeof w.limite==="string"?w.limite:null; state.exterieur=cleanDays(w.exterieur);
-  state.absents=(w.absents&&typeof w.absents==="object")?JSON.parse(JSON.stringify(w.absents)):{}; if(window.__dbReady) applyValidation(); state.invites=(Array.isArray(w.invites)&&w.invites.length===7)?w.invites.map(x=>Math.max(0,Math.min(20,+x||0))):[0,0,0,0,0,0,0]; state.extras=cleanExtras(w.extras); state.qtEdit=cleanQt(w.quantites); state.tickets=cleanTickets(w.tickets); }
+  state.absents=(w.absents&&typeof w.absents==="object")?JSON.parse(JSON.stringify(w.absents)):{}; if(window.__dbReady) applyValidation(); state.invites=(Array.isArray(w.invites)&&w.invites.length===7)?w.invites.map(x=>Math.max(0,Math.min(20,+x||0))):[0,0,0,0,0,0,0]; state.extras=cleanExtras(w.extras); state.qtEdit=cleanQt(w.quantites); state.lieux=cleanLieux(w.lieux); state.tickets=cleanTickets(w.tickets); }
+const LIEUX={super:"au supermarché",boucher:"chez le boucher",boulanger:"chez le boulanger",marche:"au marché",autre:"dans un autre magasin"};
+function cleanLieux(o){ const r={}; if(o&&typeof o==="object") Object.entries(o).slice(0,200).forEach(([k,v])=>{ if(typeof k==="string"&&k.length<=90&&LIEUX[v]) r[k]=v; }); return r; }
 function cleanQt(o){ const r={}; if(o&&typeof o==="object") Object.entries(o).slice(0,300).forEach(([k,v])=>{ if(typeof k==="string"&&k.length<=90&&typeof v==="string"&&v.trim()) r[k]=propre(v,20); }); return r; }
 function cleanTickets(a){ return Array.isArray(a)?a.filter(x=>x&&+x.montant>0&&+x.montant<5000).slice(0,10).map(x=>({montant:Math.round(+x.montant*100)/100,mag:typeof x.mag==="string"?x.mag.replace(/[<>"'`]/g,"").slice(0,40):"",quand:typeof x.quand==="string"?x.quand.slice(0,30):"",estime:+x.estime>0?Math.round(+x.estime*100)/100:null,par:propre(x.par,30)})):[]; }
 { const w=state.weeks[curIso()]; if(w&&Array.isArray(w.menu)&&w.menu.length===7&&w.menu.every(id=>BYID[id])) applyWeekData(w); }
@@ -593,8 +595,8 @@ function coursesTrips(){
   state.week.forEach((id,d)=>headcount(d)&&BYID[id]&&BYID[id].ing.forEach(([n,q,u,ray])=>{
     if(PLACARD[n]){ const o=dejaLa.get(n)||{n,pour:new Set()}; o.pour.add(JOURS[d]); dejaLa.set(n,o); return; }
     const t=STOCKABLE.includes(ray)?0:tripOf(d), k=n+"|"+u, m=trips[t];
-    if(!m.has(k)) m.set(k,{k,ck:t+"|"+k,n,u,ray,q:0,pour:new Set(),freeze:false});
-    const it=m.get(k); it.q+=scale(q,d); it.pour.add(JOURS[d]);
+    if(!m.has(k)) m.set(k,{k,ck:t+"|"+k,n,u,ray,q:0,pour:new Set(),jd:new Set(),plats:new Set(),freeze:false});
+    const it=m.get(k); it.q+=scale(q,d); it.pour.add(JOURS[d]); it.jd.add(d); it.plats.add(BYID[id].nom);
     const buy=t===0?trip1Day():state.trip2; if(ray==="bou"&&d-buy>=3) it.freeze=true;
   }));
   (state.extras||[]).forEach(x=>{ const t=0, k="x|"+x.id;
@@ -661,7 +663,8 @@ function renderPlan(trips){
 }
 let tripVue=null; // course affichée sur téléphone (une à la fois)
 const tripAuto=()=>0;
-function renderCourses(){
+function renderCourses(){ try{ renderManquants(); }catch(e){}
+
   const trips=coursesTrips(); let done=0, total=0;
   if(tripVue===null) tripVue=tripAuto();
   const tdone=trips.map(items=>items.filter(i=>state.checked[i.ck]).length);
@@ -1053,13 +1056,13 @@ function goWeek(off){ if(off<0||off>3||off===state.weekOffset) return;
   stashWeek(); state.weekOffset=off; setMonday(off);
   const w=state.weeks[curIso()];
   if(w&&Array.isArray(w.menu)&&w.menu.length===7&&w.menu.every(id=>BYID[id])) applyWeekData(w);
-  else { state.week=proposeMenu(); state.cooks=Array(7).fill(null); state.checked={}; state.statut="proposition"; state.journal=[]; state.absents={}; state.invites=[0,0,0,0,0,0,0]; state.approbations={}; state.limite=null; state.exterieur=null; state.extras=[]; state.qtEdit={}; state.tickets=[]; }
+  else { state.week=proposeMenu(); state.cooks=Array(7).fill(null); state.checked={}; state.statut="proposition"; state.journal=[]; state.absents={}; state.invites=[0,0,0,0,0,0,0]; state.approbations={}; state.limite=null; state.exterieur=null; state.extras=[]; state.qtEdit={}; state.lieux={}; state.tickets=[]; }
   state.picking=null; applyValidation(); saveLocal(); subscribeWeek(); render(); }
 
 // --- partage via la base de données de la page ---
 let DB=null, USER=null, ME=null, CAN_WRITE=null, unsubWeek=null, unsubFam=null, IS_OWNER=true, VALID={}, LIMITES={};
 let shareOpen=false, shareReady=false, lastShared=null, lastFamily=null, writing=false, dirty=false, syncState="local";
-const sharedPayload=()=>({menu:state.week,cuisiniers:state.cooks,coches:state.checked,absents:state.absents,invites:state.invites,approbations:state.approbations,exterieur:state.exterieur,ajouts:state.extras,quantites:state.qtEdit||{},tickets:state.tickets||[]});
+const sharedPayload=()=>({menu:state.week,cuisiniers:state.cooks,coches:state.checked,absents:state.absents,invites:state.invites,approbations:state.approbations,exterieur:state.exterieur,ajouts:state.extras,quantites:state.qtEdit||{},lieux:state.lieux||{},tickets:state.tickets||[]});
 function describeChange(prev,next){
   if(!prev) return "a proposé le menu de la semaine";
   const out=[];
@@ -1100,11 +1103,11 @@ function subscribeWeek(){
       const d=snap.data();
       if(Array.isArray(d.menu)&&d.menu.length===7&&!d.menu.every(id=>BYID[id])) pendingWeek={iso,d};
       if(!snap.metadata.hasPendingWrites && Array.isArray(d.menu) && d.menu.length===7 && d.menu.every(id=>BYID[id])){
-        applyWeekData({menu:d.menu,cooks:d.cuisiniers,checked:d.coches,statut:d.statut,journal:d.journal,absents:d.absents,invites:d.invites,approbations:d.approbations,exterieur:d.exterieur,extras:d.ajouts,quantites:d.quantites,tickets:d.tickets});
+        applyWeekData({menu:d.menu,cooks:d.cuisiniers,checked:d.coches,statut:d.statut,journal:d.journal,absents:d.absents,invites:d.invites,approbations:d.approbations,exterieur:d.exterieur,extras:d.ajouts,quantites:d.quantites,lieux:d.lieux,tickets:d.tickets});
         lastShared=JSON.stringify(sharedPayload()); saveLocal(); render(); if(modalCtx) renderModal();
       }
     }
-    if(!snap.metadata.fromCache){ clearTimeout(timer); shareReady=true; setSync(CAN_WRITE===false?"readonly":"ok");
+    if(!snap.metadata.fromCache){ clearTimeout(timer); shareReady=true; setTimeout(()=>{ try{ rappelManquants(); }catch(e){} },900); setSync(CAN_WRITE===false?"readonly":"ok");
       if(!snap.exists) shareSync(); }   // première ouverture : on publie le menu local pour la famille
   }, err=>{ clearTimeout(timer); setSync("err"); });
 }
@@ -1331,7 +1334,7 @@ function subscribeRecettes(){ if(!DB) return; if(unsubRec) unsubRec();
       else { const r=registerRecipe(x); if(r){ state.perso=[...state.perso.filter(p=>p.id!==r.id),r]; changed=true; } } });
     if(changed){ saveLocal();
       if(pendingWeek&&pendingWeek.iso===curIso()&&pendingWeek.d.menu.every(id=>BYID[id])){ const d=pendingWeek.d; pendingWeek=null;
-        applyWeekData({menu:d.menu,cooks:d.cuisiniers,checked:d.coches,statut:d.statut,journal:d.journal,absents:d.absents,invites:d.invites,approbations:d.approbations,exterieur:d.exterieur,extras:d.ajouts,quantites:d.quantites,tickets:d.tickets}); lastShared=JSON.stringify(sharedPayload()); }
+        applyWeekData({menu:d.menu,cooks:d.cuisiniers,checked:d.coches,statut:d.statut,journal:d.journal,absents:d.absents,invites:d.invites,approbations:d.approbations,exterieur:d.exterieur,extras:d.ajouts,quantites:d.quantites,lieux:d.lieux,tickets:d.tickets}); lastShared=JSON.stringify(sharedPayload()); }
       render(); if(modalCtx&&BYID[modalCtx.id]) renderModal(); }
   },()=>{}); }
 async function saveRecipeShared(r){ if(!DB||CAN_WRITE===false) return; try{ await DB.collection("recettes").doc(r.id).set({...r}); }catch(e){ toast("La recette est gardée sur cet appareil, le partage a échoué"); } }
@@ -2249,13 +2252,15 @@ $("qval").addEventListener("keydown",e=>{ if(e.key==="Enter"){ e.preventDefault(
 document.addEventListener("keydown",e=>{ if(e.key==="Escape"&&!$("qoverlay").hidden){ e.stopPropagation(); fermerQt(); } },true);
 // Photos de tickets : lues par la mise à jour du lundi et du mercredi, elles alimentent la base des prix réels
 let TICKETS_PH={};
+// Texte d'une ligne de ticket : on garde les apostrophes (« Huile d'olive »), on retire tout ce qui pourrait former du code
+function txtLigne(v,max){ return typeof v==="string"?v.replace(/[<>"`\\{}]/g,"").replace(/\s+/g," ").trim().slice(0,max):""; }
 function cleanTicketPh(x){ if(!x||typeof x!=="object") return null; const r=x.resultat&&typeof x.resultat==="object"?x.resultat:{};
   const jr=v=>typeof v==="string"&&/^\d{4}-\d{2}-\d{2}/.test(v)?v.slice(0,10):"";
   return {semaine:jr(x.semaine),quand:typeof x.quand==="string"&&/^\d{4}-\d{2}-\d{2}T[\d:.]+Z?$/.test(x.quand)?x.quand:"",par:typeof x.par==="string"&&UUID_RE.test(x.par)?x.par:propre(x.par,30),mag:typeof x.mag==="string"?x.mag.replace(/[<>"'`]/g,"").slice(0,40):"",
     lie:!!x.lie,statut:["attente","analyse","illisible"].includes(x.statut)?x.statut:"attente",aPhoto:typeof x.photo==="string",
     res:{total:+r.total>0?Math.round(+r.total*100)/100:null,articles:+r.articles>0?Math.round(+r.articles):null,magasin:propre(r.magasin,50),date:jr(r.date),reconnus:+r.reconnus>=0?Math.round(+r.reconnus):null,note:propre(r.note,200),
-      lignes:Array.isArray(r.lignes)?r.lignes.slice(0,250).map(l=>l&&typeof l==="object"?{p:propre(l.p,70),i:propre(l.i,50),q:+l.q>0&&+l.q<1000?+l.q:1,u:["kg","L","u","g","cl"].includes(l.u)?l.u:"u",m:+l.m>=0&&+l.m<1000?Math.round(+l.m*100)/100:0,r:RAYONS[l.r]?l.r:"epi",md:!!l.md}:null).filter(l=>l&&l.p):[]}}; }
-function subscribeTicketsPh(){ if(!DB) return; DB.collection("tickets").onSnapshot(q=>{ q.docChanges().forEach(c=>{ if(c.type==="removed") delete TICKETS_PH[c.doc.id]; else { const v=cleanTicketPh(c.doc.data()); if(v) TICKETS_PH[c.doc.id]=v; } }); if(state.tab==="courses") renderTicket(); },()=>{}); }
+      lignes:Array.isArray(r.lignes)?r.lignes.slice(0,250).map(l=>l&&typeof l==="object"?{p:txtLigne(l.p,70),i:txtLigne(l.i,50),q:+l.q>0&&+l.q<1000?+l.q:1,u:["kg","L","u","g","cl"].includes(l.u)?l.u:"u",m:+l.m>=0&&+l.m<1000?Math.round(+l.m*100)/100:0,r:RAYONS[l.r]?l.r:"epi",md:!!l.md}:null).filter(l=>l&&l.p):[]}}; }
+function subscribeTicketsPh(){ if(!DB) return; DB.collection("tickets").onSnapshot(q=>{ q.docChanges().forEach(c=>{ if(c.type==="removed") delete TICKETS_PH[c.doc.id]; else { const v=cleanTicketPh(c.doc.data()); if(v) TICKETS_PH[c.doc.id]=v; } }); if(state.tab==="courses") renderTicket(); try{ renderManquants(); }catch(e){} },()=>{}); }
 function compresserTicket(file){ return new Promise((ok,ko)=>{ const img=new Image(), url=URL.createObjectURL(file);
   img.onload=()=>{ URL.revokeObjectURL(url); const essai=(max,q)=>{ const m=Math.min(1,max/Math.max(img.naturalWidth,img.naturalHeight)), c=document.createElement("canvas");
       c.width=Math.round(img.naturalWidth*m); c.height=Math.round(img.naturalHeight*m); const x=c.getContext("2d"); x.filter="grayscale(1) contrast(1.15)"; x.drawImage(img,0,0,c.width,c.height); return c.toDataURL("image/jpeg",q); };
@@ -2305,6 +2310,55 @@ document.addEventListener("click",e=>{
   const re=e.target.closest("[data-remettre]"); if(re){ const n=re.dataset.remettre; majPlacard(n,false); toast(`${n} remis sur la liste`); return; }
   const td=e.target.closest("[data-tkdel]"); if(td){ state.tickets=(state.tickets||[]).filter((_,i)=>i!==+td.dataset.tkdel); save(); renderTicket(); toast("Ticket supprimé"); return; }
 },true);
+
+// ===================== Ingrédients encore à acheter =====================
+// Après le jour des courses, tout article de la liste non coché est « manquant » : on rappelle pour quel repas
+// et quel jour il le faut, et où l'acheter (boucher, boulanger…), choix partagé avec la famille.
+function coursesFaites(){ return TODAY>=tripDate(0); }
+function lignesTicketSemaine(){ const out=[]; try{ Object.values(TICKETS_PH).forEach(t=>{ if(t.semaine===curIso()&&t.statut==="analyse") (t.res.lignes||[]).forEach(l=>out.push(l)); }); }catch(e){} return out; }
+const MOTS_VIDES=new Set(["de","du","des","la","le","les","en","au","aux","et","a","pour","avec","sans","bocal","pot","paquet","sachet","boite"]);
+function motsCles(t,variantes){ return String(t||"").toLowerCase().replace(/œ/g,"oe").replace(/æ/g,"ae").normalize("NFD").replace(/[̀-ͯ]/g,"").split(/[^a-z0-9]+/).flatMap(w=>variantes&&/^[dl][aeiouh]/.test(w)&&w.length>=5?[w,w.slice(1)]:[w]).filter(w=>w.length>=3&&!MOTS_VIDES.has(w)&&!/^\d/.test(w)).map(w=>w.slice(0,4)); }
+// Un article de la liste est considéré comme acheté s'il ressemble assez à une ligne du ticket (au moins la moitié de ses mots)
+function surLeTicket(n,lignes){ const m=[...new Set(motsCles(n))]; if(!m.length) return false;
+  return lignes.some(l=>{ const t=new Set([...motsCles(l.i,true),...motsCles(l.p,true)]); const ok=m.filter(w=>t.has(w)).length; const ing=motsCles(l.i);
+    return ok>=Math.max(1,Math.ceil(m.length/2))||(ing.length>0&&ing.every(w=>m.includes(w))); }); }
+function manquantsSemaine(){ if(!coursesFaites()) return []; const lt=lignesTicketSemaine();
+  const recettes=[]; state.week.forEach((id,d)=>headcount(d)&&BYID[id]&&BYID[id].ing.forEach(([n])=>recettes.push({d,n,plat:BYID[id].nom,m:motsCles(n)})));
+  return coursesTrips()[0].filter(i=>!state.checked[i.ck]&&!surLeTicket(i.n,lt)).map(i=>{
+    // article ajouté à la main : on le relie au repas du menu qui utilise ce produit (« Boudin boucherie » → Boudin, compote et purée)
+    if(i.x&&!(i.jd&&i.jd.size)){ const mi=motsCles(i.n); const r=recettes.filter(r=>r.m.length&&r.m.every(w=>mi.includes(w))); if(r.length){ i={...i,jd:new Set(r.map(x=>x.d)),plats:new Set(r.map(x=>x.plat))}; } }
+    const jours=i.jd?[...i.jd].sort((a,b)=>a-b):[];
+    const futurs=jours.filter(d=>dayOffset(d)>=TODAY), d=futurs.length?futurs[0]:(jours.length?jours[jours.length-1]:null);
+    const date=d!=null?dayOffset(d):null, dans=date?Math.round((date-TODAY)/DAY):null;
+    return {...i,d,date,dans,lieu:(state.lieux||{})[i.k]||(i.ray==="bou"?"boucher":i.ray==="bl"?"boulanger":"super"),choisi:!!(state.lieux||{})[i.k],plats:i.plats?[...i.plats]:[]}; })
+    .filter(x=>x.dans==null||x.dans>=0).sort((a,b)=>(a.dans==null?99:a.dans)-(b.dans==null?99:b.dans)||a.n.localeCompare(b.n,"fr")); }
+function quand(x){ return x.dans==null?"cette semaine":x.dans===0?"aujourd'hui":x.dans===1?"demain":JOURS[x.d].toLowerCase()+" "+fmtShort(x.date); }
+function renderManquants(){ const l=manquantsSemaine();
+  ["manquants","manquants2"].forEach(id=>{ const box=$(id); if(!box) return; if(!l.length){ box.hidden=true; box.innerHTML=""; return; } box.hidden=false;
+    const urg=l.filter(x=>x.dans!=null&&x.dans<=1).length;
+    box.innerHTML=`<div class="mqhead"><h3>Il manque encore ${l.length} ingrédient${l.length>1?"s":""}${urg?` <span class="badge warm">${urg} pour ${l.some(x=>x.dans===0)?"aujourd'hui ou ":""}demain</span>`:""}</h3>
+      <span class="mqact"><button type="button" class="btn small" data-mqtout="1" data-tip="Coche tous ces articles : tout a été acheté">Tout est acheté</button><button type="button" class="btn small" data-mqics="1" data-tip="Ajoute un rappel dans l'agenda du téléphone, la veille de chaque repas concerné">📅 Rappel agenda</button></span></div>
+      ${lignesTicketSemaine().length?`<p class="note">Les produits lus sur le ticket de la semaine sont déjà comptés comme achetés.</p>`:""}
+      <div class="mqlist">${l.map(x=>`<div class="mq${x.dans!=null&&x.dans<=1?" urgent":""}"><span class="mqn"><b>${esc(x.n)}</b> <small>${esc(qtyOf(x))}</small>
+        <small>pour ${x.plats.length?esc(x.plats.join(", ")):"la semaine"} · <b>${quand(x)}</b></small></span>
+        <select class="mqlieu edit-ctl" data-mqlieu="${esc(x.k)}" aria-label="Où acheter ${esc(x.n)}">${Object.entries(LIEUX).map(([k,v])=>`<option value="${k}"${k===x.lieu?" selected":""}>${v[0].toUpperCase()+v.slice(1)}</option>`).join("")}</select>
+        <button type="button" class="chip on" data-mqok="${esc(x.ck)}" aria-label="${esc(x.n)} est acheté">Acheté ✓</button></div>`).join("")}</div>`; }); }
+function rappelManquants(){ if(window.__mqRappel) return; const l=manquantsSemaine().filter(x=>x.dans!=null&&x.dans<=1); if(!l.length) return; window.__mqRappel=true;
+  const x=l[0], reste=l.length-1;
+  setTimeout(()=>toast(`${l.some(y=>y.dans===0)?"Aujourd'hui":"Demain"} : ${x.n} ${LIEUX[x.lieu]}${reste?` et ${reste} autre${reste>1?"s":""}`:""}`,()=>setTab("courses"),"Voir"),1500); }
+function icsManquants(){ const l=manquantsSemaine(); const pad=n=>String(n).padStart(2,"0"), f=d=>`${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}T${pad(d.getHours())}${pad(d.getMinutes())}00`;
+  const parJour=new Map(); l.forEach(x=>{ const k=x.date?x.date.getTime():TODAY.getTime(); (parJour.get(k)||parJour.set(k,[]).get(k)).push(x); });
+  const now=new Date(), ev=[...parJour.entries()].map(([t,xs],i)=>{ let d=new Date(t); d.setDate(d.getDate()-1); d.setHours(17,30,0,0); if(d<now){ d=new Date(now.getTime()+60*60000); }
+    const fin=new Date(d.getTime()+30*60000), txt=s=>String(s).replace(/[\;,]/g,m=>"\\"+m).replace(/\n/g,"\\n");
+    const resume="Courses : "+xs.map(x=>x.n).join(", "), desc=xs.map(x=>`- ${x.n} ${qtyOf(x)} ${LIEUX[x.lieu]} (pour ${x.plats.join(", ")||"la semaine"}, ${quand(x)})`).join("\n");
+    return ["BEGIN:VEVENT",`UID:menus-${curIso()}-${i}-${now.getTime()}@menus-semaine`,`DTSTAMP:${f(now)}`,`DTSTART:${f(d)}`,`DTEND:${f(fin)}`,`SUMMARY:${txt(resume)}`,`DESCRIPTION:${txt(desc)}`,"BEGIN:VALARM","ACTION:DISPLAY",`DESCRIPTION:${txt(resume)}`,"TRIGGER:-PT0M","END:VALARM","END:VEVENT"].join("\r\n"); });
+  return new Blob([["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Menus de la semaine//FR","CALSCALE:GREGORIAN",...ev,"END:VCALENDAR"].join("\r\n")],{type:"text/calendar;charset=utf-8"}); }
+document.addEventListener("change",e=>{ const s=e.target.closest&&e.target.closest("[data-mqlieu]"); if(!s) return; state.lieux={...(state.lieux||{}),[s.dataset.mqlieu]:s.value}; save(); renderManquants(); toast(`Noté : ${LIEUX[s.value]}`); });
+document.addEventListener("click",async e=>{
+  const ok=e.target.closest("[data-mqok]"); if(ok){ const k=ok.dataset.mqok; state.checked[k]=true; save(); renderCourses(); const it=coursesTrips()[0].find(i=>i.ck===k); toast(`${it?it.n:"Article"} acheté`,()=>{ delete state.checked[k]; save(); renderCourses(); },"Annuler"); return; }
+  const tt=e.target.closest("[data-mqtout]"); if(tt){ const l=manquantsSemaine(); if(!l.length) return; const avant={...state.checked}; l.forEach(x=>state.checked[x.ck]=true); save(); renderCourses(); toast(`${l.length} article${l.length>1?"s":""} cochés comme achetés`,()=>{ state.checked=avant; save(); renderCourses(); },"Annuler"); return; }
+  const ic=e.target.closest("[data-mqics]"); if(ic){ try{ const res=await DL.save({filename:`rappel-courses-${curIso()}.ics`,data:icsManquants()}); toast(res&&res.status==="shared"?"Rappel partagé : choisissez votre agenda":"Fichier de rappel téléchargé : ouvrez-le pour l'ajouter à votre agenda"); }catch(err){ toast("Rappel impossible sur cet appareil"); } return; }
+});
 
 // ===================== Historique des courses =====================
 // Sources : les lignes des tickets lus (base privée de la famille), les listes de chaque semaine (menu + produits ajoutés)

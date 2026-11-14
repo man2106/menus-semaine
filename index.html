@@ -806,6 +806,18 @@ body.notowner .owner-only{display:none!important}
 .hlignes{display:grid;gap:4px;margin-top:8px;font-size:13.5px}.hlignes>div{display:grid;grid-template-columns:1fr auto 64px;gap:8px;border-bottom:1px dashed var(--line);padding:3px 0}
 .hlignes b{text-align:right;font-variant-numeric:tabular-nums}.hlignes .md{color:var(--accent);font-size:11px}
 .gfilters.wrap{flex-wrap:wrap;overflow:visible}
+
+/* Ingrédients encore à acheter */
+.mqpanel{border-left:4px solid var(--warm)}
+.mqhead{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;margin-bottom:8px}
+.mqhead h3{margin:0;font-size:16px}.badge.warm{background:var(--warm);color:var(--bg)}
+.btn.small{padding:6px 10px;font-size:13px;min-height:0}.mqact{display:flex;gap:6px;flex-wrap:wrap}
+.mqlist{display:grid;gap:8px}
+.mq{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;padding:8px 10px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.mq.urgent{border-color:var(--warm)}
+.mqn{min-width:0}.mqn small{display:block;color:var(--muted);font-size:12.5px}.mqn b+small{display:inline;margin-left:4px}
+.mqlieu{max-width:170px;padding:6px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);font:inherit;font-size:13px}
+@media (max-width:520px){.mq{grid-template-columns:1fr auto}.mqn{grid-column:1/-1}}
 </style>
 </head>
 <body>
@@ -842,6 +854,7 @@ body.notowner .owner-only{display:none!important}
   <section id="view-menu">
     <div class="col-a">
     <div class="panel acomp" id="acompleter"></div>
+    <div class="panel mqpanel" id="manquants" hidden></div>
     <div class="panel weekbar" id="weekbar"></div>
     <div class="next" id="next"></div>
     <div class="panel retours" id="retoursbox" hidden></div>
@@ -858,6 +871,7 @@ body.notowner .owner-only{display:none!important}
   <!-- ===== COURSES ===== -->
   <section id="view-courses" hidden>
     <div class="col-a">
+    <div class="panel mqpanel" id="manquants2" hidden></div>
     <div class="toolbar">
       <div class="progress"><span id="ptext"></span><div class="track"><i id="pbar"></i></div></div>
       <div class="actions">
@@ -1063,10 +1077,10 @@ body.notowner .owner-only{display:none!important}
   <div class="sfoot" id="sfoot"></div>
 </div>
 
-<script src="vendor/jspdf-4.2.1.umd.min.js?v=39"></script>
-<script src="vendor/supabase-js-2.45.4.js?v=39"></script>
-<script src="js/partage.js?v=39"></script>
-<script src="js/app.js?v=39"></script>
+<script src="vendor/jspdf-4.2.1.umd.min.js?v=40"></script>
+<script src="vendor/supabase-js-2.45.4.js?v=40"></script>
+<script src="js/partage.js?v=40"></script>
+<script src="js/app.js?v=40"></script>
 
 </body>
 </html>
