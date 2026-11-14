@@ -1591,7 +1591,8 @@ function pickNearest(){ const prev=[...state.storeOrder], seen=new Set();
 // --- Position précise : adresse -> coordonnées, et vrais magasins autour (OpenStreetMap) ---
 // ---- Google Maps (clé du propriétaire, enregistrée dans la base de la famille) ----
 let GKEY=null, gmLoad=null, gmToken=null;
-try{ GKEY=localStorage.getItem(KEY+"-gkey")||null; }catch(e){}
+// Google Maps abandonné : on n'utilise plus de clé et on efface celle qui aurait été gardée sur l'appareil
+try{ localStorage.removeItem(KEY+"-gkey"); }catch(e){}
 function chargerGoogle(){ if(!GKEY) return Promise.reject(new Error("pas de clé")); if(window.google&&google.maps&&google.maps.importLibrary) return Promise.resolve();
   if(gmLoad) return gmLoad;
   gmLoad=new Promise((ok,ko)=>{ window.__gmReady=()=>ok(); window.gm_authFailure=()=>{ GKEY_ERR=true; toast("Google Maps refuse la clé : vérifiez les restrictions de la clé (site et API autorisés)."); ko(new Error("auth")); };
@@ -1620,7 +1621,7 @@ async function magasinsGoogle(R){ await chargerGoogle(); const {Place,SearchNear
   const enseignes=["Delhaize","Carrefour","Colruyt","Aldi","Lidl","Intermarché","OKay","Spar","Albert Heijn","Louis Delhaize"];
   await Promise.all(enseignes.map(async e=>{ try{ const r=await Place.searchByText({textQuery:e+" supermarché",fields:champs,locationBias:{center,radius:Math.min(R,50000)},maxResultCount:5,language:"fr",region:"be"}); garder(r.places); }catch(err){} }));
   return out; }
-function setGoogleKey(k){ GKEY=k||null; gmLoad=null; GKEY_ERR=false; try{ k?localStorage.setItem(KEY+"-gkey",k):localStorage.removeItem(KEY+"-gkey"); }catch(e){} renderGkey(); }
+function setGoogleKey(k){ k=null; GKEY=null; gmLoad=null; GKEY_ERR=false; try{ k?localStorage.setItem(KEY+"-gkey",k):localStorage.removeItem(KEY+"-gkey"); }catch(e){} renderGkey(); }
 function renderGkey(){ const b=$("gkeybox"); if(!b) return; b.hidden=!GKEY; if(!GKEY){ b.innerHTML=""; return; }
   b.innerHTML=`<b>Google Maps</b> <span class="bdg ${GKEY?"b-eco":"b-plaisir"}">${GKEY?"activé":"pas encore activé"}</span>
     <p class="note">${GKEY?"Les adresses et les magasins viennent de Google Maps. OpenStreetMap sert de secours.":"Sans clé, les adresses et les magasins viennent d'OpenStreetMap, moins complet."}</p>
@@ -2227,9 +2228,10 @@ function validerQt(k,span){ const it=coursesTrips()[0].find(i=>i.k===k); if(!it)
 // Photos de tickets : lues par la mise à jour du lundi et du mercredi, elles alimentent la base des prix réels
 let TICKETS_PH={};
 function cleanTicketPh(x){ if(!x||typeof x!=="object") return null; const r=x.resultat&&typeof x.resultat==="object"?x.resultat:{};
-  return {semaine:typeof x.semaine==="string"?x.semaine.slice(0,10):"",quand:typeof x.quand==="string"?x.quand.slice(0,30):"",par:propre(x.par,30),mag:typeof x.mag==="string"?x.mag.replace(/[<>"'`]/g,"").slice(0,40):"",
+  const jr=v=>typeof v==="string"&&/^\d{4}-\d{2}-\d{2}/.test(v)?v.slice(0,10):"";
+  return {semaine:jr(x.semaine),quand:typeof x.quand==="string"&&/^\d{4}-\d{2}-\d{2}T[\d:.]+Z?$/.test(x.quand)?x.quand:"",par:propre(x.par,30),mag:typeof x.mag==="string"?x.mag.replace(/[<>"'`]/g,"").slice(0,40):"",
     lie:!!x.lie,statut:["attente","analyse","illisible"].includes(x.statut)?x.statut:"attente",aPhoto:typeof x.photo==="string",
-    res:{total:+r.total>0?Math.round(+r.total*100)/100:null,articles:+r.articles>0?Math.round(+r.articles):null,magasin:propre(r.magasin,50),date:typeof r.date==="string"?r.date.slice(0,10):"",reconnus:+r.reconnus>=0?Math.round(+r.reconnus):null,note:propre(r.note,200)}}; }
+    res:{total:+r.total>0?Math.round(+r.total*100)/100:null,articles:+r.articles>0?Math.round(+r.articles):null,magasin:propre(r.magasin,50),date:jr(r.date),reconnus:+r.reconnus>=0?Math.round(+r.reconnus):null,note:propre(r.note,200)}}; }
 function subscribeTicketsPh(){ if(!DB) return; DB.collection("tickets").onSnapshot(q=>{ q.docChanges().forEach(c=>{ if(c.type==="removed") delete TICKETS_PH[c.doc.id]; else { const v=cleanTicketPh(c.doc.data()); if(v) TICKETS_PH[c.doc.id]=v; } }); if(state.tab==="courses") renderTicket(); },()=>{}); }
 function compresserTicket(file){ return new Promise((ok,ko)=>{ const img=new Image(), url=URL.createObjectURL(file);
   img.onload=()=>{ URL.revokeObjectURL(url); const essai=(max,q)=>{ const m=Math.min(1,max/Math.max(img.naturalWidth,img.naturalHeight)), c=document.createElement("canvas");

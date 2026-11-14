@@ -207,7 +207,7 @@
         <p class="note">Toute personne qui ouvre ce lien et indique son prénom peut voir et modifier les menus. Ne le partagez qu'avec la famille.</p>
         <div class="invite"><code id="acc-link">${esc(window.INVITE_URL)}</code><button class="btn primary" id="acc-copy" type="button">Copier le lien</button></div>
         <p class="note">Code famille : <b>${esc(code)}</b></p>
-        <div class="addrow"><input id="acc-code" type="text" maxlength="40" placeholder="Nouveau code (6 caractères minimum)" aria-label="Nouveau code famille"><button class="btn" id="acc-code-ok" type="button">Changer le code</button></div>
+        <div class="addrow"><input id="acc-code" type="text" maxlength="40" placeholder="Nouveau code (10 caractères minimum, ex. : cerise-tulipe-4827)" aria-label="Nouveau code famille"><button class="btn" id="acc-code-ok" type="button">Changer le code</button></div>
         <h3 class="shopray">Sauvegarde</h3>
         <p class="note">Téléchargez de temps en temps une copie de toutes les données de la famille : menus, recettes, avis, sondage et goûts. ${(()=>{ let d=null; try{ d=localStorage.getItem("menus-semaine-sauvegarde"); }catch(e){} return d?"Dernière sauvegarde depuis cet appareil : "+new Date(d).toLocaleDateString("fr-BE")+".":"Aucune sauvegarde depuis cet appareil."; })()}</p>
         <div class="actions"><button class="btn" id="acc-backup" type="button">Télécharger une sauvegarde</button></div>
@@ -226,7 +226,7 @@
     if (t.id === "acc-nom-ok") { const n = $("acc-nom").value.trim(); if (!n) return; await sb.rpc("definir_nom", { nom: n }); ACCES.nom = n; PROFILS.set(UID, n); toastFn("Prénom enregistré"); renderAcces(); }
     if (t.id === "acc-copy") { try { await navigator.clipboard.writeText(window.INVITE_URL); toastFn("Lien d'invitation copié"); } catch(err){ toastFn(window.INVITE_URL); } }
     if (t.id === "acc-code-ok") { const c = $("acc-code").value.trim(); const { error } = await sb.rpc("changer_code_famille", { nouveau: c });
-      if (error) toastFn(/court/.test(error.message) ? "Code trop court : 6 caractères minimum" : "Le code n'a pas pu être changé"); else { toastFn("Nouveau code enregistré : envoyez le nouveau lien"); renderAcces(); } }
+      if (error) toastFn(/court/.test(error.message)||c.length<10 ? "Code trop court : 10 caractères minimum" : "Le code n'a pas pu être changé"); else { toastFn("Nouveau code enregistré : envoyez le nouveau lien"); renderAcces(); } }
     if (t.id === "acc-backup") {
       const docs = {}; [...CACHE.keys()].sort().forEach(k => { docs[k] = CACHE.get(k); });
       const jour = new Date().toISOString().slice(0, 10);
