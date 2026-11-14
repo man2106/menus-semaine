@@ -3,8 +3,8 @@ window.addEventListener("error",e=>{ const t=e.target; if(t&&t.tagName==="IMG"){
 
 // Nettoie un texte venu de la base partagée ou d'un fichier : jamais de balise ni de caractère dangereux à l'affichage
 function propre(v,max){ return typeof v==="string" ? v.replace(/[<>&"'`]/g,"").replace(/[\u0000-\u001f]/g," ").trim().slice(0,max||200) : ""; }
-const RAYONS = {bou:"Boucherie & charcuterie", cre:"Crèmerie", fl:"Fruits & légumes", bl:"Boulangerie", epi:"Épicerie", sur:"Surgelés", dro:"Droguerie & hygiène"};
-const ORDRE = ["fl","bou","cre","bl","epi","sur","dro"];
+const RAYONS = {bou:"Boucherie & charcuterie", cre:"Crèmerie", fl:"Fruits & légumes", bl:"Boulangerie", epi:"Épicerie", sur:"Surgelés", boi:"Boissons", dro:"Droguerie & hygiène"};
+const ORDRE = ["fl","bou","cre","bl","epi","boi","sur","dro"];
 // Quantités pour 5 personnes : [nom, quantité, unité, rayon]
 const RECETTES = [
  {id:"carbo",nom:"Pâtes carbonara",acc:"Salade verte",t:20,astuce:"Prenez un grand paquet de lardons : la moitié sert pour la quiche.",ing:[["Spaghetti",600,"g","epi"],["Lardons",200,"g","bou"],["Œufs",4,"","cre"],["Crème fraîche",20,"cl","cre"],["Fromage râpé",100,"g","cre"],["Laitue",1,"","fl"]]},
@@ -52,7 +52,7 @@ const RECETTES = [
  {id:"liegeoise",nom:"Salade liégeoise tiède",acc:"Pain",t:25,b:"eco",p:"porc",f:"pdt",c:"belge",astuce:"Haricots, lardons et pommes de terre : le plat complet liégeois.",ing:[["Pommes de terre", 1200, "g", "fl"], ["Haricots verts", 800, "g", "sur"], ["Lardons", 250, "g", "bou"], ["Oignons", 2, "", "fl"], ["Vinaigre", 1, "flacon", "epi"], ["Œufs", 5, "", "cre"]]},
  {id:"boulets",nom:"Boulets sauce lapin express",acc:"Frites au four",t:30,b:"moyen",p:"boeuf",f:"pdt",c:"belge",astuce:"La sauce au sirop de Liège fait toute la différence.",ing:[["Haché porc-bœuf", 800, "g", "bou"], ["Oignons", 3, "", "fl"], ["Sirop de Liège", 1, "pot", "epi"], ["Bouillon de bœuf", 2, "cube", "epi"], ["Œufs", 1, "", "cre"], ["Chapelure", 1, "paquet", "epi"], ["Frites au four", 1500, "g", "sur"]]},
  {id:"waterzooi",nom:"Waterzooi de poulet express",acc:"Pain ou pommes de terre",t:30,b:"moyen",p:"volaille",f:"pdt",c:"belge",astuce:"Le plat gantois, prêt en une demi-heure avec des blancs de poulet.",ing:[["Blancs de poulet", 700, "g", "bou"], ["Poireaux", 2, "", "fl"], ["Carottes", 400, "g", "fl"], ["Pommes de terre", 800, "g", "fl"], ["Crème fraîche", 25, "cl", "cre"], ["Bouillon de volaille", 2, "cube", "epi"], ["Œufs", 1, "", "cre"]]},
- {id:"carbonnades",nom:"Carbonnades express à l'autocuiseur",acc:"Frites au four",t:30,b:"plaisir",p:"boeuf",f:"pdt",c:"belge",astuce:"À l'autocuiseur, 20 minutes suffisent. Sans autocuiseur, gardez-les pour le week-end.",ing:[["Bœuf à carbonnades", 900, "g", "bou"], ["Oignons", 3, "", "fl"], ["Bière brune", 33, "cl", "epi"], ["Pain d'épices", 3, "tranche", "bl"], ["Moutarde", 1, "pot", "epi"], ["Frites au four", 1500, "g", "sur"]]},
+ {id:"carbonnades",nom:"Carbonnades express à l'autocuiseur",acc:"Frites au four",t:30,b:"plaisir",p:"boeuf",f:"pdt",c:"belge",astuce:"À l'autocuiseur, 20 minutes suffisent. Sans autocuiseur, gardez-les pour le week-end.",ing:[["Bœuf à carbonnades", 900, "g", "bou"], ["Oignons", 3, "", "fl"], ["Bière brune", 33, "cl", "boi"], ["Pain d'épices", 3, "tranche", "bl"], ["Moutarde", 1, "pot", "epi"], ["Frites au four", 1500, "g", "sur"]]},
  {id:"americain",nom:"Américain préparé et frites",acc:"Salade",t:15,b:"plaisir",p:"boeuf",f:"pdt",c:"belge",astuce:"Achetez l'américain le jour même chez le boucher.",ing:[["Américain préparé", 750, "g", "bou"], ["Frites au four", 1500, "g", "sur"], ["Laitue", 1, "", "fl"], ["Tomates", 3, "", "fl"], ["Oignons", 1, "", "fl"]]},
  {id:"chicons",nom:"Chicons braisés et jambon, purée",acc:"Purée",t:30,b:"eco",p:"porc",f:"pdt",c:"belge",astuce:"Version rapide des chicons au gratin : sans béchamel ni four.",ing:[["Chicons", 1000, "g", "fl"], ["Jambon cuit", 250, "g", "bou"], ["Pommes de terre", 1200, "g", "fl"], ["Lait", 20, "cl", "cre"], ["Beurre", 50, "g", "cre"], ["Fromage râpé", 80, "g", "cre"]]},
  {id:"risotto",nom:"Risotto aux champignons",acc:"Salade de roquette",t:30,b:"moyen",p:"vege",f:"riz",c:"italienne",astuce:"Le secret : remuer souvent et ajouter le bouillon petit à petit.",ing:[["Riz à risotto", 450, "g", "epi"], ["Champignons", 500, "g", "fl"], ["Oignons", 1, "", "fl"], ["Bouillon de légumes", 2, "cube", "epi"], ["Parmesan", 100, "g", "cre"], ["Beurre", 40, "g", "cre"]]},
@@ -125,7 +125,7 @@ Object.entries({"carbo": "italienne", "omelette": "espagnole", "wraps": "mexicai
 // Budget (eco, moyen, plaisir), protéine et féculent des recettes de départ, pour varier les menus
 Object.entries({"carbo": ["eco", "porc", "pates"], "omelette": ["eco", "oeufs", "pdt"], "wraps": ["moyen", "volaille", "pain"], "cantonais": ["eco", "porc", "riz"], "croque": ["eco", "porc", "pain"], "chili": ["moyen", "boeuf", "riz"], "quiche": ["eco", "porc", "tarte"], "stoemp": ["eco", "porc", "pdt"], "thon": ["eco", "poisson", "pates"], "boulettes": ["moyen", "boeuf", "riz"], "pizza": ["moyen", "porc", "tarte"], "poisson": ["eco", "poisson", "pdt"], "soupe": ["eco", "vege", "pain"], "curry": ["eco", "vege", "riz"]}).forEach(([id,[b,p,f]])=>{ const r=RECETTES.find(x=>x.id===id); if(r){ r.b=b; r.p=p; r.f=f; } });
 const BYID = Object.fromEntries(RECETTES.map(r=>[r.id,r]));
-const RAYKEYS=["fl","bou","cre","bl","epi","sur"];
+const RAYKEYS=["fl","bou","cre","bl","epi","boi","sur"];
 // Recette de la famille : quantités ramenées à 5 personnes, photo en data URL facultative
 function cleanRecipe(x){
   if(!x||typeof x!=="object"||typeof x.id!=="string"||!/^p[a-z0-9]{3,20}$/.test(x.id)) return null;
@@ -582,19 +582,21 @@ function renderDays(){
 // ---- Deux courses par semaine ----
 const STOCKABLE = ["epi","sur"];
 const trip1Day = () => state.trip1==="sam" ? -2 : 0;   // samedi avant la semaine = -2
-const tripOf = d => d>=state.trip2 ? 1 : 0;
+const tripOf = d => 0; // une seule course par semaine (la liste n'est plus scindée)
 const tripName = t => t===0 ? (state.trip1==="sam"?"Samedi":"Lundi") : JOURS[state.trip2];
 function tripDate(t){ return dayOffset(t===0 ? trip1Day() : state.trip2); }
 function coursesTrips(){
-  const trips=[new Map(),new Map()];
+  const trips=[new Map()];
   state.week.forEach((id,d)=>headcount(d)&&BYID[id].ing.forEach(([n,q,u,ray])=>{
     const t=STOCKABLE.includes(ray)?0:tripOf(d), k=n+"|"+u, m=trips[t];
     if(!m.has(k)) m.set(k,{k,ck:t+"|"+k,n,u,ray,q:0,pour:new Set(),freeze:false});
     const it=m.get(k); it.q+=scale(q,d); it.pour.add(JOURS[d]);
     const buy=t===0?trip1Day():state.trip2; if(ray==="bou"&&d-buy>=3) it.freeze=true;
   }));
-  (state.extras||[]).forEach(x=>{ const t=x.t===1?1:0, k="x|"+x.id;
+  (state.extras||[]).forEach(x=>{ const t=0, k="x|"+x.id;
     trips[t].set(k,{k,ck:t+"|"+k,n:x.n,u:"",ray:RAYONS[x.ray]?x.ray:"epi",q:0,qt:x.qt||"",pour:new Set(),freeze:false,x:true,id:x.id,par:x.par||""}); });
+  // anciennes cases cochées de la 2e course : reprises dans la liste unique
+  trips[0].forEach(it=>{ if(state.checked["1|"+it.k]&&!state.checked[it.ck]) state.checked[it.ck]=true; });
   return trips.map(m=>[...m.values()].sort((a,b)=>ORDRE.indexOf(a.ray)-ORDRE.indexOf(b.ray)||a.n.localeCompare(b.n,"fr")));
 }
 function cleanExtras(a){ return Array.isArray(a)? a.filter(x=>x&&typeof x.n==="string"&&x.n.trim()&&x.id).slice(0,200).map(x=>({id:String(x.id).slice(0,40),n:String(x.n).trim().slice(0,60),qt:String(x.qt||"").slice(0,20),ray:RAYONS[x.ray]?x.ray:"epi",t:x.t===1?1:0,par:String(x.par||"").slice(0,30)})) : []; }
@@ -641,7 +643,7 @@ function renderPlan(trips){
   const stops=plans.reduce((s,p)=>s+(p.secondary?2:1),0);
   $("plan").innerHTML=`<h2>Plan de déplacement</h2>
     <div class="planstats"><span><b>${stops}</b> arrêt${stops>1?"s":""} en magasin</span><span><b>≈ ${kmTxt(totKm)}</b> aller-retour au total</span><span><b>${eur(totSav)}</b> d'économies promo connues</span></div>
-    ${plans.map((p,t)=>`<div class="route"><div class="rt">Course ${t+1} · ${fmtD(p.date)}</div>
+    ${plans.map((p,t)=>`<div class="route"><div class="rt">Courses de la semaine · ${fmtD(p.date)}</div>
       <div class="rpath"><span class="rhome">Maison</span><span class="rarrow">→</span><span class="rstop">${MAGNOM[p.primary]}</span>${p.secondary?`<span class="rarrow">→</span><span class="rstop alt">${MAGNOM[p.secondary]}</span>`:""}<span class="rarrow">→</span><span class="rhome">Maison</span></div>
       <small>≈ ${kmTxt(p.route)} (≈ ${eur(p.route*COUT_KM)} de route) · ${p.secondary?`le 2e arrêt rapporte ${eur(p.extra)} pour ${kmTxt(p.detour)} de détour`: (state.maxStores===2 && p.extra>0 ? `un 2e arrêt rapporterait ${eur(p.extra)} pour ${kmTxt(p.detour)} de détour : pas rentable selon votre seuil` : "tout dans un seul magasin")}</small></div>`).join("")}
     <div class="planopts">
@@ -653,7 +655,7 @@ function renderPlan(trips){
   return plans;
 }
 let tripVue=null; // course affichée sur téléphone (une à la fois)
-const tripAuto=()=>{ const t=[0,1].find(x=>tripDate(x)>=TODAY); return t===undefined?1:t; };
+const tripAuto=()=>0;
 function renderCourses(){
   const trips=coursesTrips(); let done=0, total=0;
   if(tripVue===null) tripVue=tripAuto();
@@ -662,7 +664,7 @@ function renderCourses(){
   $("aisles").innerHTML=trips.map((items,t)=>{
     const plan=plans[t], store=plan.primary, date=plan.date;
     const days=JOURS.filter((_,d)=>tripOf(d)===t);
-    const cover=`Repas du ${days[0].toLowerCase()} au ${days[days.length-1].toLowerCase()}${t===0?", plus l'épicerie et les surgelés de toute la semaine":""}`;
+    const cover=`Tous les repas de la semaine, du ${days[0].toLowerCase()} au ${days[days.length-1].toLowerCase()}`;
     const stopsHtml=[plan.primary,plan.secondary].filter(Boolean).map((mag,si)=>{
       const sitems=items.filter(i=>plan.assign[i.k]===mag); if(!sitems.length) return "";
       const m=MAGBYID(mag), nP=sitems.filter(i=>promosFor(i.n).some(p=>p.mag===ensOf(mag)&&validOn(p,date))).length;
@@ -674,9 +676,9 @@ function renderCourses(){
         return `<label class="item${c?" checked":""}"><input type="checkbox" data-k="${esc(i.ck)}"${c?" checked":""}><span class="iname"><b>${esc(i.n)}</b><small>${i.x?(i.par?"Ajouté par "+esc(i.par):"Ajouté à la main"):[...i.pour].join(", ")}${i.freeze?'<span class="ptag" style="color:var(--accent)">· à congeler à l\'achat</span>':""}${tags}</small></span><span class="qty">${esc(qtyOf(i))}${i.x?`<button type="button" class="xdel edit-only" data-xdel="${esc(i.id)}" aria-label="Retirer ${esc(i.n)} de la liste">×</button>`:""}</span></label>`}).join("");
       return `<div class="aisle"><h2><span>${RAYONS[ray]}</span><span>${its.length}</span></h2><div class="list">${rows}</div></div>`}).join("");
       return `<div class="stop"><div class="stophead"><span class="stopno">Arrêt ${si+1}</span><b>${esc(m.nom)}</b><small>${esc(m.lieu)} · ${sitems.length} article${sitems.length>1?"s":""}${nP?` · ${nP} en promo`:""} · ≈ ${eur(sitems.reduce((s,i)=>s+itemCost(i.n,i.u,i.q,i.ray),0))}</small></div>${groups}</div>`}).join("");
-    return `<div class="trip${t===tripVue?" on":""}" id="trip-${t}"><div class="triphead"><div><div class="tripno">Course ${t+1} · ${fmtD(date)}</div><p class="note">${cover}</p></div>
+    return `<div class="trip${t===tripVue?" on":""}" id="trip-${t}"><div class="triphead"><div><div class="tripno">Courses de la semaine · ${fmtD(date)}</div><p class="note">${cover}</p></div>
       <button class="btn primary" data-shop="${t}" data-tip="Liste plein écran, rayon par rayon : cochez en avançant dans le magasin">Mode magasin</button>
-      <label class="tripstore">Magasin principal <select data-store="${t}" aria-label="Magasin principal de la course ${t+1}"><option value="">Automatique</option>${orderedStores().map(m=>`<option value="${m.id}"${m.id===state.tripStore[t]?" selected":""}>${m.nom} · ${kmTxt(km(HOME,m))}</option>`).join("")}</select></label></div>
+      <label class="tripstore">Magasin principal <select data-store="${t}" aria-label="Magasin principal"><option value="">Automatique</option>${orderedStores().map(m=>`<option value="${m.id}"${m.id===state.tripStore[t]?" selected":""}>${m.nom} · ${kmTxt(km(HOME,m))}</option>`).join("")}</select></label></div>
       <p class="note">${items.length} articles · ≈ ${eur(items.reduce((s,i)=>s+itemCost(i.n,i.u,i.q,i.ray),0))} (gamme ${GAMMES[state.gamme].nom.toLowerCase()}) · trajet ≈ ${kmTxt(plan.route)}</p>${stopsHtml}</div>`}).join("");
   $("tripsel").innerHTML=(`${trips.map((items,t)=>`<button role="tab" data-tripvue="${t}" aria-selected="${t===tripVue}"><b>Course ${t+1}</b><small>${fmtShort(tripDate(t))} · ${tdone[t]}/${items.length}</small></button>`).join("")}`);
   $("ptext").textContent=`${done} sur ${total} dans le caddie`;
@@ -769,8 +771,8 @@ function renderPromos(){
     if(!ps) return `<div class="vrow"><div><b>${m.nom}</b><small>${m.lieu}</small></div><div class="vr"><span class="st none">Pas de folder relevé</span></div></div>`;
     const periods=[...new Set(ps.map(p=>p.du+"|"+p.au))].map(k=>{const [du,au]=k.split("|"); const p=ps.find(x=>x.du===du&&x.au===au); const s=promoStatus(p);
       return `<div class="vr"><span>du ${fmtD(isoDate(du))} au ${fmtD(isoDate(au))}</span><span class="st ${s.cls}">${s.txt}</span></div>`}).join("");
-    const c1=ps.some(p=>validOn(p,tripDate(0))), c2=ps.some(p=>validOn(p,tripDate(1)));
-    const use=[c1?`course 1 (${fmtShort(tripDate(0))})`:null,c2?`course 2 (${fmtShort(tripDate(1))})`:null].filter(Boolean);
+    const c1=ps.some(p=>validOn(p,tripDate(0))), c2=false;
+    const use=[c1?`les courses du ${fmtShort(tripDate(0))}`:null].filter(Boolean);
     return `<div class="vrow"><div><b>${m.nom}</b><small>${m.lieu} · ${ps.length} promo${ps.length>1?"s":""}</small><small>${use.length?"Valable pour la "+use.join(" et la "):"Non valable vos jours de courses"}</small></div><div>${periods}</div></div>`}).join("");
   // indice
   const max=6;
@@ -789,7 +791,7 @@ function renderCmp(onlyTotals){
   const tot={}, cnt={};
   orderedStores().forEach(m=>{tot[m.id]=0;cnt[m.id]=0;});
   const rows=items.map(i=>{const pr=state.prices[i.k]||{};
-    return `<tr><td>${i.n}<small>${qtyOf(i)}</small></td>${orderedStores().map(m=>{const v=pr[m.id]; if(typeof v==="number"){tot[m.id]+=v;cnt[m.id]++;}
+    return `<tr><td>${esc(i.n)}<small>${esc(qtyOf(i))}</small></td>${orderedStores().map(m=>{const v=pr[m.id]; if(typeof v==="number"){tot[m.id]+=v;cnt[m.id]++;}
       return `<td><input type="number" inputmode="decimal" min="0" step="0.01" id="px-${i.k.replace(/[^a-zA-Z0-9]/g,"_")}-${m.id}" data-pk="${esc(i.k)}" data-mag="${m.id}" value="${typeof v==="number"?v:""}" aria-label="Prix ${esc(i.n)} chez ${m.nom}"></td>`}).join("")}</tr>`}).join("");
   const full=orderedStores().filter(m=>cnt[m.id]===items.length&&items.length);
   const best=full.length?Math.min(...full.map(m=>tot[m.id])):null;
@@ -833,7 +835,7 @@ function renderNext(){
   let d=state.week.findIndex((_,i)=>dayOffset(i)>=TODAY&&!isOut(i)); if(d<0) d=homeDays()[0]??0;
   const r=BYID[state.week[d]], isToday=dayOffset(d).getTime()===TODAY.getTime();
   const trips=coursesTrips();
-  let t=[0,1].find(x=>tripDate(x)>=TODAY); if(t===undefined) t=1;
+  let t=0;
   const items=trips[t], plan=planTrip(t,items), left=items.filter(i=>!state.checked[i.ck]).length;
   const days=Math.round((tripDate(t)-TODAY)/DAY);
   const when=days===0?"aujourd'hui":days===1?"demain":fmtD(tripDate(t));
@@ -857,7 +859,7 @@ function renderModal(){
   const trips = d===null ? [null] : [...new Set(items.map(i=>i.t))].sort();
   const lists = trips.map(t=>{const its=items.filter(i=>i.t===t);
     const plan = t===null?null:planTrip(t,coursesTrips()[t]), date = t===null?null:tripDate(t);
-    const head = t===null ? "" : `<div class="store">Course ${t+1} · ${fmtD(date)}</div>`;
+    const head = t===null ? "" : `<div class="store">Courses de la semaine · ${fmtD(date)}</div>`;
     const rows = its.map(i=>{const c = i.ck && !!state.checked[i.ck];
       const tags = promosFor(i.n).map(p=>{const ok = date ? validOn(p,date) : true;
         return `<span class="ptag"${ok?"":' style="opacity:.6"'}>· Promo ${ENS[p.mag]} ${eur(p.prix)}${ok?"":" (pas valable ce jour-là)"}</span>`}).join("");
@@ -911,9 +913,9 @@ $("mbody").addEventListener("click",e=>{ if(e.target.id!=="mcopy") return;
   try{ navigator.clipboard.writeText(txt).then(()=>toast("Ingrédients copiés"),()=>toast("Copie impossible ici")); }catch(err){ toast("Copie impossible ici"); }
 });
 $("recipes").addEventListener("click",e=>{const b=e.target.closest("[data-openrec]"); if(b) openMeal(b.dataset.openrec,null);});
-$("trip1").onchange=e=>{state.trip1=e.target.value;state.checked={};save();render();toast("Course 1 : "+tripName(0));};
-$("trip2").onchange=e=>{state.trip2=+e.target.value;state.checked={};save();render();toast("Course 2 : "+tripName(1));};
-function render(){if(!$("view-menu")) return; $("trip1").value=state.trip1;$("trip2").value=String(state.trip2);renderWeekbar();renderCompteHaut();renderACompleter();renderCalendrier();renderPresences();renderBudget();renderStats();renderDays();renderCourses();renderPromos();renderRecettes();renderReglages();if(typeof renderRetours==="function")renderRetours();if(state.tab==="envies"&&typeof renderEnvies==="function")renderEnvies();}
+$("trip1").onchange=e=>{state.trip1=e.target.value;state.checked={};save();render();toast("Jour des courses : "+tripName(0));};
+
+function render(){if(!$("view-menu")) return; $("trip1").value=state.trip1;renderWeekbar();renderCompteHaut();renderACompleter();renderCalendrier();renderPresences();renderBudget();renderStats();renderDays();renderCourses();renderPromos();renderRecettes();renderReglages();if(typeof renderRetours==="function")renderRetours();if(state.tab==="envies"&&typeof renderEnvies==="function")renderEnvies();}
 $("sugg").addEventListener("change",e=>{const s=e.target.closest("select[data-add]"); if(!s||s.value==="") return;
   replaceDay(+s.value,s.dataset.add);});
 $("cmp").addEventListener("change",e=>{const inp=e.target.closest("input[data-pk]"); if(!inp) return;
@@ -1368,7 +1370,7 @@ function renderShop(){ const c=sheetCtx, t=c.t, items=coursesTrips()[t], plan=pl
   if(c.stop>=stores.length) c.stop=0; const mag=stores[c.stop];
   const sitems=items.filter(i=>plan.assign[i.k]===mag).sort((a,b)=>ORDRE.indexOf(a.ray)-ORDRE.indexOf(b.ray)||a.n.localeCompare(b.n,"fr"));
   const done=sitems.filter(i=>state.checked[i.ck]).length;
-  $("seyebrow").textContent=`Course ${t+1} · ${fmtD(tripDate(t))}`; $("stitle").textContent=MAGNOM[mag];
+  $("seyebrow").textContent=`Courses de la semaine · ${fmtD(tripDate(t))}`; $("stitle").textContent=MAGNOM[mag];
   $("sextra").innerHTML=`<span class="scount">${done}/${sitems.length}</span>`;
   $("sbody").innerHTML=(stores.length>1?`<div class="gfilters">${stores.map((m,i)=>`<button class="chip${i===c.stop?" on":""}" data-stop="${i}">Arrêt ${i+1} · ${MAGNOM[m]}</button>`).join("")}</div>`:"")+
     (sitems.length?ORDRE.map(ray=>{const its=sitems.filter(i=>i.ray===ray); if(!its.length) return "";
@@ -1411,8 +1413,7 @@ function renderWizard(){ const c=sheetCtx, st=c.step;
       <form class="addrow addmember owner-only" id="wform"><input id="wname" type="text" placeholder="Prénom" maxlength="20" autocomplete="off" aria-label="Prénom"><input id="wmail" type="email" inputmode="email" placeholder="E-mail (facultatif)" maxlength="120" autocomplete="off" aria-label="Adresse e-mail"><button class="btn primary" type="submit">Ajouter</button></form>`; }
   if(st===1){ $("stitle").textContent="Quand faites-vous les courses ?";
     $("sbody").innerHTML=`<p class="wlead">Deux passages par semaine gardent les produits frais. L'épicerie et les surgelés sont achetés à la première course.</p>
-      <label class="wfield">Première course<select id="wt1" class="pick"><option value="sam"${state.trip1==="sam"?" selected":""}>Samedi, avant la semaine</option><option value="lun"${state.trip1==="lun"?" selected":""}>Lundi</option></select></label>
-      <label class="wfield">Deuxième course<select id="wt2" class="pick">${[[2,"Mercredi"],[3,"Jeudi"],[4,"Vendredi"]].map(([v,l])=>`<option value="${v}"${state.trip2===v?" selected":""}>${l}</option>`).join("")}</select></label>`; }
+      <label class="wfield">Première course<select id="wt1" class="pick"><option value="sam"${state.trip1==="sam"?" selected":""}>Samedi, avant la semaine</option><option value="lun"${state.trip1==="lun"?" selected":""}>Lundi</option></select></label>`; }
   if(st===2){ $("stitle").textContent="Vos magasins";
     const near=MAGASINS.slice().sort((a,b)=>km(HOME,a)-km(HOME,b));
     $("sbody").innerHTML=`<p class="wlead">Touchez les magasins où vous allez, dans votre ordre de préférence : le premier touché devient votre magasin habituel.</p>
@@ -1498,7 +1499,7 @@ $("sheet").addEventListener("click",async e=>{ const c=sheetCtx; if(!c) return; 
       if(!state.storeOrder.length) state.storeOrder=[id]; save(); render(); renderWizard(); return; }
     if(D.wstore!==undefined){ if(D.wstore){ state.storeMode="fixe"; state.storeOrder=[D.wstore,...state.storeOrder.filter(x=>x!==D.wstore)]; state.storeOff=state.storeOff.filter(x=>x!==D.wstore); } else state.storeMode="auto"; save(); render(); renderWizard(); return; }
     if(D.wskip){ closeSheet(); return; }
-    if(D.wstep){ if(c.step===1){ state.trip1=$("wt1").value; state.trip2=+$("wt2").value; save(); }
+    if(D.wstep){ if(c.step===1){ state.trip1=$("wt1").value; save(); }
       if(c.step===2&&$("wmode")){ state.storeMode=$("wmode").value; save(); }
       if(c.step===0&&!state.family.length&&+D.wstep>0){ toast("Ajoutez au moins une personne, ou touchez « Plus tard »"); return; }
       const nx=c.step+(+D.wstep); if(nx>2){ state.onboarded=true; save(); closeSheet(); render(); toast("C'est prêt ! Bon appétit cette semaine."); return; }
@@ -1781,13 +1782,13 @@ function maybeWizard(){ if(wizardChecked) return; wizardChecked=true; if(!state.
 // ======================= Export de la liste : PDF, e-mail, message =======================
 let DL=null; // capacité de téléchargement (null si indisponible)
 function pdfSafe(t){ return String(t).replace(/[  ]/g," ").replace(/≈\s?/g,"env. ").replace(/→/g,"->").replace(/[‘’]/g,"'").replace(/[“”]/g,'"').replace(/…/g,"...").replace(/✓/g,"x"); }
-function exportTrips(){ const c=sheetCtx||{}, which=c.which||"both"; return which==="both"?[0,1]:[+which]; }
+function exportTrips(){ return [0]; }
 function exportItems(t,items){ const c=sheetCtx||{}; return c.onlyLeft? items.filter(i=>!state.checked[i.ck]) : items; }
 function exportText(){
   const trips=coursesTrips();
   let txt=`Liste de courses · semaine du ${weekLabel()} (${totalCouverts()} couverts)\n`;
   exportTrips().forEach(t=>{ const all=trips[t], plan=planTrip(t,all), items=exportItems(t,all); if(!items.length) return;
-    txt+=`\n== Course ${t+1} · ${fmtD(tripDate(t))} ==\n`;
+    txt+=`\n== Courses de la semaine · ${fmtD(tripDate(t))} ==\n`;
     [plan.primary,plan.secondary].filter(Boolean).forEach(mag=>{ const si=items.filter(i=>plan.assign[i.k]===mag); if(!si.length) return;
       txt+=`\n>> ${MAGNOM[mag]}\n`+ORDRE.map(ray=>{const its=si.filter(i=>i.ray===ray); return its.length? RAYONS[ray]+"\n"+its.map(i=>`- ${i.n} : ${qtyOf(i)}${state.checked[i.ck]?" (acheté)":""}`).join("\n")+"\n":""}).join(""); }); });
   return txt+`\nÀ vérifier au placard : huile, sel, poivre, ail, vinaigrette, sauce soja.\n${APP_URL}`;
@@ -1807,7 +1808,7 @@ function buildPdf(){
   y+=mh+8;
   const trips=coursesTrips();
   exportTrips().forEach(t=>{ const all=trips[t], plan=planTrip(t,all), items=exportItems(t,all); if(!items.length) return;
-    need(16); doc.setFont("helvetica","bold"); doc.setFontSize(15); doc.setTextColor(...INK); doc.text(T(`Course ${t+1} · ${fmtD(tripDate(t))}`),M,y); y+=3;
+    need(16); doc.setFont("helvetica","bold"); doc.setFontSize(15); doc.setTextColor(...INK); doc.text(T(`Courses de la semaine · ${fmtD(tripDate(t))}`),M,y); y+=3;
     doc.setDrawColor(...ACC); doc.setLineWidth(0.6); doc.line(M,y,W-M,y); y+=6;
     [plan.primary,plan.secondary].filter(Boolean).forEach(mag=>{ const si=items.filter(i=>plan.assign[i.k]===mag); if(!si.length) return; const m=MAGBYID(mag);
       need(12); doc.setFont("helvetica","bold"); doc.setFontSize(12); doc.setTextColor(...ACC); doc.text(T(m.nom),M,y);
@@ -1843,9 +1844,8 @@ function renderExport(){ const c=sheetCtx; c.kind=c.kind||"courses"; if(c.kind==
   const mails=state.family.map(n=>state.emails[n]).filter(Boolean);
   $("seyebrow").textContent=`Semaine du ${weekLabel()}`; $("stitle").textContent="Exporter et envoyer"; $("sextra").innerHTML="";
   $("sbody").innerHTML=`${exportKindChips()}<div class="wfield"><span>Quelle liste ?</span>
-      <div class="gfilters">${[["both","Les deux courses"],["0",`Course 1 · ${fmtShort(tripDate(0))}`],["1",`Course 2 · ${fmtShort(tripDate(1))}`]].map(([v,l])=>`<button class="chip${c.which===v?" on":""}" data-xwhich="${v}">${l}</button>`).join("")}</div></div>
     <label class="xcheck"><input type="checkbox" id="xleft"${c.onlyLeft?" checked":""}> Seulement les articles qui restent à acheter</label>
-    <p class="note">${exportTrips().map(t=>`Course ${t+1} : ${cnt(t)} article${cnt(t)>1?"s":""}`).join(" · ")}</p>
+    <p class="note">${exportTrips().map(t=>`${cnt(t)} article${cnt(t)>1?"s":""}`).join(" · ")}</p>
     <div class="xopt"><div><b>En PDF</b><small>Un document imprimable, avec les cases à cocher, classé par magasin et par rayon. Sur téléphone, le menu de partage s'ouvre : choisissez Mail, Messages ou WhatsApp.</small></div>
       <button class="btn primary big" data-xpdf="1"${DL&&window.jspdf?"":" disabled"}>Créer le PDF</button>
       ${DL&&window.jspdf?"":`<small class="xwarn">L'export PDF n'est pas disponible dans cette vue. Ouvrez l'application depuis claude.ai ou l'app Claude.</small>`}</div>
@@ -2457,7 +2457,8 @@ const CATALOGUE = {
  bou:["Jambon","Saucisson","Salami","Pâté","Filet de dinde","Filet de poulet","Haché","Américain","Boulettes","Poulet entier","Côtelettes de porc","Steaks"],
  cre:["Lait","Beurre","Margarine","Yaourts","Yaourts aux fruits","Fromage blanc","Skyr","Crème fraîche","Œufs","Gouda","Emmental râpé","Brie","Fromage à tartiner","Desserts lactés","Lait d'avoine","Crème soja"],
  bl:["Pain","Pain gris","Pain blanc","Baguette","Pistolets","Croissants","Couques","Pain de mie","Cramique","Sandwichs"],
- epi:["Café","Café en grains","Dosettes de café","Thé","Sucre","Farine","Sel","Poivre","Huile d'olive","Huile de tournesol","Vinaigre","Moutarde","Mayonnaise","Ketchup","Confiture","Choco","Miel","Céréales","Flocons d'avoine","Biscuits","Speculoos","Gaufres","Chocolat","Chips","Cacahuètes","Riz","Pâtes","Sauce tomate","Thon","Maïs","Compote","Bouillon","Épices","Levure","Cacao","Eau plate","Eau pétillante","Jus d'orange","Jus de pomme","Sirop","Soda","Bière","Vin","Lait UHT","Croquettes pour chat","Croquettes pour chien"],
+ epi:["Café","Café en grains","Dosettes de café","Thé","Sucre","Farine","Sel","Poivre","Huile d'olive","Huile de tournesol","Vinaigre","Moutarde","Mayonnaise","Ketchup","Confiture","Choco","Miel","Céréales","Flocons d'avoine","Biscuits","Speculoos","Gaufres","Chocolat","Chips","Cacahuètes","Riz","Pâtes","Sauce tomate","Thon","Maïs","Compote","Bouillon","Épices","Levure","Cacao","Lait UHT","Croquettes pour chat","Croquettes pour chien"],
+ boi:["Eau plate","Eau pétillante","Jus d'orange","Jus de pomme","Limonade","Soda","Coca","Ice tea","Sirop","Bière","Vin","Bières spéciales","Vin rouge","Vin blanc","Vin rosé","Chocolat chaud"],
  sur:["Frites surgelées","Glace","Légumes surgelés","Pizza surgelée","Poisson pané","Épinards surgelés","Croquettes de pommes de terre","Fruits rouges surgelés"],
  dro:["Papier toilette","Essuie-tout","Mouchoirs","Liquide vaisselle","Tablettes lave-vaisselle","Sel lave-vaisselle","Lessive","Adoucissant","Sacs poubelle","Éponges","Papier aluminium","Film alimentaire","Sacs congélation","Dentifrice","Brosses à dents","Shampoing","Après-shampoing","Gel douche","Savon","Déodorant","Coton-tiges","Cotons démaquillants","Rasoirs","Serviettes hygiéniques","Couches","Lingettes","Produit WC","Nettoyant multi-usage","Eau de Javel","Piles","Ampoules"]
 };
@@ -2473,6 +2474,7 @@ function produitsConnus(){ const m=new Map(), put=(n,ray,c)=>{ const k=norm(n); 
   (state.extras||[]).forEach(x=>put(x.n,x.ray,8));
   RECETTES.forEach(r=>r.ing.forEach(([n,,,ray])=>put(n,ray,2)));
   Object.entries(CATALOGUE).forEach(([ray,l])=>l.forEach(n=>put(n,ray,1)));
+  CATALOGUE.boi.forEach(n=>{ const o=m.get(norm(n)); if(o) o.ray="boi"; });
   return [...m.values()]; }
 // « 2 kg pommes », « pommes 2 kg », « café x2 » : sépare la quantité du nom
 const UNITES="kg|g|gr|l|cl|ml|x|pc|pcs|pièces?|paquets?|boîtes?|boites?|bouteilles?|pots?|sachets?|barquettes?|tranches?|rouleaux?|packs?|bacs?|filets?";
@@ -2487,8 +2489,7 @@ function chercherProduits(q){ const k=norm(q); if(!k) return [];
 let apRayon=null; // saisie en attente du choix d'un rayon
 function dejaPrevu(n,t){ const k=norm(n); return coursesTrips()[t].find(i=>norm(i.n)===k); }
 function renderApTrip(){ const box=$("aptrip"); if(!box) return; const t=tripVue===null?tripAuto():tripVue;
-  const sb=$("addprod").querySelector("button[type=submit]"); if(sb) sb.textContent=innerWidth<700?`Ajouter à la Course ${t+1}`:"Ajouter";
-  box.innerHTML=`<span>Ajouter dans</span>`+[0,1].map(x=>`<button type="button" class="chip${x===t?" on":""}" data-aptrip="${x}" aria-pressed="${x===t}">Course ${x+1} · ${fmtShort(tripDate(x))}</button>`).join(""); }
+  box.hidden=true; box.innerHTML=""; }
 function renderApSugg(){ const box=$("apsugg"), inp=$("apname"); if(!box||!inp) return;
   const t=tripVue===null?tripAuto():tripVue;
   if(apRayon){ box.hidden=false;
@@ -2502,14 +2503,21 @@ function renderApSugg(){ const box=$("apsugg"), inp=$("apname"); if(!box||!inp) 
 function ajouterProduit(n,ray,qt){
   const t=tripVue===null?tripAuto():tripVue, k=norm(n);
   const dbl=(state.extras||[]).find(x=>x.t===t&&norm(x.n)===k);
-  if(dbl){ if(qt){ dbl.qt=qt; save(); renderCourses(); toast(`${dbl.n} : quantité mise à jour`); } else toast(`${dbl.n} est déjà dans la Course ${t+1}`); viderSaisie(); return; }
+  if(dbl){ if(qt){ dbl.qt=qt; save(); renderCourses(); toast(`${dbl.n} : quantité mise à jour`); } else toast(`${dbl.n} est déjà dans la liste`); viderSaisie(); return; }
   const prevu=dejaPrevu(n,t);
   state.extras=[...(state.extras||[]),{id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),n,qt:qt||"",ray,t,par:ME||""}];
   noteHisto(n,ray,qt); save(); renderCourses(); viderSaisie();
-  toast(prevu?`${n} ajouté : il était déjà prévu pour les repas (${qtyOf(prevu)}), vérifiez la quantité`:`${n} ajouté à la Course ${t+1}`); }
-function viderSaisie(){ apRayon=null; $("apname").value=""; $("apqty").value=""; renderApSugg(); }
+  toast(prevu?`${n} ajouté : il était déjà prévu pour les repas (${qtyOf(prevu)}), vérifiez la quantité`:`${n} ajouté à la liste`); }
+function viderSaisie(){ apRayon=null; $("apname").value=""; $("apqty").value=""; if($("apunit")) $("apunit").value=""; renderApSugg(); }
+// quantité saisie + unité choisie (g, kg, cl, L, pièces…) ; « 1500 g » devient « 1,5 kg »
+function qteSaisie(){ let q=($("apqty").value||"").trim().replace(/\s+/g," "); const u=$("apunit")?$("apunit").value:"";
+  if(!q) return ""; const m=q.match(/^(\d+(?:[.,]\d+)?)$/);
+  if(m&&u){ let v=parseFloat(m[1].replace(",",".")), un=u;
+    if(un==="g"&&v>=1000){ v=v/1000; un="kg"; } if(un==="cl"&&v>=100){ v=v/100; un="L"; }
+    return `${String(Math.round(v*100)/100).replace(".",",")} ${un}`; }
+  return q; }
 function validerSaisie(){ const inp=$("apname"), lu=lireSaisie(inp.value); if(!lu.n) return;
-  const qt=$("apqty").value.trim()||lu.qt, connu=produitsConnus().find(p=>norm(p.n)===norm(lu.n));
+  const qt=qteSaisie()||lu.qt, connu=produitsConnus().find(p=>norm(p.n)===norm(lu.n));
   if(connu){ ajouterProduit(connu.n,connu.ray,qt); return; }
   const res=chercherProduits(lu.n);
   apRayon={n:lu.n,qt}; renderApSugg(); }
@@ -2518,7 +2526,7 @@ if($("addprod")){
   $("apname").addEventListener("input",()=>{ apRayon=null; renderApSugg(); });
   $("apname").addEventListener("focus",renderApSugg);
   $("apsugg").addEventListener("click",e=>{
-    const p=e.target.closest("[data-apick]"); if(p){ const it=$("apsugg")._res[+p.dataset.apick], lu=lireSaisie($("apname").value); ajouterProduit(it.n,it.ray,$("apqty").value.trim()||lu.qt); $("apname").focus(); return; }
+    const p=e.target.closest("[data-apick]"); if(p){ const it=$("apsugg")._res[+p.dataset.apick], lu=lireSaisie($("apname").value); ajouterProduit(it.n,it.ray,qteSaisie()||lu.qt); $("apname").focus(); return; }
     const r=e.target.closest("[data-apray]"); if(r&&apRayon){ ajouterProduit(apRayon.n,r.dataset.apray,apRayon.qt); $("apname").focus(); } });
   $("aptrip").addEventListener("click",e=>{ const b=e.target.closest("[data-aptrip]"); if(!b) return; tripVue=+b.dataset.aptrip; renderCourses(); renderApSugg(); });
   document.addEventListener("click",e=>{ if(!e.target.closest("#addprod")&&!$("apsugg").hidden&&!apRayon){ $("apsugg").hidden=true; } });

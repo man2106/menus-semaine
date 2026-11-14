@@ -38,7 +38,7 @@ if (R) {
     ok(["legumes", "lentilles", "galette", "pates", "riz", "pdt", "pain", "tarte", "semoule"].includes(r.f), q + " : féculent f invalide");
     ok(["belge", "francaise", "italienne", "grecque", "espagnole", "asiatique", "indienne", "orientale", "mexicaine", "americaine"].includes(r.c), q + " : cuisine c invalide");
     ok(Array.isArray(r.ing) && r.ing.length >= 2 && r.ing.length <= 15, q + " : 2 à 15 ingrédients");
-    (r.ing || []).forEach(g => ok(Array.isArray(g) && typeof g[0] === "string" && +g[1] > 0 && typeof g[2] === "string" && ["fl", "bou", "cre", "bl", "epi", "sur"].includes(g[3]), q + " : ingrédient mal formé " + JSON.stringify(g)));
+    (r.ing || []).forEach(g => ok(Array.isArray(g) && typeof g[0] === "string" && +g[1] > 0 && typeof g[2] === "string" && ["fl", "bou", "cre", "bl", "epi", "boi", "sur"].includes(g[3]), q + " : ingrédient mal formé " + JSON.stringify(g)));
     ok(Array.isArray(r.etapes) && r.etapes.length >= 3 && r.etapes.length <= 8, q + " : 3 à 8 étapes");
     ok((r.source && /^https:\/\//.test(r.source.url || "")) || (typeof r.propose_par === "string" && r.propose_par), q + " : source.url (https) ou propose_par manquant");
     ok(jour.test(r.ajoute || ""), q + " : date « ajoute » manquante");

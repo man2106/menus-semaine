@@ -681,7 +681,7 @@ body.notowner .owner-only{display:none!important}
 @media (max-width:560px){ .comptehaut{justify-items:start;text-align:left;width:100%;box-sizing:border-box} }
 /* ---- Ajout manuel de produits ---- */
 .addprod{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px;margin-bottom:14px;display:grid;gap:8px}
-.aprow{display:grid;grid-template-columns:1fr 64px auto;gap:6px}
+.aprow{display:grid;grid-template-columns:1fr 64px auto auto;gap:6px}
 .aprow input{min-width:0;font-size:16px;padding:9px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:inherit}
 .aprow input:focus{outline:2px solid var(--accent);outline-offset:0;border-color:transparent}
 .aprow .btn{padding:9px 14px;font-size:15px;border-radius:10px}
@@ -695,7 +695,7 @@ body.notowner .owner-only{display:none!important}
 .aptrip{display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:13px;color:var(--muted)}
 .aptrip .chip.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
 .xdel{margin-left:8px;width:30px;height:30px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--muted);font-size:18px;line-height:1;cursor:pointer;vertical-align:middle}
-@media (max-width:699px){ .aprow{grid-template-columns:1fr 58px} .aprow .btn{grid-column:1/-1} .aptrip{display:none} }
+@media (max-width:699px){ .aprow{grid-template-columns:1fr 58px 92px} .aprow .btn{grid-column:1/-1} .aptrip{display:none} }
 /* ---- Liste de courses sur téléphone ---- */
 .ptag.off{opacity:.6}
 .tripsel{display:none}
@@ -731,6 +731,9 @@ body.notowner .owner-only{display:none!important}
 }
 
 .sondiv{display:grid;gap:6px}.sondiv div{display:grid;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:6px 10px}.sondiv small{color:var(--muted);font-size:12px}
+
+.tripsel,.aptrip{display:none!important}
+#apunit{padding:8px 6px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink);font:inherit;font-size:14px;max-width:110px}
 </style>
 </head>
 <body>
@@ -797,7 +800,8 @@ body.notowner .owner-only{display:none!important}
     <form class="addprod edit-only" id="addprod" autocomplete="off">
       <div class="aprow">
         <input id="apname" type="text" placeholder="Ajouter un produit…" aria-label="Produit à ajouter" enterkeyhint="done" autocapitalize="sentences" autocorrect="off" spellcheck="false" maxlength="60">
-        <input id="apqty" type="text" placeholder="Qté" aria-label="Quantité (facultatif)" maxlength="20" enterkeyhint="done">
+        <input id="apqty" type="text" inputmode="decimal" placeholder="Qté" aria-label="Quantité (facultatif)" maxlength="20" enterkeyhint="done">
+        <select id="apunit" aria-label="Unité" data-tip="Unité de la quantité : 1500 g devient 1,5 kg"><option value="">unité</option><option>g</option><option>kg</option><option>cl</option><option>L</option><option value="pièce(s)">pièce(s)</option><option value="paquet(s)">paquet(s)</option><option value="bouteille(s)">bouteille(s)</option><option value="boîte(s)">boîte(s)</option></select>
         <button class="btn primary" type="submit">Ajouter</button>
       </div>
       <div class="apsugg" id="apsugg" role="listbox" aria-label="Suggestions" hidden></div>
@@ -854,12 +858,12 @@ body.notowner .owner-only{display:none!important}
   <section id="view-envies" hidden></section>
   <section id="view-reglages" hidden>
     <div class="panel">
-      <h2>Jours de courses</h2>
-      <p>Deux passages par semaine : l'épicerie et les surgelés à la première course, les produits frais répartis pour qu'ils restent frais.</p>
+      <h2>Jour des courses</h2>
+      <p>Une seule course par semaine, pour tous les repas. La viande prévue pour la fin de semaine est signalée « à congeler à l'achat ».</p>
       <div class="planning">
-        <div class="prow"><span>Course 1</span><span><select id="trip1" class="pick" aria-label="Jour de la première course"><option value="sam">Samedi (avant la semaine)</option><option value="lun">Lundi</option></select></span></div>
+        <div class="prow"><span>Courses</span><span><select id="trip1" class="pick" aria-label="Jour des courses"><option value="sam">Samedi (avant la semaine)</option><option value="lun">Lundi</option></select></span></div>
         <div class="prow"><span>Soirs à l'extérieur</span><span class="gfilters wrapchips" id="outdef"></span></div>
-        <div class="prow"><span>Course 2</span><span><select id="trip2" class="pick" aria-label="Jour de la deuxième course"><option value="2">Mercredi</option><option value="3">Jeudi</option><option value="4">Vendredi</option></select></span></div>
+        <select id="trip2" hidden aria-hidden="true"><option value="3">Jeudi</option></select>
       </div>
     </div>
     <div class="panel" id="storeprefs">
@@ -962,10 +966,10 @@ body.notowner .owner-only{display:none!important}
   <div class="sfoot" id="sfoot"></div>
 </div>
 
-<script src="vendor/jspdf-2.5.1.umd.min.js?v=30"></script>
-<script src="vendor/supabase-js-2.45.4.js?v=30"></script>
-<script src="js/partage.js?v=30"></script>
-<script src="js/app.js?v=30"></script>
+<script src="vendor/jspdf-2.5.1.umd.min.js?v=31"></script>
+<script src="vendor/supabase-js-2.45.4.js?v=31"></script>
+<script src="js/partage.js?v=31"></script>
+<script src="js/app.js?v=31"></script>
 
 </body>
 </html>

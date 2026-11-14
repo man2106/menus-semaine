@@ -55,7 +55,7 @@ Ne jamais modifier `index.html`, `js/`, `supabase/` ni les autres fichiers penda
 - `b` (budget, prix par personne en gamme économique) : `eco` sous 2 €, `moyen` de 2 à 3 €, `plaisir` au-dessus ou plat « de fête ».
 - `p` : veau, boeuf, porc, volaille, poisson, oeufs, vege. `f` : legumes, lentilles, galette, pates, riz, pdt, pain, tarte, semoule.
 - `c` : belge, francaise, italienne, grecque, espagnole, asiatique, indienne, orientale, mexicaine, americaine.
-- `ing` : `[nom, quantité pour 5, unité, rayon]` ; unités `g`, `cl`, `""` (pièce) ou un mot (boîte, pot, sachet…) ; rayons `fl` fruits-légumes, `bou` boucherie, `cre` crèmerie, `bl` boulangerie, `epi` épicerie, `sur` surgelés. Réutiliser le nom exact d'un ingrédient de l'inventaire quand il existe ; sinon ajouter son prix de référence dans `prix` (`[prix, "kg" | "L" | "u"]`). Sel, poivre, huile, ail, épices courantes : ne pas les lister.
+- `ing` : `[nom, quantité pour 5, unité, rayon]` ; unités `g`, `cl`, `""` (pièce) ou un mot (boîte, pot, sachet…) ; rayons `fl` fruits-légumes, `bou` boucherie, `cre` crèmerie, `bl` boulangerie, `epi` épicerie, `boi` boissons, `sur` surgelés. Réutiliser le nom exact d'un ingrédient de l'inventaire quand il existe ; sinon ajouter son prix de référence dans `prix` (`[prix, "kg" | "L" | "u"]`). Sel, poivre, huile, ail, épices courantes : ne pas les lister.
 - `etapes` : 3 à 8 phrases courtes, rédigées avec nos propres mots (ne pas recopier le texte du site source).
 - `source` : la page web qui a inspiré l'idée.
 
