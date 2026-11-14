@@ -425,13 +425,15 @@ if(!Array.isArray(state.invites)||state.invites.length!==7) state.invites=[0,0,0
 // semaine affichée au démarrage
 function setMonday(off){ MONDAY=new Date(BASE_MONDAY); MONDAY.setDate(BASE_MONDAY.getDate()+7*off); }
 setMonday(state.weekOffset);
-function stashWeek(){ state.weeks[curIso()]={menu:[...state.week],cooks:[...state.cooks],checked:{...state.checked},statut:state.statut,journal:state.journal.slice(0,15),approbations:JSON.parse(JSON.stringify(state.approbations)),limite:state.limite,exterieur:state.exterieur,absents:JSON.parse(JSON.stringify(state.absents)),invites:[...state.invites],extras:JSON.parse(JSON.stringify(state.extras||[]))};
+function stashWeek(){ state.weeks[curIso()]={menu:[...state.week],cooks:[...state.cooks],checked:{...state.checked},statut:state.statut,journal:state.journal.slice(0,15),approbations:JSON.parse(JSON.stringify(state.approbations)),limite:state.limite,exterieur:state.exterieur,absents:JSON.parse(JSON.stringify(state.absents)),invites:[...state.invites],extras:JSON.parse(JSON.stringify(state.extras||[])),quantites:{...(state.qtEdit||{})},tickets:JSON.parse(JSON.stringify(state.tickets||[]))};
   // ne garder que les semaines récentes
   const limit=new Date(BASE_MONDAY); limit.setDate(limit.getDate()-14); Object.keys(state.weeks).forEach(k=>{ if(isoDate(k)<limit) delete state.weeks[k]; }); }
 function applyValidation(){ if(DB){ state.statut = VALID[curIso()]==="valide" ? "valide" : "proposition"; state.limite = LIMITES[curIso()]||null; } }
 function applyWeekData(w){ state.week=[...w.menu]; state.cooks=(Array.isArray(w.cooks)&&w.cooks.length===7)?w.cooks.map(x=>propre(x,30)||null):Array(7).fill(null); state.checked={...(w.checked||{})}; state.statut=w.statut||"proposition"; state.journal=Array.isArray(w.journal)?w.journal:[];
   state.approbations=(w.approbations&&typeof w.approbations==="object")?JSON.parse(JSON.stringify(w.approbations)):{}; state.limite=typeof w.limite==="string"?w.limite:null; state.exterieur=cleanDays(w.exterieur);
-  state.absents=(w.absents&&typeof w.absents==="object")?JSON.parse(JSON.stringify(w.absents)):{}; if(window.__dbReady) applyValidation(); state.invites=(Array.isArray(w.invites)&&w.invites.length===7)?w.invites.map(x=>Math.max(0,Math.min(20,+x||0))):[0,0,0,0,0,0,0]; state.extras=cleanExtras(w.extras); }
+  state.absents=(w.absents&&typeof w.absents==="object")?JSON.parse(JSON.stringify(w.absents)):{}; if(window.__dbReady) applyValidation(); state.invites=(Array.isArray(w.invites)&&w.invites.length===7)?w.invites.map(x=>Math.max(0,Math.min(20,+x||0))):[0,0,0,0,0,0,0]; state.extras=cleanExtras(w.extras); state.qtEdit=cleanQt(w.quantites); state.tickets=cleanTickets(w.tickets); }
+function cleanQt(o){ const r={}; if(o&&typeof o==="object") Object.entries(o).slice(0,300).forEach(([k,v])=>{ if(typeof k==="string"&&k.length<=90&&typeof v==="string"&&v.trim()) r[k]=propre(v,20); }); return r; }
+function cleanTickets(a){ return Array.isArray(a)?a.filter(x=>x&&+x.montant>0&&+x.montant<5000).slice(0,10).map(x=>({montant:Math.round(+x.montant*100)/100,mag:typeof x.mag==="string"?x.mag.replace(/[<>"'`]/g,"").slice(0,40):"",quand:typeof x.quand==="string"?x.quand.slice(0,30):"",estime:+x.estime>0?Math.round(+x.estime*100)/100:null,par:propre(x.par,30)})):[]; }
 { const w=state.weeks[curIso()]; if(w&&Array.isArray(w.menu)&&w.menu.length===7&&w.menu.every(id=>BYID[id])) applyWeekData(w); }
 if(!Array.isArray(state.cooks)||state.cooks.length!==7) state.cooks=Array(7).fill(null);
 function save(){ saveLocal(); if(typeof shareSync==="function"){ shareSync(); familySync(); goutsSync(); } }
@@ -445,7 +447,7 @@ function cookSelect(d,extra=""){
 
 const nf = new Intl.NumberFormat("fr-BE",{maximumFractionDigits:2});
 function plural(u,c){ if(!u||c<=1) return u; if(u.endsWith("s")) return u; if(u.endsWith("eau")) return u+"x"; return u+"s"; }
-const qtyOf = i => i.x ? (i.qt||"") : fmt(i.q,i.u);
+const qtyOf = i => (state.qtEdit&&state.qtEdit[i.k]) ? state.qtEdit[i.k] : i.x ? (i.qt||"") : fmt(i.q,i.u);
 function fmt(q,u){
   if(u==="g"){ q=Math.max(50,Math.round(q/50)*50); return q>=1000? nf.format(q/1000)+" kg" : q+" g"; }
   if(u==="cl"){ q=Math.max(5,Math.round(q/5)*5); return q>=100? nf.format(q/100)+" L" : q+" cl"; }
@@ -587,7 +589,9 @@ const tripName = t => t===0 ? (state.trip1==="sam"?"Samedi":"Lundi") : JOURS[sta
 function tripDate(t){ return dayOffset(t===0 ? trip1Day() : state.trip2); }
 function coursesTrips(){
   const trips=[new Map()];
-  state.week.forEach((id,d)=>headcount(d)&&BYID[id].ing.forEach(([n,q,u,ray])=>{
+  const dejaLa=new Map();
+  state.week.forEach((id,d)=>headcount(d)&&BYID[id]&&BYID[id].ing.forEach(([n,q,u,ray])=>{
+    if(PLACARD[n]){ const o=dejaLa.get(n)||{n,pour:new Set()}; o.pour.add(JOURS[d]); dejaLa.set(n,o); return; }
     const t=STOCKABLE.includes(ray)?0:tripOf(d), k=n+"|"+u, m=trips[t];
     if(!m.has(k)) m.set(k,{k,ck:t+"|"+k,n,u,ray,q:0,pour:new Set(),freeze:false});
     const it=m.get(k); it.q+=scale(q,d); it.pour.add(JOURS[d]);
@@ -597,6 +601,7 @@ function coursesTrips(){
     trips[t].set(k,{k,ck:t+"|"+k,n:x.n,u:"",ray:RAYONS[x.ray]?x.ray:"epi",q:0,qt:x.qt||"",pour:new Set(),freeze:false,x:true,id:x.id,par:x.par||""}); });
   // anciennes cases cochées de la 2e course : reprises dans la liste unique
   trips[0].forEach(it=>{ if(state.checked["1|"+it.k]&&!state.checked[it.ck]) state.checked[it.ck]=true; });
+  DEJA_LA=[...dejaLa.values()].sort((a,b)=>a.n.localeCompare(b.n,"fr"));
   return trips.map(m=>[...m.values()].sort((a,b)=>ORDRE.indexOf(a.ray)-ORDRE.indexOf(b.ray)||a.n.localeCompare(b.n,"fr")));
 }
 function cleanExtras(a){ return Array.isArray(a)? a.filter(x=>x&&typeof x.n==="string"&&x.n.trim()&&x.id).slice(0,200).map(x=>({id:String(x.id).slice(0,40),n:String(x.n).trim().slice(0,60),qt:String(x.qt||"").slice(0,20),ray:RAYONS[x.ray]?x.ray:"epi",t:x.t===1?1:0,par:String(x.par||"").slice(0,30)})) : []; }
@@ -673,7 +678,7 @@ function renderCourses(){
         const tags=promosFor(i.n).map(p=>{const ok=validOn(p,date);
           const when= ok ? `jusqu'au ${fmtShort(isoDate(p.au))}` : (isoDate(p.du)>date ? `dès le ${fmtShort(isoDate(p.du))}, pas encore valable ce jour-là` : `terminée le ${fmtShort(isoDate(p.au))}`);
           return `<span class="ptag${ok&&p.mag===ensOf(mag)?"":" off"}">· Promo ${ENS[p.mag]} ${eur(p.prix)} ${when}</span>`}).join("");
-        return `<label class="item${c?" checked":""}"><input type="checkbox" data-k="${esc(i.ck)}"${c?" checked":""}><span class="iname"><b>${esc(i.n)}</b><small>${i.x?(i.par?"Ajouté par "+esc(i.par):"Ajouté à la main"):[...i.pour].join(", ")}${i.freeze?'<span class="ptag" style="color:var(--accent)">· à congeler à l\'achat</span>':""}${tags}</small></span><span class="qty">${esc(qtyOf(i))}${i.x?`<button type="button" class="xdel edit-only" data-xdel="${esc(i.id)}" aria-label="Retirer ${esc(i.n)} de la liste">×</button>`:""}</span></label>`}).join("");
+        return `<label class="item${c?" checked":""}"><input type="checkbox" data-k="${esc(i.ck)}"${c?" checked":""}><span class="iname"><b>${esc(i.n)}</b><small>${i.x?(i.par?"Ajouté par "+esc(nomDe(i.par)):"Ajouté à la main"):[...i.pour].join(", ")}${i.freeze?'<span class="ptag" style="color:var(--accent)">· à congeler à l\'achat</span>':""}${tags}</small></span><span class="qty"><button type="button" class="qtbtn" data-qedit="${esc(i.k)}" aria-label="Changer la quantité de ${esc(i.n)}" data-tip="Changer la quantité">${esc(qtyOf(i))||"qté"}${state.qtEdit&&state.qtEdit[i.k]&&!i.x?`<s>${esc(fmt(i.q,i.u))}</s>`:""}</button>${i.x?`<button type="button" class="xdel edit-only" data-xdel="${esc(i.id)}" aria-label="Retirer ${esc(i.n)} de la liste">×</button>`:`<button type="button" class="dejabtn edit-only" data-deja="${esc(i.n)}" aria-label="J'en ai déjà : ${esc(i.n)}" data-tip="J'en ai déjà à la maison : ne plus le mettre sur la liste">🏠</button>`}</span></label>`}).join("");
       return `<div class="aisle"><h2><span>${RAYONS[ray]}</span><span>${its.length}</span></h2><div class="list">${rows}</div></div>`}).join("");
       return `<div class="stop"><div class="stophead"><span class="stopno">Arrêt ${si+1}</span><b>${esc(m.nom)}</b><small>${esc(m.lieu)} · ${sitems.length} article${sitems.length>1?"s":""}${nP?` · ${nP} en promo`:""} · ≈ ${eur(sitems.reduce((s,i)=>s+itemCost(i.n,i.u,i.q,i.ray),0))}</small></div>${groups}</div>`}).join("");
     return `<div class="trip${t===tripVue?" on":""}" id="trip-${t}"><div class="triphead"><div><div class="tripno">Courses de la semaine · ${fmtD(date)}</div><p class="note">${cover}</p></div>
@@ -682,6 +687,7 @@ function renderCourses(){
       <p class="note">${items.length} articles · ≈ ${eur(items.reduce((s,i)=>s+itemCost(i.n,i.u,i.q,i.ray),0))} (gamme ${GAMMES[state.gamme].nom.toLowerCase()}) · trajet ≈ ${kmTxt(plan.route)}</p>${stopsHtml}</div>`}).join("");
   $("tripsel").innerHTML=(`${trips.map((items,t)=>`<button role="tab" data-tripvue="${t}" aria-selected="${t===tripVue}"><b>Course ${t+1}</b><small>${fmtShort(tripDate(t))} · ${tdone[t]}/${items.length}</small></button>`).join("")}`);
   $("ptext").textContent=`${done} sur ${total} dans le caddie`;
+  if(typeof renderHabituels==="function"){ renderHabituels(); renderDejaLa(); renderTicket(); }
   if(typeof renderApTrip==="function") renderApTrip();
   $("pbar").style.width=(total?done/total*100:0)+"%";
   $("ccount").textContent=total-done?String(total-done):"";
@@ -1047,13 +1053,13 @@ function goWeek(off){ if(off<0||off>3||off===state.weekOffset) return;
   stashWeek(); state.weekOffset=off; setMonday(off);
   const w=state.weeks[curIso()];
   if(w&&Array.isArray(w.menu)&&w.menu.length===7&&w.menu.every(id=>BYID[id])) applyWeekData(w);
-  else { state.week=proposeMenu(); state.cooks=Array(7).fill(null); state.checked={}; state.statut="proposition"; state.journal=[]; state.absents={}; state.invites=[0,0,0,0,0,0,0]; state.approbations={}; state.limite=null; state.exterieur=null; }
+  else { state.week=proposeMenu(); state.cooks=Array(7).fill(null); state.checked={}; state.statut="proposition"; state.journal=[]; state.absents={}; state.invites=[0,0,0,0,0,0,0]; state.approbations={}; state.limite=null; state.exterieur=null; state.extras=[]; state.qtEdit={}; state.tickets=[]; }
   state.picking=null; applyValidation(); saveLocal(); subscribeWeek(); render(); }
 
 // --- partage via la base de données de la page ---
 let DB=null, USER=null, ME=null, CAN_WRITE=null, unsubWeek=null, unsubFam=null, IS_OWNER=true, VALID={}, LIMITES={};
 let shareOpen=false, shareReady=false, lastShared=null, lastFamily=null, writing=false, dirty=false, syncState="local";
-const sharedPayload=()=>({menu:state.week,cuisiniers:state.cooks,coches:state.checked,absents:state.absents,invites:state.invites,approbations:state.approbations,exterieur:state.exterieur,ajouts:state.extras});
+const sharedPayload=()=>({menu:state.week,cuisiniers:state.cooks,coches:state.checked,absents:state.absents,invites:state.invites,approbations:state.approbations,exterieur:state.exterieur,ajouts:state.extras,quantites:state.qtEdit||{},tickets:state.tickets||[]});
 function describeChange(prev,next){
   if(!prev) return "a proposé le menu de la semaine";
   const out=[];
@@ -1094,7 +1100,7 @@ function subscribeWeek(){
       const d=snap.data();
       if(Array.isArray(d.menu)&&d.menu.length===7&&!d.menu.every(id=>BYID[id])) pendingWeek={iso,d};
       if(!snap.metadata.hasPendingWrites && Array.isArray(d.menu) && d.menu.length===7 && d.menu.every(id=>BYID[id])){
-        applyWeekData({menu:d.menu,cooks:d.cuisiniers,checked:d.coches,statut:d.statut,journal:d.journal,absents:d.absents,invites:d.invites,approbations:d.approbations,exterieur:d.exterieur,extras:d.ajouts});
+        applyWeekData({menu:d.menu,cooks:d.cuisiniers,checked:d.coches,statut:d.statut,journal:d.journal,absents:d.absents,invites:d.invites,approbations:d.approbations,exterieur:d.exterieur,extras:d.ajouts,quantites:d.quantites,tickets:d.tickets});
         lastShared=JSON.stringify(sharedPayload()); saveLocal(); render(); if(modalCtx) renderModal();
       }
     }
@@ -1325,7 +1331,7 @@ function subscribeRecettes(){ if(!DB) return; if(unsubRec) unsubRec();
       else { const r=registerRecipe(x); if(r){ state.perso=[...state.perso.filter(p=>p.id!==r.id),r]; changed=true; } } });
     if(changed){ saveLocal();
       if(pendingWeek&&pendingWeek.iso===curIso()&&pendingWeek.d.menu.every(id=>BYID[id])){ const d=pendingWeek.d; pendingWeek=null;
-        applyWeekData({menu:d.menu,cooks:d.cuisiniers,checked:d.coches,statut:d.statut,journal:d.journal,absents:d.absents,invites:d.invites,approbations:d.approbations,exterieur:d.exterieur,extras:d.ajouts}); lastShared=JSON.stringify(sharedPayload()); }
+        applyWeekData({menu:d.menu,cooks:d.cuisiniers,checked:d.coches,statut:d.statut,journal:d.journal,absents:d.absents,invites:d.invites,approbations:d.approbations,exterieur:d.exterieur,extras:d.ajouts,quantites:d.quantites,tickets:d.tickets}); lastShared=JSON.stringify(sharedPayload()); }
       render(); if(modalCtx&&BYID[modalCtx.id]) renderModal(); }
   },()=>{}); }
 async function saveRecipeShared(r){ if(!DB||CAN_WRITE===false) return; try{ await DB.collection("recettes").doc(r.id).set({...r}); }catch(e){ toast("La recette est gardée sur cet appareil, le partage a échoué"); } }
@@ -2170,6 +2176,83 @@ document.addEventListener("click",e=>{ const b=e.target.closest("[data-retour],[
 });
 
 
+
+// ===================== Liste de courses : habituels, quantités, « j'en ai déjà », ticket réel =====================
+let PLACARD={}, DEJA_LA=[];
+// Les ajouts gardent l'identifiant de l'appareil : on affiche le prénom correspondant
+const NOMS_PAR={}; let nomsDemandes=false;
+function nomDe(par){ if(!/^[0-9a-f-]{20,}$/.test(par)) return par; if(NOMS_PAR[par]) return NOMS_PAR[par];
+  if(!nomsDemandes&&USER&&USER.profiles){ nomsDemandes=true; const ids=[...new Set((state.extras||[]).map(x=>x.par).filter(x=>/^[0-9a-f-]{20,}$/.test(x)))];
+    USER.profiles(ids).then(ps=>{ Object.entries(ps||{}).forEach(([id,p])=>{ if(p&&p.name) NOMS_PAR[id]=p.name; }); nomsDemandes=false; if(Object.keys(NOMS_PAR).length) renderCourses(); }).catch(()=>{ nomsDemandes=false; }); }
+  return "un membre de la famille"; }
+function subscribePlacard(){ if(!DB) return; DB.doc("famille/placard").onSnapshot(snap=>{ const d=snap.exists?snap.data():{}; const r={};
+  if(d&&d.noms&&typeof d.noms==="object") Object.entries(d.noms).slice(0,200).forEach(([k,v])=>{ const n=propre(k,40); if(n) r[n]=typeof v==="string"?v.slice(0,10):""; });
+  PLACARD=r; try{ localStorage.setItem(KEY+"-placard",JSON.stringify(r)); }catch(e){} renderCourses(); },()=>{}); }
+try{ PLACARD=JSON.parse(localStorage.getItem(KEY+"-placard")||"{}")||{}; }catch(e){ PLACARD={}; }
+async function majPlacard(n,garder){ const r={...PLACARD}; if(garder) r[n]=isoOf(TODAY); else delete r[n]; PLACARD=r;
+  try{ localStorage.setItem(KEY+"-placard",JSON.stringify(r)); }catch(e){} renderCourses();
+  if(DB){ try{ await DB.doc("famille/placard").set({noms:r}); }catch(e){ toast("Le changement n'a pas pu être partagé"); } } }
+// Les courses habituelles : produits ajoutés le plus souvent, toutes semaines confondues
+function habituels(){ const c=new Map(), add=(n,ray,qt,poids)=>{ const k=norm(n); if(!k) return; const o=c.get(k)||{n,ray,qt:"",c:0}; o.c+=poids; if(qt&&!o.qt) o.qt=qt; c.set(k,o); };
+  Object.entries({...state.weeks,...(typeof SEMAINES==="object"?SEMAINES:{})}).forEach(([iso,w])=>{ if(iso===curIso()) return; (w.extras||w.ajouts||[]).forEach(x=>x&&x.n&&add(x.n,x.ray,x.qt,2)); });
+  (state.extras||[]).forEach(x=>add(x.n,x.ray,x.qt,0.5));
+  Object.values(HISTO).forEach(h=>add(h.n,h.ray,h.qt,Math.min(3,(h.c||0)/2)));
+  let l=[...c.values()].filter(x=>x.c>=1).sort((a,b)=>b.c-a.c).slice(0,14);
+  if(l.length<6) ["Lait","Pain","Œufs","Yaourts","Beurre","Bananes","Pommes","Café","Eau plate","Papier toilette"].forEach(n=>{ if(l.length<12&&!l.some(x=>norm(x.n)===norm(n))) { const p=produitsConnus().find(x=>norm(x.n)===norm(n)); l.push({n,ray:p?p.ray:"epi",qt:"",c:0}); } });
+  return l; }
+function renderHabituels(){ const box=$("habituels"); if(!box) return; const l=habituels(), dans=new Set((state.extras||[]).map(x=>norm(x.n)));
+  box.innerHTML=`<span class="habtitle">Courses habituelles</span>`+l.map((x,i)=>{ const ok=dans.has(norm(x.n));
+    return `<button type="button" class="chip${ok?" on":""}" data-hab="${i}" ${ok?'aria-pressed="true"':""} data-tip="${ok?"Déjà dans la liste":"Ajouter à la liste"+(x.qt?" ("+esc(x.qt)+")":"")}">${ok?"✓":"+"} ${esc(x.n)}</button>`; }).join("");
+  box._l=l; }
+// Panneau « déjà à la maison » sous la liste
+function renderDejaLa(){ const box=$("dejala"); if(!box) return; const autres=Object.keys(PLACARD).filter(n=>!DEJA_LA.some(x=>x.n===n));
+  if(!DEJA_LA.length&&!autres.length){ box.hidden=true; return; } box.hidden=false;
+  box.innerHTML=`<summary>Déjà à la maison <span class="badge">${DEJA_LA.length}</span></summary>
+    <p class="note">Ces ingrédients ne sont plus mis sur la liste, cette semaine comme les suivantes. Touchez « Remettre » quand il faut en racheter.</p>
+    <div class="dejalist">${DEJA_LA.map(x=>`<div><span><b>${esc(x.n)}</b><small>pour ${[...x.pour].join(", ").toLowerCase()}</small></span><button type="button" class="chip edit-only" data-remettre="${esc(x.n)}">Remettre sur la liste</button></div>`).join("")}
+    ${autres.map(n=>`<div><span><b>${esc(n)}</b><small>pas utilisé cette semaine</small></span><button type="button" class="chip edit-only" data-remettre="${esc(n)}">Remettre</button></div>`).join("")}</div>`; }
+// Modifier une quantité directement dans la liste
+let qtOuvert=null;
+function ouvrirQt(btn){ const k=btn.dataset.qedit; qtOuvert=k; const it=coursesTrips()[0].find(i=>i.k===k); if(!it) return;
+  const cur=qtyOf(it), m=String(cur).match(/^(\d+(?:[.,]\d+)?)\s*(.*)$/);
+  const span=btn.parentNode; span.innerHTML=`<span class="qtedit"><input type="text" inputmode="decimal" value="${esc(m?m[1]:cur)}" aria-label="Nouvelle quantité" maxlength="10"><select aria-label="Unité">${["","g","kg","cl","L","pièce(s)","paquet(s)","bouteille(s)","boîte(s)"].map(u=>`<option${m&&(m[2]===u||(u==="pièce(s)"&&!m[2]&&!it.x))?" selected":""} value="${u}">${u||"—"}</option>`).join("")}</select><button type="button" class="chip on" data-qok="${esc(k)}">OK</button>${state.qtEdit&&state.qtEdit[k]&&!it.x?`<button type="button" class="chip" data-qreset="${esc(k)}">Recette</button>`:""}</span>`;
+  const inp=span.querySelector("input"); inp.focus(); inp.select();
+  inp.addEventListener("keydown",e=>{ if(e.key==="Enter"){ e.preventDefault(); span.querySelector("[data-qok]").click(); } if(e.key==="Escape"){ qtOuvert=null; renderCourses(); } }); }
+function validerQt(k,span){ const it=coursesTrips()[0].find(i=>i.k===k); if(!it) return; const v=span.querySelector("input").value.trim(), u=span.querySelector("select").value;
+  let q=v; const m=v.match(/^(\d+(?:[.,]\d+)?)$/); if(m&&u){ let n=parseFloat(m[1].replace(",",".")), un=u; if(un==="g"&&n>=1000){ n/=1000; un="kg"; } if(un==="cl"&&n>=100){ n/=100; un="L"; } q=`${String(Math.round(n*100)/100).replace(".",",")} ${un}`; }
+  q=propre(q,20);
+  if(it.x){ const x=(state.extras||[]).find(y=>y.id===it.id); if(x) x.qt=q; }
+  else { state.qtEdit={...(state.qtEdit||{})}; if(q) state.qtEdit[k]=q; else delete state.qtEdit[k]; }
+  qtOuvert=null; save(); renderCourses(); toast(q?`${it.n} : ${q}`:`${it.n} : quantité effacée`); }
+// Ticket de caisse réel
+function renderTicket(){ const box=$("ticketbox"); if(!box) return; const est=weekCost(state.gamme), tk=state.tickets||[], tot=tk.reduce((s,x)=>s+x.montant,0);
+  const hist=Object.entries({...state.weeks,...(typeof SEMAINES==="object"?SEMAINES:{})}).map(([iso,w])=>{ const t=cleanTickets(w.tickets); return {iso,reel:t.reduce((s,x)=>s+x.montant,0),est:t.find(x=>x.estime)?t.find(x=>x.estime).estime:null}; })
+    .filter(x=>x.reel>0&&/^\d{4}-\d\d-\d\d$/.test(x.iso)); const hm=new Map(hist.map(x=>[x.iso,x])); if(tot>0) hm.set(curIso(),{iso:curIso(),reel:tot,est});
+  const h=[...hm.values()].sort((a,b)=>a.iso.localeCompare(b.iso)).slice(-8), max=Math.max(1,...h.map(x=>Math.max(x.reel,x.est||0)));
+  const ecart=tot>0?tot-est:null, moisCle=isoOf(TODAY).slice(0,7), mois=[...hm.values()].filter(x=>x.iso.slice(0,7)===moisCle).reduce((s,x)=>s+x.reel,0);
+  box.innerHTML=`<summary>Ticket de caisse <span class="badge">${tot>0?eur(tot):"à noter"}</span></summary>
+    <p class="note">Notez le montant réel après les courses : l'application compare au budget estimé (${eur(est)} cette semaine, gamme ${GAMMES[state.gamme].nom.toLowerCase()}).</p>
+    <form class="addrow" id="ticketform"><input id="tk-montant" type="text" inputmode="decimal" placeholder="Montant payé (ex. 87,45)" aria-label="Montant du ticket en euros" maxlength="9"><select id="tk-mag" aria-label="Magasin">${(()=>{ let pm=""; try{ pm=MAGNOM[planTrip(0,coursesTrips()[0]).primary]; }catch(e){} return orderedStores().map(m=>`<option value="${esc(m.nom)}"${m.nom===pm?" selected":""}>${esc(m.nom)}</option>`).join(""); })()}<option value="">Autre</option></select><button class="btn primary edit-only" type="submit">Noter</button></form>
+    ${tk.length?`<div class="tklist">${tk.map((x,i)=>`<div><span><b>${eur(x.montant)}</b><small>${esc(x.mag||"Magasin")} · ${x.quand?new Date(x.quand).toLocaleDateString("fr-BE"):""}${x.par?" · "+esc(x.par):""}</small></span><button type="button" class="sbtn edit-only" data-tkdel="${i}" aria-label="Supprimer ce ticket">×</button></div>`).join("")}</div>
+      <p class="tkecart ${ecart>0?"plus":"moins"}">Total ${eur(tot)} · estimé ${eur(est)} · ${ecart>0?`${eur(ecart)} de plus que prévu`:`${eur(-ecart)} de moins que prévu`}${ecart>0&&(state.extras||[]).length?` (dont ${state.extras.length} produits ajoutés hors recettes)`:""}</p>`:""}
+    ${h.length?`<h3 class="shopray">Semaine après semaine</h3><div class="tkbars">${h.map(x=>`<div class="tkbar" title="Réel ${eur(x.reel)}${x.est?", estimé "+eur(x.est):""}"><span class="tkcols"><i class="r" style="height:${Math.round(x.reel/max*100)}%"></i>${x.est?`<i class="e" style="height:${Math.round(x.est/max*100)}%"></i>`:""}</span><b>${Math.round(x.reel)} €</b><small>${fmtShort(isoDate(x.iso))}</small></div>`).join("")}</div>
+      <p class="note"><i class="leg r"></i> réel <i class="leg e"></i> estimé · ce mois-ci : ${eur(mois)} dépensés</p>`:""}`; }
+document.addEventListener("submit",e=>{ if(e.target.id!=="ticketform") return; e.preventDefault(); const v=parseFloat(($("tk-montant").value||"").replace(",",".").replace(/[^\d.]/g,""));
+  if(!(v>0&&v<5000)){ toast("Indiquez le montant du ticket, par exemple 87,45"); return; }
+  const nom=(window.__acces&&window.__acces()&&window.__acces().nom)||"";
+  state.tickets=[...(state.tickets||[]),{montant:Math.round(v*100)/100,mag:$("tk-mag").value,quand:new Date().toISOString(),estime:Math.round(weekCost(state.gamme)*100)/100,par:nom}];
+  save(); renderTicket(); toast(`Ticket de ${eur(v)} noté`); });
+document.addEventListener("click",e=>{
+  const h=e.target.closest("[data-hab]"); if(h){ const x=($("habituels")._l||[])[+h.dataset.hab]; if(!x) return; if((state.extras||[]).some(y=>norm(y.n)===norm(x.n))){ toast(`${x.n} est déjà dans la liste`); return; } ajouterProduit(x.n,x.ray,x.qt||""); return; }
+  const q=e.target.closest("[data-qedit]"); if(q){ e.preventDefault(); e.stopPropagation(); if(document.body.classList.contains("readonly")) return; ouvrirQt(q); return; }
+  const ok=e.target.closest("[data-qok]"); if(ok){ e.preventDefault(); e.stopPropagation(); validerQt(ok.dataset.qok,ok.closest(".qtedit")); return; }
+  const rs=e.target.closest("[data-qreset]"); if(rs){ e.preventDefault(); e.stopPropagation(); const k=rs.dataset.qreset; state.qtEdit={...(state.qtEdit||{})}; delete state.qtEdit[k]; qtOuvert=null; save(); renderCourses(); toast("Quantité de la recette rétablie"); return; }
+  if(e.target.closest(".qtedit")){ e.preventDefault(); e.stopPropagation(); return; }
+  const dj=e.target.closest("[data-deja]"); if(dj){ e.preventDefault(); e.stopPropagation(); const n=dj.dataset.deja; majPlacard(n,true); toast(`${n} : noté comme déjà à la maison`,()=>majPlacard(n,false),"Annuler"); return; }
+  const re=e.target.closest("[data-remettre]"); if(re){ const n=re.dataset.remettre; majPlacard(n,false); toast(`${n} remis sur la liste`); return; }
+  const td=e.target.closest("[data-tkdel]"); if(td){ state.tickets=(state.tickets||[]).filter((_,i)=>i!==+td.dataset.tkdel); save(); renderTicket(); toast("Ticket supprimé"); return; }
+},true);
+
 // ===================== Propositions de recettes par la famille =====================
 // Un lien, une envie en quelques mots, ou la photo d'une recette : la tâche du lundi et du mercredi en fait une recette de la bibliothèque.
 let SUGG={}, unsubSugg=null, suggForm={type:"lien",photo:null};
@@ -2445,7 +2528,7 @@ setTimeout(peutEtreVisite,2500);
     IS_OWNER = u ? await u.isOwner() : true; if(!IS_OWNER) document.body.classList.add("notowner");
     DB.doc("validations/menus").onSnapshot(snap=>{ const dd=snap.exists?snap.data():{}; VALID=(dd.semaines&&typeof dd.semaines==="object")?{...dd.semaines}:{}; LIMITES=(dd.limites&&typeof dd.limites==="object")?{...dd.limites}:{}; applyValidation(); saveLocal(); render(); },()=>{});
     if(c===false){ document.body.classList.add("readonly"); }
-    subscribeRecettes(); subscribeGouts(); subscribeWeek(); subscribeFamily(); subscribeRetours(); subscribeSondage(); subscribeSugg(); subscribeGoogle();
+    subscribeRecettes(); subscribeGouts(); subscribeWeek(); subscribeFamily(); subscribeRetours(); subscribeSondage(); subscribeSugg(); subscribeGoogle(); subscribePlacard();
     setTimeout(maybeWizard,1500);
   }catch(e){ setSync("local"); setTimeout(maybeWizard,300); }
 })();

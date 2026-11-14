@@ -734,6 +734,22 @@ body.notowner .owner-only{display:none!important}
 
 .tripsel,.aptrip{display:none!important}
 #apunit{padding:8px 6px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink);font:inherit;font-size:14px;max-width:110px}
+
+.habituels{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:8px}.habtitle{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;width:100%}
+.habituels .chip{font-size:13px}
+.qtbtn{background:none;border:1px dashed transparent;border-radius:8px;padding:2px 6px;color:inherit;font:inherit;cursor:pointer;display:inline-grid;justify-items:end}
+.qtbtn:hover,.qtbtn:focus-visible{border-color:var(--line);background:var(--bg)}.qtbtn s{font-size:11px;color:var(--muted)}
+.qtedit{display:inline-flex;gap:4px;align-items:center}.qtedit input{width:56px;padding:4px 6px;border:1px solid var(--accent);border-radius:8px;font:inherit;background:var(--surface);color:var(--ink)}
+.qtedit select{padding:4px;border:1px solid var(--line);border-radius:8px;font:inherit;font-size:12px;background:var(--surface);color:var(--ink)}
+.dejabtn{background:none;border:0;cursor:pointer;font-size:15px;padding:2px 4px;opacity:.55}.dejabtn:hover{opacity:1}
+.dejalist,.tklist{display:grid;gap:6px;margin-top:8px}.dejalist>div,.tklist>div{display:flex;justify-content:space-between;gap:8px;align-items:center;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:6px 10px}
+.dejalist span,.tklist span{display:grid}.dejalist small,.tklist small{color:var(--muted);font-size:12px}
+.tkecart{font-weight:700;margin:8px 0}.tkecart.plus{color:var(--warm)}.tkecart.moins{color:var(--accent)}
+.tkbars{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(48px,1fr);gap:8px;align-items:end;overflow-x:auto;padding-top:6px}
+.tkbar{display:flex;flex-direction:column;align-items:center;gap:2px}.tkbar b{font-size:12px}.tkbar small{font-size:11px;color:var(--muted)}
+.tkcols{display:flex;gap:3px;align-items:flex-end;height:96px;width:70%}.tkcols i{display:block;flex:1;border-radius:5px 5px 2px 2px;min-height:3px}
+.tkcols i.r,.leg.r{background:var(--accent)}.tkcols i.e,.leg.e{background:var(--line)}.leg{display:inline-block;width:10px;height:10px;border-radius:3px;vertical-align:-1px}
+#ticketform{display:flex;flex-wrap:wrap;gap:6px}#ticketform input{flex:1 1 150px;min-width:0}#ticketform select{flex:1 1 120px;min-width:0;max-width:100%}#ticketform .btn{flex:0 0 auto}
 </style>
 </head>
 <body>
@@ -806,11 +822,14 @@ body.notowner .owner-only{display:none!important}
       </div>
       <div class="apsugg" id="apsugg" role="listbox" aria-label="Suggestions" hidden></div>
       <div class="aptrip" id="aptrip"></div>
+      <div class="habituels" id="habituels"></div>
     </form>
     <div id="aisles"></div>
+    <details class="panel sum dejala" id="dejala" hidden></details>
     <p class="pantry"><b>À vérifier au placard :</b> huile, sel, poivre, ail, vinaigrette, sauce soja.</p>
     </div>
     <div class="col-b">
+    <details class="panel sum ticket" id="ticketbox" open></details>
 
     <h2 class="sectitle" id="economies">Économiser</h2>
     <details class="panel sum" open><summary>Recettes qui profitent des promos <span class="badge" id="pcount"></span></summary>
@@ -966,10 +985,10 @@ body.notowner .owner-only{display:none!important}
   <div class="sfoot" id="sfoot"></div>
 </div>
 
-<script src="vendor/jspdf-2.5.1.umd.min.js?v=31"></script>
-<script src="vendor/supabase-js-2.45.4.js?v=31"></script>
-<script src="js/partage.js?v=31"></script>
-<script src="js/app.js?v=31"></script>
+<script src="vendor/jspdf-2.5.1.umd.min.js?v=32"></script>
+<script src="vendor/supabase-js-2.45.4.js?v=32"></script>
+<script src="js/partage.js?v=32"></script>
+<script src="js/app.js?v=32"></script>
 
 </body>
 </html>
