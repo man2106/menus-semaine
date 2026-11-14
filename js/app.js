@@ -678,7 +678,7 @@ function renderCourses(){
         const tags=promosFor(i.n).map(p=>{const ok=validOn(p,date);
           const when= ok ? `jusqu'au ${fmtShort(isoDate(p.au))}` : (isoDate(p.du)>date ? `dès le ${fmtShort(isoDate(p.du))}, pas encore valable ce jour-là` : `terminée le ${fmtShort(isoDate(p.au))}`);
           return `<span class="ptag${ok&&p.mag===ensOf(mag)?"":" off"}">· Promo ${ENS[p.mag]} ${eur(p.prix)} ${when}</span>`}).join("");
-        return `<label class="item${c?" checked":""}"><input type="checkbox" data-k="${esc(i.ck)}"${c?" checked":""}><span class="iname${produitDe(i.n)?" has-p":""}">${vignetteProduit(i.n)}<b>${esc(i.n)}</b><small>${i.x?(i.par?"Ajouté par "+esc(nomDe(i.par)):"Ajouté à la main"):[...i.pour].join(", ")}${i.freeze?'<span class="ptag" style="color:var(--accent)">· à congeler à l\'achat</span>':""}${tags}</small></span><span class="qty"><button type="button" class="qtbtn" data-qedit="${esc(i.k)}" aria-label="Changer la quantité de ${esc(i.n)}" data-tip="Changer la quantité">${esc(qtyOf(i))||"qté"}${state.qtEdit&&state.qtEdit[i.k]&&!i.x?`<s>${esc(fmt(i.q,i.u))}</s>`:""}</button>${i.x?`<button type="button" class="xdel edit-only" data-xdel="${esc(i.id)}" aria-label="Retirer ${esc(i.n)} de la liste">×</button>`:`<button type="button" class="dejabtn edit-only" data-deja="${esc(i.n)}" aria-label="J'en ai déjà : ${esc(i.n)}" data-tip="J'en ai déjà à la maison : ne plus le mettre sur la liste">🏠</button>`}</span></label>`}).join("");
+        return `<label class="item${c?" checked":""}"><input type="checkbox" data-k="${esc(i.ck)}"${c?" checked":""}><span class="iname${produitDe(i.n)?" has-p":""}">${vignetteProduit(i.n)}<b>${esc(i.n)}</b><small>${i.x?(i.par?"Ajouté par "+esc(nomDe(i.par)):"Ajouté à la main"):[...i.pour].join(", ")}${i.freeze?'<span class="ptag" style="color:var(--accent)">· à congeler à l\'achat</span>':""}${tags}</small></span><span class="qty"><button type="button" class="qtbtn" data-qedit="${esc(i.k)}" aria-label="Changer la quantité de ${esc(i.n)}" data-tip="Changer la quantité"><span class="qtv">${esc(qtyOf(i))||"Quantité"}<i class="qtpen" aria-hidden="true">✎</i></span>${state.qtEdit&&state.qtEdit[i.k]&&!i.x?`<s>${esc(fmt(i.q,i.u))}</s>`:""}</button>${i.x?`<button type="button" class="xdel edit-only" data-xdel="${esc(i.id)}" aria-label="Retirer ${esc(i.n)} de la liste">×</button>`:`<button type="button" class="dejabtn edit-only" data-deja="${esc(i.n)}" aria-label="J'en ai déjà : ${esc(i.n)}" data-tip="J'en ai déjà à la maison : ne plus le mettre sur la liste">🏠</button>`}</span></label>`}).join("");
       return `<div class="aisle"><h2><span>${RAYONS[ray]}</span><span>${its.length}</span></h2><div class="list">${rows}</div></div>`}).join("");
       return `<div class="stop"><div class="stophead"><span class="stopno">Arrêt ${si+1}</span><b>${esc(m.nom)}</b><small>${esc(m.lieu)} · ${sitems.length} article${sitems.length>1?"s":""}${nP?` · ${nP} en promo`:""} · ≈ ${eur(sitems.reduce((s,i)=>s+itemCost(i.n,i.u,i.q,i.ray),0))}</small></div>${groups}</div>`}).join("");
     return `<div class="trip${t===tripVue?" on":""}" id="trip-${t}"><div class="triphead"><div><div class="tripno">Courses de la semaine · ${fmtD(date)}</div><p class="note">${cover}</p></div>
@@ -1381,7 +1381,7 @@ function renderShop(){ const c=sheetCtx, t=c.t, items=coursesTrips()[t], plan=pl
   $("sbody").innerHTML=(stores.length>1?`<div class="gfilters">${stores.map((m,i)=>`<button class="chip${i===c.stop?" on":""}" data-stop="${i}">Arrêt ${i+1} · ${MAGNOM[m]}</button>`).join("")}</div>`:"")+
     (sitems.length?ORDRE.map(ray=>{const its=sitems.filter(i=>i.ray===ray); if(!its.length) return "";
       return `<h3 class="shopray">${RAYONS[ray]}</h3>`+its.map(i=>{const ck=!!state.checked[i.ck], pr=promosFor(i.n).find(p=>p.mag===ensOf(mag)&&validOn(p,tripDate(t)));
-        return `<button class="shopitem${ck?" done":""}" data-shopk="${esc(i.ck)}" aria-pressed="${ck}"><span class="sbox" aria-hidden="true">${ck?"✓":""}</span><span class="sname">${esc(i.n)}${pr?`<small>Promo ${eur(pr.prix)}</small>`:""}</span><span class="sqty">${esc(qtyOf(i))}</span></button>`}).join("")}).join("")
+        return `<div class="shoprow"><button class="shopitem${ck?" done":""}" data-shopk="${esc(i.ck)}" aria-pressed="${ck}"><span class="sbox" aria-hidden="true">${ck?"✓":""}</span><span class="sname">${esc(i.n)}${pr?`<small>Promo ${eur(pr.prix)}</small>`:""}</span></button><button type="button" class="sqty sqtybtn${ck?" done":""}" data-qedit="${esc(i.k)}" aria-label="Changer la quantité de ${esc(i.n)}">${esc(qtyOf(i))||"Qté"}<i class="qtpen" aria-hidden="true">✎</i></button></div>`}).join("")}).join("")
      :`<p class="note">Rien à acheter ici.</p>`)+
     (done===sitems.length&&sitems.length?`<div class="shopdone">Tout est dans le caddie.</div>`:"");
   $("sfoot").innerHTML=`<div class="track big"><i style="width:${sitems.length?done/sitems.length*100:0}%"></i></div><button class="btn primary" data-shopend="1">${done===sitems.length?"Terminer":"Fermer"}</button>`; }
@@ -2217,17 +2217,35 @@ function renderDejaLa(){ const box=$("dejala"); if(!box) return; const autres=Ob
     ${autres.map(n=>`<div><span><b>${esc(n)}</b><small>pas utilisé cette semaine</small></span><button type="button" class="chip edit-only" data-remettre="${esc(n)}">Remettre</button></div>`).join("")}</div>`; }
 // Modifier une quantité directement dans la liste
 let qtOuvert=null;
-function ouvrirQt(btn){ const k=btn.dataset.qedit; qtOuvert=k; const it=coursesTrips()[0].find(i=>i.k===k); if(!it) return;
-  const cur=qtyOf(it), m=String(cur).match(/^(\d+(?:[.,]\d+)?)\s*(.*)$/);
-  const span=btn.parentNode; span.innerHTML=`<span class="qtedit"><input type="text" inputmode="decimal" value="${esc(m?m[1]:cur)}" aria-label="Nouvelle quantité" maxlength="10"><select aria-label="Unité">${["","g","kg","cl","L","pièce(s)","paquet(s)","bouteille(s)","boîte(s)"].map(u=>`<option${m&&(m[2]===u||(u==="pièce(s)"&&!m[2]&&!it.x))?" selected":""} value="${u}">${u||"—"}</option>`).join("")}</select><button type="button" class="chip on" data-qok="${esc(k)}">OK</button>${state.qtEdit&&state.qtEdit[k]&&!it.x?`<button type="button" class="chip" data-qreset="${esc(k)}">Recette</button>`:""}</span>`;
-  const inp=span.querySelector("input"); inp.focus(); inp.select();
-  inp.addEventListener("keydown",e=>{ if(e.key==="Enter"){ e.preventDefault(); span.querySelector("[data-qok]").click(); } if(e.key==="Escape"){ qtOuvert=null; renderCourses(); } }); }
-function validerQt(k,span){ const it=coursesTrips()[0].find(i=>i.k===k); if(!it) return; const v=span.querySelector("input").value.trim(), u=span.querySelector("select").value;
-  let q=v; const m=v.match(/^(\d+(?:[.,]\d+)?)$/); if(m&&u){ let n=parseFloat(m[1].replace(",",".")), un=u; if(un==="g"&&n>=1000){ n/=1000; un="kg"; } if(un==="cl"&&n>=100){ n/=100; un="L"; } q=`${String(Math.round(n*100)/100).replace(".",",")} ${un}`; }
+const QUNITES=["pièce(s)","g","kg","cl","L","paquet(s)","bouteille(s)","boîte(s)"];
+function articleQt(k){ return coursesTrips().flat().find(i=>i.k===k)||null; }
+function ouvrirQt(btn){ const k=btn.dataset.qedit; const it=articleQt(k); if(!it) return; qtOuvert=k;
+  const cur=String(qtyOf(it)||""), m=cur.match(/^(\d+(?:[.,]\d+)?)\s*(.*)$/);
+  let u=m?m[2].trim():""; if(u==="pièce"||u==="pièces"||(!u&&m)) u="pièce(s)"; if(!QUNITES.includes(u)&&u) u="";
+  $("qnom").textContent=it.n; $("qval").value=m?m[1]:cur; $("qunits").innerHTML=QUNITES.map(x=>`<button type="button" class="chip${x===u?" on":""}" data-qunit="${esc(x)}" aria-pressed="${x===u}">${x}</button>`).join("");
+  $("qorig").innerHTML=!it.x&&state.qtEdit&&state.qtEdit[k]?`Quantité prévue par les recettes : <b>${esc(fmt(it.q,it.u))}</b> · <button type="button" class="linkbtn" data-qreset="${esc(k)}">Rétablir</button>`:(!it.x?`Quantité calculée d'après les recettes de la semaine.`:"");
+  qLast=document.activeElement; $("qoverlay").hidden=false; const inp=$("qval"); setTimeout(()=>{ try{ inp.focus(); inp.select(); }catch(e){} },30); }
+let qLast=null;
+function fermerQt(){ $("qoverlay").hidden=true; qtOuvert=null; if(qLast&&qLast.focus&&document.contains(qLast)) try{qLast.focus()}catch(e){} }
+function pasQt(u){ return u==="g"?50:u==="cl"?10:(u==="kg"||u==="L")?0.25:1; }
+function uniteQt(){ const b=document.querySelector("#qunits .chip.on"); return b?b.dataset.qunit:""; }
+function changerQt(sens){ const inp=$("qval"); const n=parseFloat(String(inp.value).replace(",","."))||0, st=pasQt(uniteQt());
+  const v=Math.max(0,Math.round((n+sens*st)*100)/100); inp.value=String(v).replace(".",","); }
+function validerQt(k){ const it=articleQt(k); if(!it) return; const v=$("qval").value.trim(), u=uniteQt();
+  let q=v; const m=v.match(/^(\d+(?:[.,]\d+)?)$/);
+  if(m){ let n=parseFloat(m[1].replace(",",".")), un=u; if(n===0){ q=""; } else { if(un==="g"&&n>=1000){ n/=1000; un="kg"; } if(un==="cl"&&n>=100){ n/=100; un="L"; }
+    if(un==="pièce(s)") un=it.x?"":""; q=`${String(Math.round(n*100)/100).replace(".",",")}${un?" "+un:""}`; } }
   q=propre(q,20);
   if(it.x){ const x=(state.extras||[]).find(y=>y.id===it.id); if(x) x.qt=q; }
   else { state.qtEdit={...(state.qtEdit||{})}; if(q) state.qtEdit[k]=q; else delete state.qtEdit[k]; }
-  qtOuvert=null; save(); renderCourses(); toast(q?`${it.n} : ${q}`:`${it.n} : quantité effacée`); }
+  fermerQt(); save(); renderCourses(); if(sheetCtx&&sheetCtx.type==="shop") renderShop(); toast(q?`${it.n} : ${q}`:`${it.n} : quantité effacée`); }
+$("qclose").addEventListener("click",fermerQt); $("qcancel").addEventListener("click",fermerQt);
+$("qoverlay").addEventListener("click",e=>{ if(e.target.id==="qoverlay") fermerQt();
+  const un=e.target.closest("[data-qunit]"); if(un){ document.querySelectorAll("#qunits .chip").forEach(c=>{ c.classList.toggle("on",c===un); c.setAttribute("aria-pressed",c===un); }); }
+  const pm=e.target.closest("[data-qpas]"); if(pm) changerQt(+pm.dataset.qpas); });
+$("qok").addEventListener("click",()=>{ if(qtOuvert) validerQt(qtOuvert); });
+$("qval").addEventListener("keydown",e=>{ if(e.key==="Enter"){ e.preventDefault(); if(qtOuvert) validerQt(qtOuvert); } });
+document.addEventListener("keydown",e=>{ if(e.key==="Escape"&&!$("qoverlay").hidden){ e.stopPropagation(); fermerQt(); } },true);
 // Photos de tickets : lues par la mise à jour du lundi et du mercredi, elles alimentent la base des prix réels
 let TICKETS_PH={};
 function cleanTicketPh(x){ if(!x||typeof x!=="object") return null; const r=x.resultat&&typeof x.resultat==="object"?x.resultat:{};
@@ -2278,8 +2296,7 @@ document.addEventListener("submit",e=>{ if(e.target.id!=="ticketform") return; e
 document.addEventListener("click",e=>{
   const h=e.target.closest("[data-hab]"); if(h){ const x=($("habituels")._l||[])[+h.dataset.hab]; if(!x) return; if((state.extras||[]).some(y=>norm(y.n)===norm(x.n))){ toast(`${x.n} est déjà dans la liste`); return; } ajouterProduit(x.n,x.ray,x.qt||""); return; }
   const q=e.target.closest("[data-qedit]"); if(q){ e.preventDefault(); e.stopPropagation(); if(document.body.classList.contains("readonly")) return; ouvrirQt(q); return; }
-  const ok=e.target.closest("[data-qok]"); if(ok){ e.preventDefault(); e.stopPropagation(); validerQt(ok.dataset.qok,ok.closest(".qtedit")); return; }
-  const rs=e.target.closest("[data-qreset]"); if(rs){ e.preventDefault(); e.stopPropagation(); const k=rs.dataset.qreset; state.qtEdit={...(state.qtEdit||{})}; delete state.qtEdit[k]; qtOuvert=null; save(); renderCourses(); toast("Quantité de la recette rétablie"); return; }
+  const rs=e.target.closest("[data-qreset]"); if(rs){ e.preventDefault(); e.stopPropagation(); const k=rs.dataset.qreset; state.qtEdit={...(state.qtEdit||{})}; delete state.qtEdit[k]; fermerQt(); save(); renderCourses(); if(sheetCtx&&sheetCtx.type==="shop") renderShop(); toast("Quantité de la recette rétablie"); return; }
   if(e.target.closest(".qtedit")){ e.preventDefault(); e.stopPropagation(); return; }
   const dj=e.target.closest("[data-deja]"); if(dj){ e.preventDefault(); e.stopPropagation(); const n=dj.dataset.deja; majPlacard(n,true); toast(`${n} : noté comme déjà à la maison`,()=>majPlacard(n,false),"Annuler"); return; }
   const re=e.target.closest("[data-remettre]"); if(re){ const n=re.dataset.remettre; majPlacard(n,false); toast(`${n} remis sur la liste`); return; }

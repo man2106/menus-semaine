@@ -95,7 +95,7 @@
 .iname.has-p>.pthumb{grid-row:1/3}.iname.has-p>b,.iname.has-p>small{grid-column:2}
 .pthumb{width:44px;height:44px;border-radius:10px;border:1px solid var(--line);background:var(--soft,#eef4ef);padding:0;overflow:hidden;cursor:pointer;display:grid;place-items:center;color:var(--accent);font:700 15px/1 Georgia,serif}
 .pthumb img{width:100%;height:100%;object-fit:cover;display:block}
-.povl{z-index:60}.pmodal{max-width:520px}
+.overlay.povl{z-index:60}.pmodal{max-width:520px}
 .pphoto img{aspect-ratio:4/3;object-fit:cover}
 .pdesc{font-size:15px;line-height:1.5;margin:4px 0 12px}
 .pinfo{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;margin:0 0 14px;font-size:14px}.pinfo dt{color:var(--muted)}.pinfo dd{margin:0}
@@ -103,6 +103,19 @@
 .pmodal h4{font-size:13px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin:14px 0 6px}
 .plist{list-style:none;margin:0;padding:0;display:grid;gap:6px}.plist li{padding:8px 10px;border:1px solid var(--line);border-radius:10px}.plist small{display:block;color:var(--muted);font-size:12px}
 @media (max-width:420px){.pinfo{grid-template-columns:1fr}.pinfo dd{margin-bottom:6px}}
+.qtbtn{border:1px solid var(--line)!important;background:var(--surface)!important;padding:5px 9px!important;border-radius:10px!important;min-height:36px}
+.qtv{display:inline-flex;align-items:center;gap:5px}.qtpen{font-style:normal;font-size:12px;color:var(--accent);opacity:.8}
+.shoprow{display:grid;grid-template-columns:1fr 108px;gap:8px;align-items:stretch}
+.shoprow .shopitem{grid-template-columns:40px 1fr}
+.sqtybtn{border:1px solid var(--line);border-radius:14px;background:var(--surface);color:var(--ink);padding:0 8px;min-width:0;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;font-family:inherit}
+.sqtybtn.done{color:var(--done);text-decoration:line-through}
+.qmodal{max-width:420px}
+.qstep{display:grid;grid-template-columns:56px 1fr 56px;gap:10px;margin:6px 0 14px}
+.qstep input{font-size:26px;font-weight:700;text-align:center;padding:10px;border:1.5px solid var(--accent);border-radius:14px;background:var(--surface);color:var(--ink);min-width:0}
+.qpm{font-size:28px;line-height:1;border:1px solid var(--line);border-radius:14px;background:var(--bg);color:var(--accent);cursor:pointer}
+.qunits{flex-wrap:wrap;overflow:visible}
+.linkbtn{background:none;border:0;padding:0;color:var(--accent);text-decoration:underline;font:inherit;cursor:pointer}
+.qmodal .actions{display:flex;gap:10px;justify-content:flex-end;margin-top:12px}
 </style>
 <title>Menus de la semaine</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -992,6 +1005,20 @@ body.notowner .owner-only{display:none!important}
   </div>
 </div>
 
+<!-- Changer une quantité -->
+<div class="overlay povl" id="qoverlay" hidden>
+  <div class="modal qmodal" role="dialog" aria-modal="true" aria-labelledby="qnom">
+    <div class="mhead"><div><div class="meyebrow">Changer la quantité</div><h2 id="qnom"></h2></div><button class="mclose" id="qclose" aria-label="Fermer">×</button></div>
+    <div class="mbody">
+      <div class="qstep"><button type="button" class="qpm" data-qpas="-1" aria-label="Moins">−</button><input id="qval" type="text" inputmode="decimal" maxlength="12" aria-label="Quantité" autocomplete="off"><button type="button" class="qpm" data-qpas="1" aria-label="Plus">+</button></div>
+      <div class="gfilters qunits" id="qunits" role="group" aria-label="Unité"></div>
+      <p class="note" id="qorig"></p>
+      <p class="note">Vous pouvez aussi écrire librement, par exemple « 2 sachets » ou « 1 grand ». Laissez vide pour effacer.</p>
+      <div class="actions"><button type="button" class="btn" id="qcancel">Annuler</button><button type="button" class="btn primary" id="qok">Enregistrer</button></div>
+    </div>
+  </div>
+</div>
+
 <!-- Fiche d'un produit -->
 <div class="overlay povl" id="poverlay" hidden>
   <div class="modal pmodal" role="dialog" aria-modal="true" aria-labelledby="ptitle">
@@ -1007,10 +1034,10 @@ body.notowner .owner-only{display:none!important}
   <div class="sfoot" id="sfoot"></div>
 </div>
 
-<script src="vendor/jspdf-4.2.1.umd.min.js?v=37"></script>
-<script src="vendor/supabase-js-2.45.4.js?v=37"></script>
-<script src="js/partage.js?v=37"></script>
-<script src="js/app.js?v=37"></script>
+<script src="vendor/jspdf-4.2.1.umd.min.js?v=38"></script>
+<script src="vendor/supabase-js-2.45.4.js?v=38"></script>
+<script src="js/partage.js?v=38"></script>
+<script src="js/app.js?v=38"></script>
 
 </body>
 </html>
