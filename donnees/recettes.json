@@ -1,4 +1,382 @@
 {
- "maj": "2026-11-13",
- "recettes": []
+ "maj": "2026-11-14",
+ "recettes": [
+  {
+   "id": "pechesthon",
+   "nom": "Pêches au thon et frites",
+   "acc": "Salade et tomates",
+   "t": 25,
+   "b": "eco",
+   "p": "poisson",
+   "f": "pdt",
+   "c": "belge",
+   "astuce": "Un classique belge : préparez la farce pendant que les frites cuisent au four.",
+   "ing": [
+    [
+     "Pêches au sirop",
+     3,
+     "boîte",
+     "epi"
+    ],
+    [
+     "Thon au naturel",
+     4,
+     "boîte",
+     "epi"
+    ],
+    [
+     "Mayonnaise",
+     1,
+     "pot",
+     "epi"
+    ],
+    [
+     "Ketchup",
+     1,
+     "flacon",
+     "epi"
+    ],
+    [
+     "Frites au four",
+     1500,
+     "g",
+     "sur"
+    ],
+    [
+     "Laitue",
+     1,
+     "",
+     "fl"
+    ],
+    [
+     "Tomates",
+     5,
+     "",
+     "fl"
+    ],
+    [
+     "Œufs",
+     5,
+     "",
+     "cre"
+    ]
+   ],
+   "etapes": [
+    "Enfournez les frites selon le paquet et cuisez les œufs durs 10 minutes.",
+    "Égouttez le thon et mélangez-le avec 4 cuillères de mayonnaise, un peu de ketchup, sel et poivre.",
+    "Égouttez les demi-pêches et garnissez-les de thon.",
+    "Servez avec la salade, les tomates, les œufs coupés en deux et les frites."
+   ],
+   "propose_par": "Romane",
+   "ajoute": "2026-11-14"
+  },
+  {
+   "id": "lasagnebutternut",
+   "nom": "Lasagnes butternut, pleurotes et épinards à la poêle",
+   "acc": "Salade verte",
+   "t": 30,
+   "b": "moyen",
+   "p": "vege",
+   "f": "pates",
+   "c": "italienne",
+   "astuce": "Version rapide de la recette proposée : les feuilles de lasagne cassées cuisent dans la sauce, sans passer au four.",
+   "ing": [
+    [
+     "Butternut",
+     1000,
+     "g",
+     "fl"
+    ],
+    [
+     "Pleurotes",
+     250,
+     "g",
+     "fl"
+    ],
+    [
+     "Épinards",
+     450,
+     "g",
+     "sur"
+    ],
+    [
+     "Feuilles de lasagne",
+     400,
+     "g",
+     "epi"
+    ],
+    [
+     "Ricotta",
+     250,
+     "g",
+     "cre"
+    ],
+    [
+     "Mozzarella",
+     2,
+     "boule",
+     "cre"
+    ],
+    [
+     "Bouillon de légumes",
+     2,
+     "cube",
+     "epi"
+    ],
+    [
+     "Oignons",
+     1,
+     "",
+     "fl"
+    ]
+   ],
+   "etapes": [
+    "Épluchez la butternut et coupez-la en petits dés ; émincez l'oignon et les pleurotes.",
+    "Faites revenir l'oignon et la butternut 5 minutes dans une grande sauteuse, ajoutez les pleurotes 3 minutes.",
+    "Versez 1 L de bouillon, ajoutez les feuilles de lasagne cassées et les épinards ; couvrez et cuisez 15 minutes en remuant de temps en temps.",
+    "Ajoutez la ricotta par cuillerées et la mozzarella déchirée, couvrez 3 minutes pour la faire fondre."
+   ],
+   "source": {
+    "titre": "Colruyt (lien proposé par Servane)",
+    "url": "https://www.colruyt.be/fr/recettes/lasagne-de-butternut-aux-pleurotes-et-aux-epinards"
+   },
+   "propose_par": "Servane",
+   "ajoute": "2026-11-14"
+  },
+  {
+   "id": "painviandegrec",
+   "nom": "Pains de viande à la grecque, pommes rissolées",
+   "acc": "Salade tomate, concombre et feta",
+   "t": 30,
+   "b": "moyen",
+   "p": "boeuf",
+   "f": "pdt",
+   "c": "grecque",
+   "astuce": "Cuits en petits pains (ou dans des moules à muffins), ils sont prêts en 20 minutes au lieu d'une heure.",
+   "ing": [
+    [
+     "Haché porc-bœuf",
+     700,
+     "g",
+     "bou"
+    ],
+    [
+     "Feta",
+     200,
+     "g",
+     "cre"
+    ],
+    [
+     "Œufs",
+     1,
+     "",
+     "cre"
+    ],
+    [
+     "Chapelure",
+     1,
+     "paquet",
+     "epi"
+    ],
+    [
+     "Origan",
+     1,
+     "pot",
+     "epi"
+    ],
+    [
+     "Pommes de terre",
+     1200,
+     "g",
+     "fl"
+    ],
+    [
+     "Tomates",
+     4,
+     "",
+     "fl"
+    ],
+    [
+     "Concombre",
+     1,
+     "",
+     "fl"
+    ]
+   ],
+   "etapes": [
+    "Préchauffez le four à 210 °C. Coupez les pommes de terre en petits dés et faites-les rissoler 20 minutes à la poêle, à couvert au début.",
+    "Mélangez le haché, l'œuf, 4 cuillères de chapelure, 1 cuillère d'origan et la moitié de la feta émiettée.",
+    "Formez 10 petits pains et enfournez-les 18 minutes.",
+    "Préparez la salade : tomates, concombre, le reste de la feta, origan et huile d'olive."
+   ],
+   "source": {
+    "titre": "Colruyt (lien proposé par Servane)",
+    "url": "https://www.colruyt.be/fr/recettes/pain-de-viande-a-la-grecque-pommes-de-terre-rissolees-et-salade-rafraichissante"
+   },
+   "propose_par": "Servane",
+   "ajoute": "2026-11-14"
+  },
+  {
+   "id": "pinsa",
+   "nom": "Pinsas à l'aubergine, au jambon et à la burrata",
+   "acc": "Roquette",
+   "t": 25,
+   "b": "plaisir",
+   "p": "porc",
+   "f": "pain",
+   "c": "italienne",
+   "astuce": "Les bases de pinsa toutes prêtes se trouvent au rayon frais ; la burrata se pose à la sortie du four.",
+   "ing": [
+    [
+     "Pinsa",
+     5,
+     "",
+     "cre"
+    ],
+    [
+     "Aubergines",
+     2,
+     "",
+     "fl"
+    ],
+    [
+     "Coulis de tomate",
+     40,
+     "cl",
+     "epi"
+    ],
+    [
+     "Jambon cru",
+     150,
+     "g",
+     "bou"
+    ],
+    [
+     "Burrata",
+     3,
+     "",
+     "cre"
+    ],
+    [
+     "Roquette",
+     125,
+     "g",
+     "fl"
+    ]
+   ],
+   "etapes": [
+    "Préchauffez le four à 230 °C. Coupez les aubergines en fines rondelles et faites-les dorer à la poêle avec un peu d'huile.",
+    "Étalez le coulis de tomate sur les pinsas et répartissez les aubergines.",
+    "Enfournez 8 à 10 minutes.",
+    "À la sortie du four, ajoutez le jambon, la burrata déchirée et la roquette."
+   ],
+   "source": {
+    "titre": "Colruyt (lien proposé par Servane)",
+    "url": "https://www.colruyt.be/fr/recettes/pinsa-a-laubergine-au-jambon-et-a-la-burrata"
+   },
+   "propose_par": "Servane",
+   "ajoute": "2026-11-14"
+  },
+  {
+   "id": "lasagnesaumon",
+   "nom": "Lasagnes saumon et épinards à la poêle",
+   "acc": "Salade verte",
+   "t": 30,
+   "b": "plaisir",
+   "p": "poisson",
+   "f": "pates",
+   "c": "italienne",
+   "astuce": "Version rapide de la recette proposée : tout cuit dans la même sauteuse en une demi-heure.",
+   "ing": [
+    [
+     "Saumon frais",
+     600,
+     "g",
+     "sur"
+    ],
+    [
+     "Épinards",
+     600,
+     "g",
+     "sur"
+    ],
+    [
+     "Feuilles de lasagne",
+     400,
+     "g",
+     "epi"
+    ],
+    [
+     "Crème fraîche",
+     25,
+     "cl",
+     "cre"
+    ],
+    [
+     "Lait",
+     40,
+     "cl",
+     "cre"
+    ],
+    [
+     "Fromage râpé",
+     150,
+     "g",
+     "cre"
+    ],
+    [
+     "Oignons",
+     1,
+     "",
+     "fl"
+    ]
+   ],
+   "etapes": [
+    "Faites revenir l'oignon émincé, ajoutez les épinards et laissez-les décongeler 5 minutes.",
+    "Versez le lait, la crème et 30 cl d'eau, salez, poivrez, ajoutez les feuilles de lasagne cassées ; couvrez et cuisez 12 minutes en remuant.",
+    "Ajoutez le saumon en cubes et laissez cuire 5 minutes à couvert.",
+    "Parsemez de fromage râpé et couvrez 2 minutes avant de servir."
+   ],
+   "source": {
+    "titre": "Marmiton (lien proposé par Manu)",
+    "url": "https://www.marmiton.org/recettes/recette_lasagnes-au-saumon-et-aux-epinards_14665.aspx"
+   },
+   "propose_par": "Manu",
+   "ajoute": "2026-11-14"
+  }
+ ],
+ "prix": {
+  "Pêches au sirop": [
+   1.6,
+   "u"
+  ],
+  "Butternut": [
+   2.0,
+   "kg"
+  ],
+  "Pleurotes": [
+   12,
+   "kg"
+  ],
+  "Ricotta": [
+   8,
+   "kg"
+  ],
+  "Pinsa": [
+   2.2,
+   "u"
+  ],
+  "Aubergines": [
+   1.2,
+   "u"
+  ],
+  "Burrata": [
+   2.6,
+   "u"
+  ],
+  "Origan": [
+   1.5,
+   "u"
+  ]
+ }
 }
