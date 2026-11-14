@@ -1343,7 +1343,7 @@ function openSheet(ctx){ sheetCtx=ctx; $("sheet").hidden=false; document.body.st
 function closeSheet(){ const c=sheetCtx; if(c&&c.type==="wizard"&&!state.onboarded){ state.onboarded=true; saveLocal(); }
   sheetCtx=null; $("sheet").hidden=true; if(!modalCtx) document.body.style.overflow=""; keepAwake(false); if(c&&c.after) c.after(); }
 function renderSheet(){ const c=sheetCtx; if(!c) return; $("sheet").dataset.type=c.type;
-  ({gallery:renderGallery,shop:renderShop,cook:renderCook,wizard:renderWizard,recipe:renderRecipeForm,gouts:renderGouts,export:renderExport,retour:renderRetourSheet,bilan:renderBilan})[c.type](); }
+  ({gallery:renderGallery,shop:renderShop,cook:renderCook,wizard:renderWizard,recipe:renderRecipeForm,gouts:renderGouts,export:renderExport,retour:renderRetourSheet,bilan:renderBilan,historique:renderHistorique})[c.type](); }
 async function keepAwake(on){ try{ if(on&&navigator.wakeLock&&!wakeLock){ wakeLock=await navigator.wakeLock.request("screen"); wakeLock.addEventListener&&wakeLock.addEventListener("release",()=>{wakeLock=null;}); }
   else if(!on&&wakeLock){ const w=wakeLock; wakeLock=null; await w.release(); } }catch(e){ wakeLock=null; } }
 document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible"&&sheetCtx&&sheetCtx.wake&&!wakeLock) keepAwake(true); });
@@ -2200,6 +2200,7 @@ async function majPlacard(n,garder){ const r={...PLACARD}; if(garder) r[n]=isoOf
 function habituels(){ const c=new Map(), add=(n,ray,qt,poids)=>{ const k=norm(n); if(!k) return; const o=c.get(k)||{n,ray,qt:"",c:0}; o.c+=poids; if(qt&&!o.qt) o.qt=qt; c.set(k,o); };
   Object.entries({...state.weeks,...(typeof SEMAINES==="object"?SEMAINES:{})}).forEach(([iso,w])=>{ if(iso===curIso()) return; (w.extras||w.ajouts||[]).forEach(x=>x&&x.n&&add(x.n,x.ray,x.qt,2)); });
   (state.extras||[]).forEach(x=>add(x.n,x.ray,x.qt,0.5));
+  try{ Object.values(TICKETS_PH).forEach(t=>(t.res.lignes||[]).forEach(l=>{ const n=l.i||""; if(n&&!estIngredientMenu(n)) add(n,l.r,"",1.5); })); }catch(e){}
   Object.values(HISTO).forEach(h=>add(h.n,h.ray,h.qt,Math.min(3,(h.c||0)/2)));
   let l=[...c.values()].filter(x=>x.c>=1).sort((a,b)=>b.c-a.c).slice(0,14);
   if(l.length<6) ["Lait","Pain","Œufs","Yaourts","Beurre","Bananes","Pommes","Café","Eau plate","Papier toilette"].forEach(n=>{ if(l.length<12&&!l.some(x=>norm(x.n)===norm(n))) { const p=produitsConnus().find(x=>norm(x.n)===norm(n)); l.push({n,ray:p?p.ray:"epi",qt:"",c:0}); } });
@@ -2252,7 +2253,8 @@ function cleanTicketPh(x){ if(!x||typeof x!=="object") return null; const r=x.re
   const jr=v=>typeof v==="string"&&/^\d{4}-\d{2}-\d{2}/.test(v)?v.slice(0,10):"";
   return {semaine:jr(x.semaine),quand:typeof x.quand==="string"&&/^\d{4}-\d{2}-\d{2}T[\d:.]+Z?$/.test(x.quand)?x.quand:"",par:typeof x.par==="string"&&UUID_RE.test(x.par)?x.par:propre(x.par,30),mag:typeof x.mag==="string"?x.mag.replace(/[<>"'`]/g,"").slice(0,40):"",
     lie:!!x.lie,statut:["attente","analyse","illisible"].includes(x.statut)?x.statut:"attente",aPhoto:typeof x.photo==="string",
-    res:{total:+r.total>0?Math.round(+r.total*100)/100:null,articles:+r.articles>0?Math.round(+r.articles):null,magasin:propre(r.magasin,50),date:jr(r.date),reconnus:+r.reconnus>=0?Math.round(+r.reconnus):null,note:propre(r.note,200)}}; }
+    res:{total:+r.total>0?Math.round(+r.total*100)/100:null,articles:+r.articles>0?Math.round(+r.articles):null,magasin:propre(r.magasin,50),date:jr(r.date),reconnus:+r.reconnus>=0?Math.round(+r.reconnus):null,note:propre(r.note,200),
+      lignes:Array.isArray(r.lignes)?r.lignes.slice(0,250).map(l=>l&&typeof l==="object"?{p:propre(l.p,70),i:propre(l.i,50),q:+l.q>0&&+l.q<1000?+l.q:1,u:["kg","L","u","g","cl"].includes(l.u)?l.u:"u",m:+l.m>=0&&+l.m<1000?Math.round(+l.m*100)/100:0,r:RAYONS[l.r]?l.r:"epi",md:!!l.md}:null).filter(l=>l&&l.p):[]}}; }
 function subscribeTicketsPh(){ if(!DB) return; DB.collection("tickets").onSnapshot(q=>{ q.docChanges().forEach(c=>{ if(c.type==="removed") delete TICKETS_PH[c.doc.id]; else { const v=cleanTicketPh(c.doc.data()); if(v) TICKETS_PH[c.doc.id]=v; } }); if(state.tab==="courses") renderTicket(); },()=>{}); }
 function compresserTicket(file){ return new Promise((ok,ko)=>{ const img=new Image(), url=URL.createObjectURL(file);
   img.onload=()=>{ URL.revokeObjectURL(url); const essai=(max,q)=>{ const m=Math.min(1,max/Math.max(img.naturalWidth,img.naturalHeight)), c=document.createElement("canvas");
@@ -2287,7 +2289,8 @@ function renderTicket(){ const box=$("ticketbox"); if(!box) return;
     ${tk.length?`<div class="tklist">${tk.map((x,i)=>`<div><span><b>${eur(x.montant)}</b><small>${esc(x.mag||"Magasin")} · ${x.quand?new Date(x.quand).toLocaleDateString("fr-BE"):""}${x.par?" · "+esc(x.par):""}</small></span><button type="button" class="sbtn edit-only" data-tkdel="${i}" aria-label="Supprimer ce ticket">×</button></div>`).join("")}</div>
       <p class="tkecart ${ecart>0?"plus":"moins"}">Total ${eur(tot)} · estimé ${eur(est)} · ${ecart>0?`${eur(ecart)} de plus que prévu`:`${eur(-ecart)} de moins que prévu`}${ecart>0&&(state.extras||[]).length?` (dont ${state.extras.length} produits ajoutés hors recettes)`:""}</p>`:""}
     ${h.length?`<h3 class="shopray">Semaine après semaine</h3><div class="tkbars">${h.map(x=>`<div class="tkbar" title="Réel ${eur(x.reel)}${x.est?", estimé "+eur(x.est):""}"><span class="tkcols"><i class="r" style="height:${Math.round(x.reel/max*100)}%"></i>${x.est?`<i class="e" style="height:${Math.round(x.est/max*100)}%"></i>`:""}</span><b>${Math.round(x.reel)} €</b><small>${fmtShort(isoDate(x.iso))}</small></div>`).join("")}</div>
-      <p class="note"><i class="leg r"></i> réel <i class="leg e"></i> estimé · ce mois-ci : ${eur(mois)} dépensés</p>`:""}`; }
+      <p class="note"><i class="leg r"></i> réel <i class="leg e"></i> estimé · ce mois-ci : ${eur(mois)} dépensés</p>`:""}
+    <button type="button" class="btn histbtn" data-histo="1" data-tip="Dépenses, produits récurrents, évolution des prix et détail de chaque ticket">📊 Historique et analyse des courses</button>`; }
 document.addEventListener("submit",e=>{ if(e.target.id!=="ticketform") return; e.preventDefault(); const v=parseFloat(($("tk-montant").value||"").replace(",",".").replace(/[^\d.]/g,""));
   if(!(v>0&&v<5000)){ toast("Indiquez le montant du ticket, par exemple 87,45"); return; }
   const nom=(window.__acces&&window.__acces()&&window.__acces().nom)||"";
@@ -2302,6 +2305,104 @@ document.addEventListener("click",e=>{
   const re=e.target.closest("[data-remettre]"); if(re){ const n=re.dataset.remettre; majPlacard(n,false); toast(`${n} remis sur la liste`); return; }
   const td=e.target.closest("[data-tkdel]"); if(td){ state.tickets=(state.tickets||[]).filter((_,i)=>i!==+td.dataset.tkdel); save(); renderTicket(); toast("Ticket supprimé"); return; }
 },true);
+
+// ===================== Historique des courses =====================
+// Sources : les lignes des tickets lus (base privée de la famille), les listes de chaque semaine (menu + produits ajoutés)
+// et les montants notés à la main. Rien n'est publié dans le dépôt.
+function estIngredientMenu(n){ const k=norm(n); return Object.values(BYID).some(r=>r.ing.some(x=>norm(x[0])===k)); }
+function historique(){
+  const weeks={...state.weeks,...(typeof SEMAINES==="object"?SEMAINES:{})};
+  weeks[curIso()]={...(weeks[curIso()]||{}),menu:state.week,ajouts:state.extras,tickets:state.tickets,coches:state.checked};
+  const tks=Object.entries(TICKETS_PH).map(([id,t])=>({id,...t})).filter(t=>t.statut==="analyse");
+  // achats réels
+  const lignes=[]; tks.forEach(t=>{ const d=t.res.date||t.semaine; (t.res.lignes||[]).forEach(l=>lignes.push({...l,date:d,sem:t.semaine,mag:t.res.magasin||t.mag||"",n:l.i||l.p})); });
+  // dépenses par semaine
+  const dep={}; const addDep=(iso,v,est)=>{ if(!/^\d{4}-\d\d-\d\d$/.test(iso)) return; const o=dep[iso]||(dep[iso]={iso,reel:0,est:null}); o.reel+=v; if(est&&!o.est) o.est=est; };
+  Object.entries(weeks).forEach(([iso,w])=>cleanTickets(w.tickets).forEach(x=>addDep(iso,x.montant,x.estime)));
+  tks.filter(t=>!t.lie&&t.res.total).forEach(t=>addDep(t.semaine,t.res.total));
+  const semaines=Object.values(dep).filter(x=>x.reel>0).sort((a,b)=>a.iso.localeCompare(b.iso));
+  // produits : semaines où ils étaient sur la liste, achats réels
+  const P=new Map(), get=n=>{ const k=norm(n); let o=P.get(k); if(!o){ o={n,listes:new Set(),achats:[],depense:0,qte:0,ray:null}; P.set(k,o); } return o; };
+  Object.entries(weeks).forEach(([iso,w])=>{ if(!/^\d{4}-\d\d-\d\d$/.test(iso)) return;
+    (Array.isArray(w.menu)?w.menu:[]).forEach(id=>BYID[id]&&BYID[id].ing.forEach(([n,,,ray])=>{ const o=get(n); o.listes.add(iso); o.ray=o.ray||ray; }));
+    (Array.isArray(w.ajouts||w.extras)?(w.ajouts||w.extras):[]).forEach(x=>{ if(x&&x.n){ const o=get(String(x.n).slice(0,50)); o.listes.add(iso); o.ray=o.ray||x.ray; } }); });
+  lignes.forEach(l=>{ const o=get(l.n); o.achats.push(l.date); o.depense+=l.m; o.qte+=l.q; o.ray=l.r||o.ray; if(l.mag) o.mag=l.mag; });
+  const nbSem=Math.max(1,new Set([...Object.keys(weeks).filter(k=>/^\d{4}-\d\d-\d\d$/.test(k)&&(weeks[k].menu||[]).some(Boolean)),...tks.map(t=>t.semaine).filter(Boolean)]).size);
+  const produits=[...P.values()].map(o=>{ const dates=[...new Set(o.achats)].sort(), sems=new Set([...o.listes,...lignes.filter(l=>norm(l.n)===norm(o.n)).map(l=>l.sem)]);
+    let intervalle=null; if(dates.length>=2){ intervalle=Math.round((isoDate(dates[dates.length-1])-isoDate(dates[0]))/DAY/(dates.length-1)); }
+    else if(sems.size>=2){ const ss=[...sems].sort(); intervalle=Math.round((isoDate(ss[ss.length-1])-isoDate(ss[0]))/DAY/(ss.length-1)); }
+    const dernier=dates.length?dates[dates.length-1]:null, prochain=dernier&&intervalle?new Date(isoDate(dernier).getTime()+intervalle*DAY):null;
+    return {...o,semaines:sems.size,dates,dernier,intervalle,prochain}; }).sort((a,b)=>b.semaines-a.semaines||b.depense-a.depense);
+  const total=lignes.reduce((s,l)=>s+l.m,0), parRayon={}; lignes.forEach(l=>parRayon[l.r]=(parRayon[l.r]||0)+l.m);
+  const md=lignes.filter(l=>l.md).reduce((s,l)=>s+l.m,0);
+  return {weeks,tks,lignes,semaines,produits,total,parRayon,md,nbSem}; }
+function barresH(items,max){ return `<div class="hbars">${items.map(([lab,v,extra])=>`<div class="hbar"><span class="hlab">${lab}</span><span class="htrack"><i style="width:${max?Math.max(2,Math.round(v/max*100)):0}%"></i></span><span class="hval">${extra||eur(v)}</span></div>`).join("")}</div>`; }
+function renderHistorique(){ const H=historique(), c=sheetCtx, onglet=c.onglet||"apercu";
+  $("seyebrow").textContent="Vos courses semaine après semaine"; $("stitle").textContent="Historique des courses";
+  $("sextra").innerHTML=""; $("sfoot").innerHTML=`<button class="btn" data-histcsv="1">Exporter (tableur)</button><button class="btn primary" data-histfin="1">Fermer</button>`;
+  const tabs=[["apercu","Aperçu"],["produits","Produits"],["prix","Prix"],["tickets","Tickets"]];
+  let html=`<div class="gfilters histtabs" role="tablist">${tabs.map(([k,l])=>`<button class="chip${k===onglet?" on":""}" role="tab" aria-selected="${k===onglet}" data-histtab="${k}">${l}</button>`).join("")}</div>`;
+  const peu=H.semaines.length<2&&H.tks.length<2;
+  if(onglet==="apercu"){
+    const tot=H.semaines.reduce((s,x)=>s+x.reel,0), moy=H.semaines.length?tot/H.semaines.length:0, der=H.semaines[H.semaines.length-1], av=H.semaines[H.semaines.length-2];
+    const mois={}; H.semaines.forEach(x=>{ const k=x.iso.slice(0,7); mois[k]=(mois[k]||0)+x.reel; });
+    const maxS=Math.max(1,...H.semaines.map(x=>Math.max(x.reel,x.est||0)));
+    const ray=Object.entries(H.parRayon).sort((a,b)=>b[1]-a[1]), maxR=Math.max(1,...ray.map(x=>x[1]));
+    const fl=(H.parRayon.fl||0)/(H.total||1), mdp=H.md/(H.total||1);
+    const dus=H.produits.filter(p=>p.prochain&&p.prochain<=new Date(TODAY.getTime()+4*DAY)).slice(0,8);
+    html+=`<div class="hkpis"><div><b>${eur(tot)}</b><small>dépensés en ${H.semaines.length} semaine${H.semaines.length>1?"s":""}</small></div><div><b>${eur(moy)}</b><small>par semaine en moyenne</small></div><div><b>${moy?eur(moy/5/7):"–"}</b><small>par personne et par jour (5 pers.)</small></div>${der&&av?`<div><b class="${der.reel>av.reel?"up":"down"}">${der.reel>av.reel?"+":"−"}${Math.abs(Math.round((der.reel-av.reel)/av.reel*100))} %</b><small>par rapport à la semaine d'avant</small></div>`:""}</div>
+    ${H.semaines.length?`<h3 class="shopray">Dépenses par semaine</h3><div class="hcols">${H.semaines.slice(-12).map(x=>`<div class="hcol" title="Semaine du ${fmtShort(isoDate(x.iso))} : ${eur(x.reel)}${x.est?" (estimé "+eur(x.est)+")":""}"><span class="hstack"><i class="r" style="height:${Math.round(x.reel/maxS*100)}%"></i>${x.est?`<i class="e" style="height:${Math.round(x.est/maxS*100)}%"></i>`:""}</span><small>${fmtShort(isoDate(x.iso))}</small><b>${Math.round(x.reel)} €</b></div>`).join("")}</div>
+      <p class="note"><i class="leg r"></i> payé <i class="leg e"></i> estimé par l'application${Object.keys(mois).length>1?" · "+Object.entries(mois).map(([k,v])=>`${MOIS[+k.slice(5)-1]} : ${eur(v)}`).join(" · "):""}</p>`:`<p class="note">Aucune dépense notée pour l'instant.</p>`}
+    ${ray.length?`<h3 class="shopray">Où va l'argent (d'après les tickets lus)</h3>${barresH(ray.map(([r,v])=>[esc(RAYONS[r]||r),v,`${eur(v)} · ${Math.round(v/H.total*100)} %`]),maxR)}`:""}
+    ${H.lignes.length?`<h3 class="shopray">Repères</h3><ul class="hreps">
+      <li><b>${Math.round(fl*100)} %</b> du ticket en fruits et légumes ${fl<0.2?"<small>(repère courant : viser au moins 20 à 25 % du budget alimentaire)</small>":"<small>(bonne part)</small>"}</li>
+      <li><b>${Math.round(mdp*100)} %</b> en marques de distributeur ${mdp<0.7?`<small>(passer aux marques du magasin pour les produits de base fait souvent gagner 20 à 40 % sur ces articles)</small>`:""}</li>
+      ${(()=>{ const b=H.lignes.filter(l=>!l.md&&l.m>=3).sort((a,b)=>b.m-a.m).slice(0,3); return b.length?`<li>Plus grosses dépenses en marque nationale : ${b.map(l=>`${esc(l.p)} (${eur(l.m)})`).join(", ")}</li>`:""; })()}
+    </ul>`:""}
+    ${dus.length?`<h3 class="shopray">Probablement à racheter</h3><div class="gfilters wrap">${dus.map(p=>`<button class="chip" data-histadd="${esc(p.n)}" data-ray="${esc(p.ray||"epi")}">+ ${esc(p.n)}</button>`).join("")}</div>`:""}
+    ${peu?`<p class="note hinfo">L'historique devient vraiment parlant après 3 ou 4 semaines : continuez à envoyer la photo de chaque ticket.</p>`:""}`;
+  }
+  if(onglet==="produits"){
+    const dans=new Set([...(state.extras||[]).map(x=>norm(x.n)),...coursesTrips().flat().map(i=>norm(i.n))]);
+    const l=H.produits.filter(p=>p.semaines>=1).slice(0,60);
+    html+=`<p class="note">Les produits qui reviennent le plus souvent sur vos listes et vos tickets (${H.nbSem} semaine${H.nbSem>1?"s":""} d'historique). Touchez un nom pour sa fiche.</p>
+    <div class="htable" role="table"><div class="hrow hhead" role="row"><span>Produit</span><span>Semaines</span><span>Dernier achat</span><span>Dépensé</span><span></span></div>
+    ${l.map(p=>{ const pr=promosFor(p.n).filter(x=>isoDate(x.au)>=TODAY)[0]; const deja=dans.has(norm(p.n));
+      return `<div class="hrow" role="row"><span>${produitDe(p.n)?`<button type="button" class="linkbtn" data-prod="${esc(p.n)}">${esc(p.n)}</button>`:esc(p.n)}${pr?`<small class="hpromo">En promo chez ${esc(ENS[pr.mag])} : ${eur(pr.prix)}</small>`:""}${p.intervalle?`<small>tous les ${p.intervalle} jours environ${p.prochain?` · prochain vers le ${fmtShort(p.prochain)}`:""}</small>`:""}</span>
+        <span>${p.semaines}/${H.nbSem}</span><span>${p.dernier?fmtShort(isoDate(p.dernier)):"–"}</span><span>${p.depense?eur(p.depense):"–"}</span>
+        <span>${deja?`<small>sur la liste</small>`:`<button type="button" class="sbtn" data-histadd="${esc(p.n)}" data-ray="${esc(p.ray||"epi")}" aria-label="Ajouter ${esc(p.n)} à la liste">+</button>`}</span></div>`; }).join("")}</div>`;
+  }
+  if(onglet==="prix"){
+    const ev=Object.entries(PRIX_DETAIL).map(([n,l])=>{ const s=[...l].sort((a,b)=>a.date.localeCompare(b.date)); const a=s[0], z=s[s.length-1]; const ref=(PRODUITS_REF[n]||null);
+      const ad=s.filter(x=>x.date===a.date&&x.u===a.u), zd=s.filter(x=>x.date===z.date&&x.u===z.u), moy=l=>l.reduce((t,x)=>t+x.p,0)/l.length;
+      return {n,l:s,a,z:{...z,p:Math.round(moy(zd)*100)/100},var:a.date!==z.date&&a.u===z.u?(moy(zd)-moy(ad))/moy(ad):null,ref}; });
+    const varies=ev.filter(x=>x.var!=null).sort((a,b)=>Math.abs(b.var)-Math.abs(a.var));
+    const ecarts=ev.filter(x=>x.ref&&x.ref[1]===x.z.u).map(x=>({...x,e:(x.z.p-x.ref[0])/x.ref[0]})).sort((a,b)=>b.e-a.e);
+    html+=`${varies.length?`<h3 class="shopray">Évolution de vos prix</h3>${barresH(varies.slice(0,15).map(x=>[esc(x.n),Math.abs(x.var),`${x.var>0?"+":"−"}${Math.abs(Math.round(x.var*100))} % · ${eur(x.z.p)}/${x.z.u}`]),Math.max(...varies.map(x=>Math.abs(x.var))))}`:`<p class="note">L'évolution des prix apparaîtra dès qu'un même produit figurera sur 2 tickets.</p>`}
+      ${ecarts.length?`<h3 class="shopray">Vos prix comparés aux estimations</h3>${barresH(ecarts.slice(0,15).map(x=>[esc(x.n),Math.abs(x.e),`${x.e>0?"+":"−"}${Math.abs(Math.round(x.e*100))} % · ${eur(x.z.p)} au lieu de ${eur(x.ref[0])}`]),Math.max(...ecarts.map(x=>Math.abs(x.e))))}`:""}
+      <p class="note">Plus vous envoyez de tickets (et de magasins différents), plus les comparaisons sont fiables.</p>`;
+  }
+  if(onglet==="tickets"){
+    const grp=new Map(); H.tks.forEach(t=>{ const k=(t.res.date||t.semaine)+"|"+norm(t.res.magasin||t.mag||""); const g=grp.get(k)||{d:t.res.date||t.semaine,mag:t.res.magasin||t.mag,total:null,tot2:null,l:[],note:"",photos:0};
+      g.photos++; if(t.res.total) g.tot2=Math.max(g.tot2||0,t.res.total); if(!t.lie&&t.res.total) g.total=(g.total||0)+t.res.total; g.l.push(...(t.res.lignes||[])); grp.set(k,g); });
+    const list=[...[...grp.values()].map(g=>({...g,note:g.photos>1?`Ticket envoyé en ${g.photos} photos.`:""})),
+      ...Object.entries(H.weeks).flatMap(([iso,w])=>cleanTickets(w.tickets).map(x=>({d:(x.quand||iso).slice(0,10),mag:x.mag,total:x.montant,l:[],manuel:true})))].sort((a,b)=>String(b.d).localeCompare(String(a.d)));
+    html+=list.length?list.map(t=>`<details class="panel htk"><summary><b>${t.d?new Date(t.d).toLocaleDateString("fr-BE",{weekday:"short",day:"numeric",month:"short"}):""}</b> · ${esc(t.mag||"Magasin")}${t.total?` · ${eur(t.total)}`:t.tot2?` · ${eur(t.tot2)}`:""}${t.manuel?" <small>(montant noté)</small>":t.l.length?` <small>(${t.l.length} articles)</small>`:""}</summary>
+      ${t.l.length?`<div class="hlignes">${t.l.map(l=>`<div><span>${esc(l.p)}${l.md?' <small class="md">marque magasin</small>':""}</span><span>${l.q!==1?String(l.q).replace(".",",")+(l.u==="u"?" ×":" "+l.u):""}</span><b>${eur(l.m)}</b></div>`).join("")}</div>`:`<p class="note">${t.manuel?"Montant noté à la main, sans le détail des articles.":"Détail non disponible."}</p>`}${t.note?`<p class="note">${esc(t.note)}</p>`:""}</details>`).join(""):`<p class="note">Aucun ticket pour l'instant.</p>`;
+  }
+  $("sbody").innerHTML=html; }
+const PRODUITS_REF={};
+function exporterHistorique(){ const H=historique(); const sep=";", q=v=>`"${String(v==null?"":v).replace(/"/g,'""')}"`;
+  const rows=[["Date","Magasin","Article","Produit de l'application","Rayon","Quantité","Unité","Montant (€)","Marque magasin"].map(q).join(sep),
+    ...H.lignes.map(l=>[l.date,l.mag,l.p,l.i,RAYONS[l.r]||l.r,String(l.q).replace(".",","),l.u,String(l.m).replace(".",","),l.md?"oui":"non"].map(q).join(sep))];
+  return new Blob(["﻿"+rows.join("\r\n")],{type:"text/csv;charset=utf-8"}); }
+document.addEventListener("click",async e=>{
+  const o=e.target.closest("[data-histo]"); if(o){ openSheet({type:"historique",onglet:"apercu"}); return; }
+  const t=e.target.closest("[data-histtab]"); if(t&&sheetCtx){ sheetCtx.onglet=t.dataset.histtab; renderHistorique(); $("sbody").scrollTop=0; return; }
+  const f=e.target.closest("[data-histfin]"); if(f){ closeSheet(); return; }
+  const a=e.target.closest("[data-histadd]"); if(a){ const n=a.dataset.histadd; if((state.extras||[]).some(y=>norm(y.n)===norm(n))){ toast(`${n} est déjà dans la liste`); return; } ajouterProduit(n,a.dataset.ray||"epi",""); if(sheetCtx&&sheetCtx.type==="historique") renderHistorique(); return; }
+  const c=e.target.closest("[data-histcsv]"); if(c){ try{ const res=await DL.save({filename:`historique-courses-${curIso()}.csv`,data:exporterHistorique()}); toast(res&&res.status==="shared"?"Historique partagé":"Historique téléchargé (s'ouvre dans Excel ou Google Sheets)"); }catch(err){ toast("Export impossible sur cet appareil"); } return; }
+});
 
 // ===================== Propositions de recettes par la famille =====================
 // Un lien, une envie en quelques mots, ou la photo d'une recette : la tâche du lundi et du mercredi en fait une recette de la bibliothèque.
@@ -2556,6 +2657,7 @@ async function chargerDonnees(){
   const [P,R,X,D]=await Promise.all([lire("donnees/promos.json"),lire("donnees/recettes.json"),lire("donnees/prix.json"),lire("donnees/produits.json")]); let ch=false;
   if(D&&Array.isArray(D.produits)){ D.produits.slice(0,3000).forEach(x=>{ const v=accepterProduit(x); if(!v) return; PRODUITS.set(norm(v.n),v); (v.alias||[]).forEach(a=>{ if(!PRODUITS.has(norm(a))) PRODUITS.set(norm(a),v); });
       if(v.ref&&!PRIX[v.n]) PRIX[v.n]=v.ref; }); ch=true; }
+  Object.keys(PRIX).forEach(k=>{ if(!PRODUITS_REF[k]) PRODUITS_REF[k]=[...PRIX[k]]; });
   if(X&&Array.isArray(X.releves)){ const lim=new Date(TODAY); lim.setDate(lim.getDate()-120); const par={};
     X.releves.slice(-5000).forEach(r=>{ if(!r||typeof r.ing!=="string"||!(+r.prixUnitaire>0)||!["kg","L","u"].includes(r.unite)||!/^\d{4}-\d\d-\d\d$/.test(r.date||"")||isoDate(r.date)<lim) return;
       const k=r.ing+"|"+r.unite; (par[k]=par[k]||[]).push({p:+r.prixUnitaire,mag:ENS[r.mag]?r.mag:null});

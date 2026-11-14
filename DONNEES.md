@@ -81,6 +81,8 @@ Les membres envoient la photo de leurs tickets depuis l'onglet Courses.
   `unite` est l'unité du prix de référence de l'ingrédient dans l'inventaire (kg, L ou u) ; `prixUnitaire` = prix ramené à cette unité. Toujours ajouter, ne jamais effacer d'anciens relevés.
 - Puis : `node outils/tickets.js resultat <chemin> analyse '{"total":87.45,"magasin":"Delhaize Ghlin","date":"2026-11-14","articles":32,"reconnus":18}'` (la photo est alors retirée de la base), ou `resultat <chemin> illisible '{"note":"Photo floue : merci d'en reprendre une"}'`.
 - Ne jamais recopier les informations de paiement (numéro de carte, code, terminal) ni le nom du caissier.
+- Dans le résultat « analyse », ajouter aussi `"lignes"` : TOUTES les lignes du ticket (pour l'historique des courses de la famille, gardé dans la base privée et jamais publié dans le dépôt) :
+  `{"p": "Beurre de laiterie doux 250 g", "i": "Beurre", "q": 4, "u": "u", "m": 8.28, "r": "cre", "md": true}` — `p` libellé lisible (sans code article), `i` nom exact du produit de l'application ou `""`, `q` quantité (nombre de pièces, ou kg/L pour les articles au poids), `u` = u, kg ou L, `m` montant payé pour la ligne, `r` rayon (fl, bou, cre, bl, epi, boi, sur, dro), `md` vrai pour une marque de distributeur (Boni, Everyday, 365, Carrefour, Milsani…). Quand un ticket est envoyé en plusieurs photos, mettre le `total` seulement sur la photo qui le montre.
 
 ## Inspiration des nouvelles recettes
 
