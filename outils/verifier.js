@@ -44,5 +44,18 @@ if (R) {
     ok(jour.test(r.ajoute || ""), q + " : date « ajoute » manquante");
   });
 }
+let X;
+try { X = JSON.parse(fs.readFileSync(path.join(racine, "donnees/prix.json"), "utf8")); } catch (e) { err.push("prix.json illisible : " + e.message); }
+if (X) {
+  ok(Array.isArray(X.releves), "prix.json : liste « releves » manquante");
+  (X.releves || []).forEach((r, i) => { const q = "relevé n°" + (i + 1) + " (" + (r && r.produit) + ")";
+    ok(typeof r.ing === "string" && r.ing, q + " : ingrédient « ing » manquant (nom exact de l'inventaire)");
+    ok(ENS.includes(r.mag), q + " : enseigne inconnue « " + r.mag + " »");
+    ok(+r.prix > 0 && +r.prixUnitaire > 0, q + " : prix et prixUnitaire positifs");
+    ok(["kg", "L", "u"].includes(r.unite), q + " : unite = kg, L ou u");
+    ok(jour.test(r.date || ""), q + " : date AAAA-MM-JJ");
+    ok(!/\d{4}\s?\d{2}\*{2,}|\*{4}\s?\d{4}/.test(JSON.stringify(r)), q + " : aucune donnée de paiement ne doit être enregistrée");
+  });
+}
 if (err.length) { console.error("PROBLÈMES (" + err.length + ") :\n- " + err.join("\n- ")); process.exit(1); }
-console.log("Tout est correct : " + (P ? P.promos.length : 0) + " promos, " + (R ? R.recettes.length : 0) + " recettes ajoutées.");
+console.log("Tout est correct : " + (P ? P.promos.length : 0) + " promos, " + (R ? R.recettes.length : 0) + " recettes ajoutées, " + (X ? X.releves.length : 0) + " prix relevés sur tickets.");

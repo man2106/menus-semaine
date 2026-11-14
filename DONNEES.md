@@ -66,3 +66,22 @@ Les membres proposent des recettes dans l'onglet Envies (un lien, une envie déc
 - `CLE_ROBOT=… node outils/suggestions.js lister` : écrit les propositions en attente dans `suggestions-a-traiter/` (une fiche `.json` par proposition, et la photo en `.jpg` s'il y en a une). Ce dossier n'est jamais publié.
 - Pour chaque proposition : lire la page du lien, ou regarder la photo, ou chercher sur le web une recette qui répond à l'envie. En faire une recette au format de `recettes.json` (5 personnes, 30 minutes maximum si possible ; ajouter `"propose_par": "<prénom>"`). Si ce n'est pas faisable (trop long, introuvable, doublon d'une recette existante), la refuser avec une explication courte et bienveillante.
 - Après la publication : `node outils/suggestions.js marquer <chemin> ajoutee <id>` ou `marquer <chemin> refusee "<explication>"`.
+
+## Tickets de caisse et base des prix réels
+
+Les membres envoient la photo de leurs tickets depuis l'onglet Courses.
+
+- `CLE_ROBOT=… node outils/tickets.js lister` : écrit les tickets en attente dans `tickets-a-traiter/` (photo `.jpg` + fiche `.json` avec la semaine, le magasin choisi et la date d'envoi). Ce dossier n'est jamais publié.
+- Pour chaque photo : lire le ticket (magasin, date, total, chaque ligne : produit, quantité, prix). Pour chaque ligne qui correspond à un ingrédient de l'inventaire, ajouter un relevé dans `donnees/prix.json` :
+
+```json
+{"ing": "Haché porc-bœuf", "produit": "Haché porc/bœuf 500 g", "mag": "delhaize", "prix": 4.29, "quantite": 0.5, "unite": "kg", "prixUnitaire": 8.58, "date": "2026-11-14"}
+```
+
+  `unite` est l'unité du prix de référence de l'ingrédient dans l'inventaire (kg, L ou u) ; `prixUnitaire` = prix ramené à cette unité. Toujours ajouter, ne jamais effacer d'anciens relevés.
+- Puis : `node outils/tickets.js resultat <chemin> analyse '{"total":87.45,"magasin":"Delhaize Ghlin","date":"2026-11-14","articles":32,"reconnus":18}'` (la photo est alors retirée de la base), ou `resultat <chemin> illisible '{"note":"Photo floue : merci d'en reprendre une"}'`.
+- Ne jamais recopier les informations de paiement (numéro de carte, code, terminal) ni le nom du caissier.
+
+## Inspiration des nouvelles recettes
+
+Source principale : Marmiton (marmiton.org), recettes bien notées, rapides et de saison. Chercher avec la recherche web (par exemple « marmiton recette rapide poireaux ») et ouvrir les liens des résultats. Rédiger les étapes avec nos propres mots et mettre la page Marmiton en `source`.

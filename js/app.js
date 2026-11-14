@@ -2224,15 +2224,43 @@ function validerQt(k,span){ const it=coursesTrips()[0].find(i=>i.k===k); if(!it)
   if(it.x){ const x=(state.extras||[]).find(y=>y.id===it.id); if(x) x.qt=q; }
   else { state.qtEdit={...(state.qtEdit||{})}; if(q) state.qtEdit[k]=q; else delete state.qtEdit[k]; }
   qtOuvert=null; save(); renderCourses(); toast(q?`${it.n} : ${q}`:`${it.n} : quantité effacée`); }
+// Photos de tickets : lues par la mise à jour du lundi et du mercredi, elles alimentent la base des prix réels
+let TICKETS_PH={};
+function cleanTicketPh(x){ if(!x||typeof x!=="object") return null; const r=x.resultat&&typeof x.resultat==="object"?x.resultat:{};
+  return {semaine:typeof x.semaine==="string"?x.semaine.slice(0,10):"",quand:typeof x.quand==="string"?x.quand.slice(0,30):"",par:propre(x.par,30),mag:typeof x.mag==="string"?x.mag.replace(/[<>"'`]/g,"").slice(0,40):"",
+    lie:!!x.lie,statut:["attente","analyse","illisible"].includes(x.statut)?x.statut:"attente",aPhoto:typeof x.photo==="string",
+    res:{total:+r.total>0?Math.round(+r.total*100)/100:null,articles:+r.articles>0?Math.round(+r.articles):null,magasin:propre(r.magasin,50),date:typeof r.date==="string"?r.date.slice(0,10):"",reconnus:+r.reconnus>=0?Math.round(+r.reconnus):null,note:propre(r.note,200)}}; }
+function subscribeTicketsPh(){ if(!DB) return; DB.collection("tickets").onSnapshot(q=>{ q.docChanges().forEach(c=>{ if(c.type==="removed") delete TICKETS_PH[c.doc.id]; else { const v=cleanTicketPh(c.doc.data()); if(v) TICKETS_PH[c.doc.id]=v; } }); if(state.tab==="courses") renderTicket(); },()=>{}); }
+function compresserTicket(file){ return new Promise((ok,ko)=>{ const img=new Image(), url=URL.createObjectURL(file);
+  img.onload=()=>{ URL.revokeObjectURL(url); const essai=(max,q)=>{ const m=Math.min(1,max/Math.max(img.naturalWidth,img.naturalHeight)), c=document.createElement("canvas");
+      c.width=Math.round(img.naturalWidth*m); c.height=Math.round(img.naturalHeight*m); const x=c.getContext("2d"); x.filter="grayscale(1) contrast(1.15)"; x.drawImage(img,0,0,c.width,c.height); return c.toDataURL("image/jpeg",q); };
+    for(const [max,q] of [[2000,0.6],[1800,0.5],[1600,0.45],[1400,0.4],[1200,0.4]]){ const d=essai(max,q); if(d.length<370000) return ok(d); } ko(new Error("trop lourde")); };
+  img.onerror=()=>{ URL.revokeObjectURL(url); ko(new Error("image")); }; img.src=url; }); }
+async function envoyerTicketPhoto(file){ if(!DB){ toast("L'envoi de photos demande le partage avec la famille"); return; }
+  let photo; try{ photo=await compresserTicket(file); }catch(e){ toast("Cette photo n'a pas pu être préparée : essayez de la recadrer sur le ticket"); return; }
+  const v=parseFloat((($("tk-montant")||{}).value||"").replace(",",".").replace(/[^\d.]/g,"")), mag=($("tk-mag")||{}).value||"", nom=(window.__acces&&window.__acces()&&window.__acces().nom)||"";
+  const id=curIso()+"-"+Date.now().toString(36);
+  try{ await DB.collection("tickets").doc(id).set({semaine:curIso(),photo,quand:new Date().toISOString(),par:nom,mag,lie:v>0,statut:"attente"}); }
+  catch(e){ toast("La photo n'a pas pu être envoyée. Réessayez dans un instant."); return; }
+  if(v>0&&v<5000){ state.tickets=[...(state.tickets||[]),{montant:Math.round(v*100)/100,mag,quand:new Date().toISOString(),estime:Math.round(weekCost(state.gamme)*100)/100,par:nom}]; save(); }
+  toast("Photo du ticket envoyée : elle sera lue lundi ou mercredi"); renderTicket(); }
+document.addEventListener("change",e=>{ if(e.target.id!=="tk-photo") return; const f=e.target.files&&e.target.files[0]; if(f) envoyerTicketPhoto(f); e.target.value=""; });
+document.addEventListener("click",async e=>{ const b=e.target.closest("[data-tphdel]"); if(!b) return; try{ await DB.collection("tickets").doc(b.dataset.tphdel).delete(); toast("Photo de ticket supprimée"); }catch(err){ toast("Seul le propriétaire peut supprimer une photo de ticket"); } });
 // Ticket de caisse réel
-function renderTicket(){ const box=$("ticketbox"); if(!box) return; const est=weekCost(state.gamme), tk=state.tickets||[], tot=tk.reduce((s,x)=>s+x.montant,0);
+function renderTicket(){ const box=$("ticketbox"); if(!box) return;
+  const ph=Object.entries(TICKETS_PH).filter(([,x])=>x.semaine===curIso()).sort((a,b)=>String(b[1].quand).localeCompare(String(a[1].quand)));
+  const est=weekCost(state.gamme), tk=state.tickets||[], tot=tk.reduce((s,x)=>s+x.montant,0)+ph.filter(([,x])=>!x.lie&&x.res.total).reduce((s,[,x])=>s+x.res.total,0);
   const hist=Object.entries({...state.weeks,...(typeof SEMAINES==="object"?SEMAINES:{})}).map(([iso,w])=>{ const t=cleanTickets(w.tickets); return {iso,reel:t.reduce((s,x)=>s+x.montant,0),est:t.find(x=>x.estime)?t.find(x=>x.estime).estime:null}; })
     .filter(x=>x.reel>0&&/^\d{4}-\d\d-\d\d$/.test(x.iso)); const hm=new Map(hist.map(x=>[x.iso,x])); if(tot>0) hm.set(curIso(),{iso:curIso(),reel:tot,est});
   const h=[...hm.values()].sort((a,b)=>a.iso.localeCompare(b.iso)).slice(-8), max=Math.max(1,...h.map(x=>Math.max(x.reel,x.est||0)));
   const ecart=tot>0?tot-est:null, moisCle=isoOf(TODAY).slice(0,7), mois=[...hm.values()].filter(x=>x.iso.slice(0,7)===moisCle).reduce((s,x)=>s+x.reel,0);
   box.innerHTML=`<summary>Ticket de caisse <span class="badge">${tot>0?eur(tot):"à noter"}</span></summary>
-    <p class="note">Notez le montant réel après les courses : l'application compare au budget estimé (${eur(est)} cette semaine, gamme ${GAMMES[state.gamme].nom.toLowerCase()}).</p>
+    <p class="note">Notez le montant réel après les courses : l'application compare au budget estimé (${eur(est)} cette semaine, gamme ${GAMMES[state.gamme].nom.toLowerCase()}).</p>${Object.keys(PRIX_REELS).length?`<p class="note">Base des prix réels : ${Object.keys(PRIX_REELS).length} ingrédients chiffrés d'après vos tickets.</p>`:""}
     <form class="addrow" id="ticketform"><input id="tk-montant" type="text" inputmode="decimal" placeholder="Montant payé (ex. 87,45)" aria-label="Montant du ticket en euros" maxlength="9"><select id="tk-mag" aria-label="Magasin">${(()=>{ let pm=""; try{ pm=MAGNOM[planTrip(0,coursesTrips()[0]).primary]; }catch(e){} return orderedStores().map(m=>`<option value="${esc(m.nom)}"${m.nom===pm?" selected":""}>${esc(m.nom)}</option>`).join(""); })()}<option value="">Autre</option></select><button class="btn primary edit-only" type="submit">Noter</button></form>
+    <label class="btn tkphoto edit-only" data-tip="Photographiez le ticket entier : il sera lu lundi ou mercredi pour enrichir la base des prix réels">📷 Photo du ticket<input id="tk-photo" type="file" accept="image/*" capture="environment" hidden></label>
+    ${ph.length?`<div class="tklist">${ph.map(([id,x])=>`<div><span><b>${x.statut==="analyse"?`Ticket lu${x.res.total?" : "+eur(x.res.total):""}`:x.statut==="illisible"?"Ticket illisible":"Photo en attente de lecture"}</b>
+      <small>${esc(x.res.magasin||x.mag||"")}${x.res.date?" · "+new Date(x.res.date).toLocaleDateString("fr-BE"):x.quand?" · envoyée le "+new Date(x.quand).toLocaleDateString("fr-BE"):""}${x.res.articles?` · ${x.res.articles} articles`:""}${x.res.reconnus!=null?`, ${x.res.reconnus} ajoutés à la base des prix`:""}${x.statut==="attente"?" · lecture lundi ou mercredi":""}${x.par?" · "+esc(x.par):""}</small>${x.res.note?`<small>${esc(x.res.note)}</small>`:""}</span>
+      <button type="button" class="sbtn owner-only" data-tphdel="${esc(id)}" aria-label="Supprimer cette photo de ticket">×</button></div>`).join("")}</div>`:""}
     ${tk.length?`<div class="tklist">${tk.map((x,i)=>`<div><span><b>${eur(x.montant)}</b><small>${esc(x.mag||"Magasin")} · ${x.quand?new Date(x.quand).toLocaleDateString("fr-BE"):""}${x.par?" · "+esc(x.par):""}</small></span><button type="button" class="sbtn edit-only" data-tkdel="${i}" aria-label="Supprimer ce ticket">×</button></div>`).join("")}</div>
       <p class="tkecart ${ecart>0?"plus":"moins"}">Total ${eur(tot)} · estimé ${eur(est)} · ${ecart>0?`${eur(ecart)} de plus que prévu`:`${eur(-ecart)} de moins que prévu`}${ecart>0&&(state.extras||[]).length?` (dont ${state.extras.length} produits ajoutés hors recettes)`:""}</p>`:""}
     ${h.length?`<h3 class="shopray">Semaine après semaine</h3><div class="tkbars">${h.map(x=>`<div class="tkbar" title="Réel ${eur(x.reel)}${x.est?", estimé "+eur(x.est):""}"><span class="tkcols"><i class="r" style="height:${Math.round(x.reel/max*100)}%"></i>${x.est?`<i class="e" style="height:${Math.round(x.est/max*100)}%"></i>`:""}</span><b>${Math.round(x.reel)} €</b><small>${fmtShort(isoDate(x.iso))}</small></div>`).join("")}</div>
@@ -2445,6 +2473,7 @@ document.addEventListener("click",e=>{ const b=e.target.closest("[data-envqui],[
 });
 
 // ===================== Données mises à jour par la tâche du lundi et du mercredi =====================
+const PRIX_REELS={}; // ingrédients dont le prix vient de vos tickets
 // donnees/promos.json : promos relevées dans les folders ; donnees/recettes.json : nouvelles recettes de la bibliothèque
 const txtOk = (v,max) => typeof v==="string" ? cleanTxt(v).slice(0,max) : "";
 function accepterRecette(x){
@@ -2461,7 +2490,12 @@ function accepterRecette(x){
 }
 async function chargerDonnees(){
   const lire=async f=>{ try{ const r=await fetch(f+"?v="+Date.now(),{cache:"no-store"}); return r.ok?await r.json():null; }catch(e){ return null; } };
-  const [P,R]=await Promise.all([lire("donnees/promos.json"),lire("donnees/recettes.json")]); let ch=false;
+  const [P,R,X]=await Promise.all([lire("donnees/promos.json"),lire("donnees/recettes.json"),lire("donnees/prix.json")]); let ch=false;
+  if(X&&Array.isArray(X.releves)){ const lim=new Date(TODAY); lim.setDate(lim.getDate()-120); const par={};
+    X.releves.slice(-5000).forEach(r=>{ if(!r||typeof r.ing!=="string"||!(+r.prixUnitaire>0)||!["kg","L","u"].includes(r.unite)||!/^\d{4}-\d\d-\d\d$/.test(r.date||"")||isoDate(r.date)<lim) return;
+      const k=r.ing+"|"+r.unite; (par[k]=par[k]||[]).push({p:+r.prixUnitaire,mag:ENS[r.mag]?r.mag:null}); });
+    Object.entries(par).forEach(([k,l])=>{ const [ing,un]=k.split("|"); const ref=PRIX[ing]; if(ref&&ref[1]!==un) return;
+      const v=l.map(x=>x.p).sort((a,b)=>a-b), med=v[Math.floor(v.length/2)]; PRIX[ing]=[Math.round(med*100)/100,un]; PRIX_REELS[ing]={n:l.length,mags:[...new Set(l.map(x=>x.mag).filter(Boolean))]}; ch=true; }); }
   if(P&&Array.isArray(P.promos)){
     const l=P.promos.filter(x=>x&&ENS[x.mag]&&typeof x.ing==="string"&&+x.prix>0&&/^\d{4}-\d\d-\d\d$/.test(x.du||"")&&/^\d{4}-\d\d-\d\d$/.test(x.au||""))
       .slice(0,400).map(x=>({mag:x.mag,produit:txtOk(x.produit,80),prix:+x.prix,avant:+x.avant>0?+x.avant:null,du:x.du,au:x.au,ing:txtOk(x.ing,40)}));
@@ -2528,7 +2562,7 @@ setTimeout(peutEtreVisite,2500);
     IS_OWNER = u ? await u.isOwner() : true; if(!IS_OWNER) document.body.classList.add("notowner");
     DB.doc("validations/menus").onSnapshot(snap=>{ const dd=snap.exists?snap.data():{}; VALID=(dd.semaines&&typeof dd.semaines==="object")?{...dd.semaines}:{}; LIMITES=(dd.limites&&typeof dd.limites==="object")?{...dd.limites}:{}; applyValidation(); saveLocal(); render(); },()=>{});
     if(c===false){ document.body.classList.add("readonly"); }
-    subscribeRecettes(); subscribeGouts(); subscribeWeek(); subscribeFamily(); subscribeRetours(); subscribeSondage(); subscribeSugg(); subscribeGoogle(); subscribePlacard();
+    subscribeRecettes(); subscribeGouts(); subscribeWeek(); subscribeFamily(); subscribeRetours(); subscribeSondage(); subscribeSugg(); subscribeGoogle(); subscribePlacard(); subscribeTicketsPh();
     setTimeout(maybeWizard,1500);
   }catch(e){ setSync("local"); setTimeout(maybeWizard,300); }
 })();
