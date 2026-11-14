@@ -604,7 +604,7 @@ function coursesTrips(){
   DEJA_LA=[...dejaLa.values()].sort((a,b)=>a.n.localeCompare(b.n,"fr"));
   return trips.map(m=>[...m.values()].sort((a,b)=>ORDRE.indexOf(a.ray)-ORDRE.indexOf(b.ray)||a.n.localeCompare(b.n,"fr")));
 }
-function cleanExtras(a){ return Array.isArray(a)? a.filter(x=>x&&typeof x.n==="string"&&x.n.trim()&&x.id).slice(0,200).map(x=>({id:String(x.id).slice(0,40),n:String(x.n).trim().slice(0,60),qt:String(x.qt||"").slice(0,20),ray:RAYONS[x.ray]?x.ray:"epi",t:x.t===1?1:0,par:String(x.par||"").slice(0,30)})) : []; }
+function cleanExtras(a){ return Array.isArray(a)? a.filter(x=>x&&typeof x.n==="string"&&x.n.trim()&&x.id).slice(0,200).map(x=>({id:String(x.id).slice(0,40),n:String(x.n).trim().slice(0,60),qt:String(x.qt||"").slice(0,20),ray:RAYONS[x.ray]?x.ray:"epi",t:x.t===1?1:0,par:String(x.par||"").replace(/[^0-9a-f-]/g,"").slice(0,36)})) : []; }
 function suggestStore(items,date){
   const c={}; items.forEach(i=>promosFor(i.n).filter(p=>validOn(p,date)).forEach(p=>c[p.mag]=(c[p.mag]||0)+1));
   const best=Object.keys(c).sort((a,b)=>c[b]-c[a])[0]; return best||"colruyt";
@@ -2181,10 +2181,13 @@ document.addEventListener("click",e=>{ const b=e.target.closest("[data-retour],[
 // ===================== Liste de courses : habituels, quantités, « j'en ai déjà », ticket réel =====================
 let PLACARD={}, DEJA_LA=[];
 // Les ajouts gardent l'identifiant de l'appareil : on affiche le prénom correspondant
-const NOMS_PAR={}; let nomsDemandes=false;
-function nomDe(par){ if(!/^[0-9a-f-]{20,}$/.test(par)) return par; if(NOMS_PAR[par]) return NOMS_PAR[par];
-  if(!nomsDemandes&&USER&&USER.profiles){ nomsDemandes=true; const ids=[...new Set((state.extras||[]).map(x=>x.par).filter(x=>/^[0-9a-f-]{20,}$/.test(x)))];
-    USER.profiles(ids).then(ps=>{ Object.entries(ps||{}).forEach(([id,p])=>{ if(p&&p.name) NOMS_PAR[id]=p.name; }); nomsDemandes=false; if(Object.keys(NOMS_PAR).length) renderCourses(); }).catch(()=>{ nomsDemandes=false; }); }
+const NOMS_PAR={}, NOMS_DEMANDES=new Set(); let nomsEnCours=false;
+const UUID_RE=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
+// Chaque identifiant n'est demandé qu'une fois : un appareil retiré de la famille ne relance jamais l'affichage
+function nomDe(par){ if(typeof par!=="string") return "un membre de la famille"; if(!UUID_RE.test(par)) return /^[0-9a-f-]{20,}$/.test(par)?"un membre de la famille":par; if(NOMS_PAR[par]) return NOMS_PAR[par];
+  if(!nomsEnCours&&USER&&USER.profiles){ const ids=[...new Set([...(state.extras||[]).map(x=>x.par),par])].filter(x=>typeof x==="string"&&UUID_RE.test(x)&&!NOMS_DEMANDES.has(x));
+    if(ids.length){ nomsEnCours=true; ids.forEach(x=>NOMS_DEMANDES.add(x));
+      USER.profiles(ids).then(ps=>{ let neuf=false; Object.entries(ps||{}).forEach(([id,p])=>{ if(p&&p.name&&!NOMS_PAR[id]){ NOMS_PAR[id]=p.name; neuf=true; } }); nomsEnCours=false; if(neuf) renderCourses(); }).catch(()=>{ nomsEnCours=false; }); } }
   return "un membre de la famille"; }
 function subscribePlacard(){ if(!DB) return; DB.doc("famille/placard").onSnapshot(snap=>{ const d=snap.exists?snap.data():{}; const r={};
   if(d&&d.noms&&typeof d.noms==="object") Object.entries(d.noms).slice(0,200).forEach(([k,v])=>{ const n=propre(k,40); if(n) r[n]=typeof v==="string"?v.slice(0,10):""; });
@@ -2229,7 +2232,7 @@ function validerQt(k,span){ const it=coursesTrips()[0].find(i=>i.k===k); if(!it)
 let TICKETS_PH={};
 function cleanTicketPh(x){ if(!x||typeof x!=="object") return null; const r=x.resultat&&typeof x.resultat==="object"?x.resultat:{};
   const jr=v=>typeof v==="string"&&/^\d{4}-\d{2}-\d{2}/.test(v)?v.slice(0,10):"";
-  return {semaine:jr(x.semaine),quand:typeof x.quand==="string"&&/^\d{4}-\d{2}-\d{2}T[\d:.]+Z?$/.test(x.quand)?x.quand:"",par:propre(x.par,30),mag:typeof x.mag==="string"?x.mag.replace(/[<>"'`]/g,"").slice(0,40):"",
+  return {semaine:jr(x.semaine),quand:typeof x.quand==="string"&&/^\d{4}-\d{2}-\d{2}T[\d:.]+Z?$/.test(x.quand)?x.quand:"",par:typeof x.par==="string"&&UUID_RE.test(x.par)?x.par:propre(x.par,30),mag:typeof x.mag==="string"?x.mag.replace(/[<>"'`]/g,"").slice(0,40):"",
     lie:!!x.lie,statut:["attente","analyse","illisible"].includes(x.statut)?x.statut:"attente",aPhoto:typeof x.photo==="string",
     res:{total:+r.total>0?Math.round(+r.total*100)/100:null,articles:+r.articles>0?Math.round(+r.articles):null,magasin:propre(r.magasin,50),date:jr(r.date),reconnus:+r.reconnus>=0?Math.round(+r.reconnus):null,note:propre(r.note,200)}}; }
 function subscribeTicketsPh(){ if(!DB) return; DB.collection("tickets").onSnapshot(q=>{ q.docChanges().forEach(c=>{ if(c.type==="removed") delete TICKETS_PH[c.doc.id]; else { const v=cleanTicketPh(c.doc.data()); if(v) TICKETS_PH[c.doc.id]=v; } }); if(state.tab==="courses") renderTicket(); },()=>{}); }
