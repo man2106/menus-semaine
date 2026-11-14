@@ -1,4 +1,245 @@
 {
  "maj": "2026-11-14",
- "releves": []
+ "releves": [
+  {
+   "ing": "Biscuits",
+   "produit": "BONI biscuits petit-déjeuner chocolat 8×50 g",
+   "mag": "okay",
+   "prix": 2.18,
+   "quantite": 1,
+   "unite": "u",
+   "prixUnitaire": 2.18,
+   "date": "2026-11-14"
+  },
+  {
+   "ing": "Biscuits",
+   "produit": "EVERYDAY galettes Campinoise 450 g",
+   "mag": "okay",
+   "prix": 1.75,
+   "quantite": 1,
+   "unite": "u",
+   "prixUnitaire": 1.75,
+   "date": "2026-11-14"
+  },
+  {
+   "ing": "Gaufres",
+   "produit": "BONI gaufres de Liège maxi 8×90 g",
+   "mag": "okay",
+   "prix": 3.75,
+   "quantite": 1,
+   "unite": "u",
+   "prixUnitaire": 3.75,
+   "date": "2026-11-14"
+  },
+  {
+   "ing": "Lanières de bœuf",
+   "produit": "Émincé de bœuf (au poids)",
+   "mag": "okay",
+   "prix": 10.21,
+   "quantite": 0.511,
+   "unite": "kg",
+   "prixUnitaire": 19.99,
+   "date": "2026-11-14"
+  },
+  {
+   "ing": "Bananes",
+   "produit": "Bananes Papillon (au poids)",
+   "mag": "okay",
+   "prix": 3.01,
+   "quantite": 1.158,
+   "unite": "kg",
+   "prixUnitaire": 2.6,
+   "date": "2026-11-14"
+  },
+  {
+   "ing": "Yaourts",
+   "produit": "EVERYDAY yaourt maigre 8×125 g",
+   "mag": "okay",
+   "prix": 1.19,
+   "quantite": 1,
+   "unite": "u",
+   "prixUnitaire": 1.19,
+   "date": "2026-11-14"
+  },
+  {
+   "ing": "Beurre",
+   "produit": "BONI beurre de laiterie doux 250 g (×4)",
+   "mag": "okay",
+   "prix": 8.28,
+   "quantite": 1.0,
+   "unite": "kg",
+   "prixUnitaire": 8.28,
+   "date": "2026-11-14"
+  },
+  {
+   "ing": "Fromage en tranches",
+   "produit": "BONI Gouda belge jeune tranches 350 g",
+   "mag": "okay",
+   "prix": 4.6,
+   "quantite": 0.35,
+   "unite": "kg",
+   "prixUnitaire": 13.14,
+   "date": "2026-11-14"
+  },
+  {
+   "ing": "Fromage à tartiner",
+   "produit": "Paysan Breton Madame Loïk nature 150 g",
+   "mag": "okay",
+   "prix": 3.25,
+   "quantite": 1,
+   "unite": "u",
+   "prixUnitaire": 3.25,
+   "date": "2026-11-14"
+  },
+  {
+   "ing": "Jambon cuit",
+   "produit": "BONI jambon à l'os 200 g",
+   "mag": "okay",
+   "prix": 3.72,
+   "quantite": 0.2,
+   "unite": "kg",
+   "prixUnitaire": 18.6,
+   "date": "2026-11-14"
+  },
+  {
+   "ing": "Saumon fumé",
+   "produit": "EVERYDAY saumon Atlantique fumé 200 g",
+   "mag": "okay",
+   "prix": 4.82,
+   "quantite": 0.2,
+   "unite": "kg",
+   "prixUnitaire": 24.1,
+   "date": "2026-11-14"
+  },
+  {
+   "ing": "Levure",
+   "produit": "Levure fraîche 42 g",
+   "mag": "okay",
+   "prix": 0.32,
+   "quantite": 1,
+   "unite": "u",
+   "prixUnitaire": 0.32,
+   "date": "2026-11-14"
+  },
+  {
+   "ing": "Œufs",
+   "produit": "BONI œufs belges élevés au sol M ×12",
+   "mag": "okay",
+   "prix": 3.99,
+   "quantite": 12,
+   "unite": "u",
+   "prixUnitaire": 0.33,
+   "date": "2026-11-14"
+  },
+  {
+   "ing": "Pommes de terre",
+   "produit": "BONI pommes de terre Laurette 2,5 kg",
+   "mag": "okay",
+   "prix": 5.2,
+   "quantite": 2.5,
+   "unite": "kg",
+   "prixUnitaire": 2.08,
+   "date": "2026-11-14"
+  },
+  {
+   "ing": "Chicons",
+   "produit": "BONI chicons 500 g",
+   "mag": "okay",
+   "prix": 2.57,
+   "quantite": 0.5,
+   "unite": "kg",
+   "prixUnitaire": 5.14,
+   "date": "2026-11-14"
+  },
+  {
+   "ing": "Laitue",
+   "produit": "Laitue feuille de chêne rouge",
+   "mag": "okay",
+   "prix": 1.52,
+   "quantite": 1,
+   "unite": "u",
+   "prixUnitaire": 1.52,
+   "date": "2026-11-14"
+  },
+  {
+   "ing": "Légumes surgelés",
+   "produit": "BONI mélange de légumes asiatiques 750 g",
+   "mag": "okay",
+   "prix": 2.4,
+   "quantite": 1,
+   "unite": "u",
+   "prixUnitaire": 2.4,
+   "date": "2026-11-14"
+  },
+  {
+   "ing": "Lait",
+   "produit": "EVERYDAY lait entier 1 L (×12)",
+   "mag": "okay",
+   "prix": 10.68,
+   "quantite": 12,
+   "unite": "L",
+   "prixUnitaire": 0.89,
+   "date": "2026-11-14"
+  },
+  {
+   "ing": "Tomates concassées",
+   "produit": "BONI tomates concassées 400 g (×6)",
+   "mag": "okay",
+   "prix": 5.34,
+   "quantite": 6,
+   "unite": "u",
+   "prixUnitaire": 0.89,
+   "date": "2026-11-14"
+  },
+  {
+   "ing": "Coulis de tomate",
+   "produit": "BONI passata basilic 690 g (×2)",
+   "mag": "okay",
+   "prix": 3.22,
+   "quantite": 1.38,
+   "unite": "L",
+   "prixUnitaire": 2.33,
+   "date": "2026-11-14"
+  },
+  {
+   "ing": "Huile d'olive",
+   "produit": "Huile d'olive extra vierge 750 ml",
+   "mag": "okay",
+   "prix": 11.99,
+   "quantite": 1,
+   "unite": "u",
+   "prixUnitaire": 11.99,
+   "date": "2026-11-14"
+  },
+  {
+   "ing": "Farine",
+   "produit": "Farine fermentante 1,2 kg",
+   "mag": "okay",
+   "prix": 2.41,
+   "quantite": 1.2,
+   "unite": "u",
+   "prixUnitaire": 2.01,
+   "date": "2026-11-14"
+  },
+  {
+   "ing": "Choco",
+   "produit": "Pâte à tartiner au chocolat 1 kg",
+   "mag": "okay",
+   "prix": 5.36,
+   "quantite": 1,
+   "unite": "u",
+   "prixUnitaire": 5.36,
+   "date": "2026-11-14"
+  },
+  {
+   "ing": "Confiture",
+   "produit": "Confiture d'abricots 335 g",
+   "mag": "okay",
+   "prix": 3.99,
+   "quantite": 1,
+   "unite": "u",
+   "prixUnitaire": 3.99,
+   "date": "2026-11-14"
+  }
+ ]
 }
