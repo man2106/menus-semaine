@@ -2100,7 +2100,7 @@ function repasPasses(jours=14){
 }
 const retoursDu = (iso,d) => Object.values(RETOURS).filter(r=>r.semaine===iso&&r.jour===d);
 // Chacun ne note que pour lui-même. Le propriétaire peut noter pour tout le monde.
-function peutNoter(n){ const a=(typeof window.__acces==="function"&&window.__acces())||{}; return a.role==="proprio" || !a.nom || n===a.nom; }
+function peutNoter(n){ const a=(typeof window.__acces==="function"&&window.__acces())||{}; return !!a.nom && n===a.nom; }
 async function enregistrerRetour(iso,d,nom,patch){
   if(!peutNoter(nom)){ toast("Vous ne notez que pour vous"); return; }
   const id=retourId(iso,d,nom), rp=repasPasses(21).find(x=>x.iso===iso&&x.d===d); if(!rp) return;
