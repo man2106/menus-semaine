@@ -354,6 +354,9 @@ const BASE_MONDAY = new Date(MONDAY);
 const isoOf = d => d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
 const curIso = () => isoOf(MONDAY);
 const dayOffset = n => { const d=new Date(MONDAY); d.setDate(MONDAY.getDate()+n); return d; };
+// Menu validé dont la semaine a commencé : figé. Jours passés = « Passé », jour en cours = « Ce soir », autres = « Prévu ».
+const verrouille = () => state.statut==="valide" && MONDAY.getTime()<=TODAY.getTime();
+const etatJour = d => { const t=dayOffset(d).getTime(); return t<TODAY.getTime()?"passe":t===TODAY.getTime()?"today":"avenir"; };
 const fmtD = d => d.toLocaleDateString("fr-BE",{weekday:"short",day:"2-digit",month:"2-digit"});
 const fmtShort = d => d.toLocaleDateString("fr-BE",{day:"2-digit",month:"2-digit"});
 const DAY = 86400000;
@@ -569,11 +572,12 @@ function renderDays(){
         <span class="dinfo"><span class="dday">${JOURS[d]} ${fmtShort(dayOffset(d))}</span><b class="dish">Repas à l'extérieur</b><span class="dmeta">Pas de cuisine ni de courses ce soir</span></span>
         <span class="dchev" aria-hidden="true">›</span></button></article>`;
     const isToday=dayOffset(d).getTime()===TODAY.getTime(), pc=promoCount(r), hc=headcount(d), w=dislikesFor(r,d);
-    return `<article class="day${isToday?" today":""}" id="day-${d}">
+    const et=etatJour(d), vtag=verrouille()?(et==="passe"?`<span class="jstat passe">Passé</span>`:et==="avenir"?`<span class="jstat prevu">Prévu</span>`:""):"";
+    return `<article class="day${isToday?" today":""}${et==="passe"?" passe":""}" id="day-${d}">
       <button class="dcard" data-open="${d}" aria-label="${JOURS[d]} : ${esc(r.nom)}, ouvrir la fiche">
         <span class="dthumbbox"><img class="dthumb" src="${photoSrc(id)}" alt="" loading="lazy" data-cache-err="1"></span>
         <span class="dinfo">
-          <span class="dday">${JOURS[d]} ${fmtShort(dayOffset(d))}${isToday?' <span class="tonight">Ce soir</span>':""}</span>
+          <span class="dday">${JOURS[d]} ${fmtShort(dayOffset(d))}${isToday?' <span class="tonight">Ce soir</span>':""}${vtag}</span>
           <b class="dish">${esc(r.nom)}</b>
           <span class="dmeta"><span class="bdg b-${budgetOf(r)}">${BUDGETS[budgetOf(r)].court}</span> ${hc?`${r.t} min · ${hc} à table`:"Personne à table"}${state.cooks[d]?` · <span class="dcook">${esc(state.cooks[d])} cuisine</span>`:(hc?` · <span class="dnocook">pas de cuisinier</span>`:"")}${pc&&hc?` · <span class="promo">promo</span>`:""}</span>
           ${w.length&&hc?`<span class="dwarn">${esc(w.join(", "))} n'aime${w.length>1?"nt":""} pas ce plat</span>`:""}
@@ -924,7 +928,7 @@ $("mbody").addEventListener("click",e=>{ if(e.target.id!=="mcopy") return;
 $("recipes").addEventListener("click",e=>{const b=e.target.closest("[data-openrec]"); if(b) openMeal(b.dataset.openrec,null);});
 $("trip1").onchange=e=>{state.trip1=e.target.value;state.checked={};save();render();toast("Jour des courses : "+tripName(0));};
 
-function render(){if(!$("view-menu")) return; $("trip1").value=state.trip1;renderWeekbar();renderCompteHaut();renderACompleter();renderCalendrier();renderPresences();renderBudget();renderStats();renderDays();renderCourses();renderPromos();renderRecettes();renderReglages();if(typeof renderRetours==="function")renderRetours();if(state.tab==="envies"&&typeof renderEnvies==="function")renderEnvies();}
+function render(){if(!$("view-menu")) return; document.body.classList.toggle("verrou",verrouille()); $("trip1").value=state.trip1;renderWeekbar();renderCompteHaut();renderACompleter();renderCalendrier();renderPresences();renderBudget();renderStats();renderDays();renderCourses();renderPromos();renderRecettes();renderReglages();if(typeof renderRetours==="function")renderRetours();if(state.tab==="envies"&&typeof renderEnvies==="function")renderEnvies();}
 $("sugg").addEventListener("change",e=>{const s=e.target.closest("select[data-add]"); if(!s||s.value==="") return;
   replaceDay(+s.value,s.dataset.add);});
 $("cmp").addEventListener("change",e=>{const inp=e.target.closest("input[data-pk]"); if(!inp) return;
@@ -961,7 +965,7 @@ function toast(msg,undo,label){const t=$("toast");t.textContent=msg;
   if(undo){const b=document.createElement("button");b.textContent=label||"Annuler";b.onclick=()=>{undo();t.hidden=true;};t.appendChild(b);}
   t.hidden=false;clearTimeout(toast.h);toast.h=setTimeout(()=>t.hidden=true,undo?4500:2000);}
 // Remplacement d'un plat avec possibilité d'annuler
-function replaceDay(d,newId){ const prev=state.week[d]; state.week[d]=newId; state.picking=null; save(); render();
+function replaceDay(d,newId){ if(verrouille()){ toast("Menu verrouillé : la semaine a commencé"); return; } const prev=state.week[d]; state.week[d]=newId; state.picking=null; save(); render();
   toast(JOURS[d]+" : "+BYID[newId].nom,()=>{state.week[d]=prev; save(); render(); toast("Plat rétabli");}); }
 
 document.querySelector("nav").addEventListener("click",e=>{const b=e.target.closest("button[data-tab]"); if(b) setTab(b.dataset.tab);});
@@ -1157,7 +1161,7 @@ function renderWeekbar(){
       <div class="wtitle"><small>${relWeek()}</small><b>Semaine du ${weekLabel()}</b></div>
       <button class="wnav" data-week="${state.weekOffset+1}" ${state.weekOffset===3?"disabled":""} aria-label="Semaine suivante">›</button>
     </div>
-    <div class="kind ${valide?"official":"proposal"}"><b>${kindTitre(valide)}</b><small>${valide?"Figé. Rouvrir pour modifier.":"À discuter en famille avant validation."}</small></div>
+    <div class="kind ${valide?"official":"proposal"}"><b>${kindTitre(valide)}</b><small>${valide?(verrouille()?"Verrouillé : la semaine a commencé. Les jours passés sont figés.":"Figé. Rouvrir pour modifier."):"À discuter en famille avant validation."}</small></div>
     <div class="wstate"><span class="st ${valide?"on":"soon"}">${valide?"Menu validé":"Proposition à discuter"}</span><span class="sync ${syncState}" id="sync"></span></div>
     <div class="actions wact">
       <button class="btn primary" id="share" data-tip="Prépare un message avec le menu et le lien de l'application, à envoyer par WhatsApp ou SMS">Envoyer à la famille</button>
@@ -1242,6 +1246,7 @@ $("weekbar").addEventListener("click",e=>{
   if(e.target.id==="copymsg"){ const txt=shareMessage(), box=$("sharemsg"); box.value=txt;
     try{ navigator.clipboard.writeText(txt).then(()=>toast("Message copié"),()=>{box.focus();box.select();toast("Sélectionnez le texte puis copiez-le");}); }catch(err){box.focus();box.select();} return; }
   if(e.target.id==="valider"){ if(DB&&!IS_OWNER){ toast("Seul le propriétaire valide le menu"); return; }
+    if(verrouille()){ toast("Menu verrouillé : la semaine a commencé"); return; }
     if(state.statut!=="valide"){ const m=manques(); if(m.length){ toast(`Validation impossible : ${manquesTexte(m)}.`); const b=$("acompleter"); if(b){ b.scrollIntoView({behavior:"smooth",block:"center"}); b.classList.remove("pulse"); void b.offsetWidth; b.classList.add("pulse"); } return; } }
     state.statut=state.statut==="valide"?"proposition":"valide";
     if(DB){ VALID={...VALID,[curIso()]:state.statut}; DB.doc("validations/menus").set({semaines:VALID,limites:LIMITES}).catch(()=>toast("La validation n'a pas pu être enregistrée"));
