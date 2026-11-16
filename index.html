@@ -825,6 +825,17 @@ body.notowner .owner-only{display:none!important}
 .mqn{min-width:0}.mqn small{display:block;color:var(--muted);font-size:12.5px}.mqn b+small{display:inline;margin-left:4px}
 .mqlieu{max-width:170px;padding:6px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);font:inherit;font-size:13px}
 @media (max-width:520px){.mq{grid-template-columns:1fr auto}.mqn{grid-column:1/-1}}
+/* Lisibilité : textes plus grands, contrastes plus forts, zones de touche plus grandes. Aucune information retirée. */
+:root{ --muted:#4A5649; --line:#C9D2C3; }
+body{font-size:15px;line-height:1.5}
+section small,.panel small,.sheet small,.mqn small,.hpinfo small,.envtxt small,.rtpers small,.pinfo small{font-size:13px!important;line-height:1.4}
+.panel{padding:16px}
+details.sum>summary{cursor:pointer;font-weight:700;padding:4px 0;font-size:15px}
+.btn{min-height:44px;font-weight:600}
+.btn.small{min-height:36px}
+.mq,.hprow,.mixrow{padding:10px 12px}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.badge{font-size:12px;min-width:20px;padding:1px 6px}
 </style>
 </head>
 <body>
@@ -1084,10 +1095,10 @@ body.notowner .owner-only{display:none!important}
   <div class="sfoot" id="sfoot"></div>
 </div>
 
-<script src="vendor/jspdf-4.2.1.umd.min.js?v=41"></script>
-<script src="vendor/supabase-js-2.45.4.js?v=41"></script>
-<script src="js/partage.js?v=41"></script>
-<script src="js/app.js?v=41"></script>
+<script src="vendor/jspdf-4.2.1.umd.min.js?v=43"></script>
+<script src="vendor/supabase-js-2.45.4.js?v=43"></script>
+<script src="js/partage.js?v=43"></script>
+<script src="js/app.js?v=43"></script>
 
 </body>
 </html>

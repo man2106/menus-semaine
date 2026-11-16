@@ -1057,7 +1057,9 @@ function goWeek(off){ if(off<0||off>3||off===state.weekOffset) return;
   const w=state.weeks[curIso()];
   if(w&&Array.isArray(w.menu)&&w.menu.length===7&&w.menu.every(id=>BYID[id])) applyWeekData(w);
   else { state.week=proposeMenu(); state.cooks=Array(7).fill(null); state.checked={}; state.statut="proposition"; state.journal=[]; state.absents={}; state.invites=[0,0,0,0,0,0,0]; state.approbations={}; state.limite=null; state.exterieur=null; state.extras=[]; state.qtEdit={}; state.lieux={}; state.tickets=[]; }
-  state.picking=null; applyValidation(); saveLocal(); subscribeWeek(); render(); }
+  state.picking=null; applyValidation(); saveLocal(); subscribeWeek(); render();
+  urlSemaine(); }
+
 
 // --- partage via la base de données de la page ---
 let DB=null, USER=null, ME=null, CAN_WRITE=null, unsubWeek=null, unsubFam=null, IS_OWNER=true, VALID={}, LIMITES={};
@@ -2893,4 +2895,9 @@ function gardeBoucle(nom,fn){ let n=0,t0=0,attente=null,dernier=null;
     return fn.apply(this,a); }; }
 render=gardeBoucle("render",render); renderCourses=gardeBoucle("renderCourses",renderCourses); renderTicket=gardeBoucle("renderTicket",renderTicket);
 renderHabituels=gardeBoucle("renderHabituels",renderHabituels); renderDejaLa=gardeBoucle("renderDejaLa",renderDejaLa); renderEnvies=gardeBoucle("renderEnvies",renderEnvies);
+// Deux pages : ?semaine=en-cours (semaine en cours) et ?semaine=suivante (semaine suivante)
+const SEM_PAGE={"en-cours":0,"suivante":1};
+function urlSemaine(){ try{ const u=new URL(location.href); const k=Object.keys(SEM_PAGE).find(x=>SEM_PAGE[x]===state.weekOffset);
+  if(k) u.searchParams.set("semaine",k); else u.searchParams.delete("semaine"); history.replaceState(null,"",u); }catch(e){} }
 render(); setTab(state.tab);
+{ const q=new URLSearchParams(location.search).get("semaine"); if(q&&q in SEM_PAGE){ setTab("menu"); if(SEM_PAGE[q]!==state.weekOffset) goWeek(SEM_PAGE[q]); else urlSemaine(); } }
