@@ -866,6 +866,7 @@ body.verrou [data-del], body.verrou #autoassign, body.verrou #clearassign, body.
 body.verrou .dgrip,body.readonly .dgrip{display:none}
 .day.dragging{opacity:.92;box-shadow:0 12px 28px rgba(0,0,0,.28);z-index:20;pointer-events:none}
 .day.dover{outline:3px dashed var(--accent);outline-offset:3px}
+.rappel-notes{border:2px solid var(--warm);background:var(--warm-soft)}
 </style>
 </head>
 <body>
@@ -877,7 +878,7 @@ body.verrou .dgrip,body.readonly .dgrip{display:none}
       <div>
         <h1>Menus de la semaine</h1>
         <p class="sub">Repas du soir · moins de 30 minutes · petit budget</p>
-        <p class="appver" data-appver="50">Version 50</p>
+        <p class="appver" data-appver="51">Version 51</p>
       </div>
       <div class="comptehaut" id="comptehaut" hidden></div>
     </div>
@@ -901,12 +902,12 @@ body.verrou .dgrip,body.readonly .dgrip{display:none}
   <!-- ===== MENU ===== -->
   <section id="view-menu">
     <div class="col-a">
+    <div class="panel retours rappel-notes" id="retoursbox" hidden></div>
     <div class="panel nouveautes" id="nouveautes" hidden></div>
     <div class="panel acomp" id="acompleter"></div>
     <div class="panel mqpanel" id="manquants" hidden></div>
     <div class="panel weekbar" id="weekbar"></div>
     <div class="next" id="next"></div>
-    <div class="panel retours" id="retoursbox" hidden></div>
     <details class="panel sum" id="budgetbox"><summary id="budgetsum"></summary><div id="budget"></div></details>
     </div>
     <div class="col-b">
@@ -1133,10 +1134,10 @@ body.verrou .dgrip,body.readonly .dgrip{display:none}
   <div class="sfoot" id="sfoot"></div>
 </div>
 
-<script src="vendor/jspdf-4.2.1.umd.min.js?v=50"></script>
-<script src="vendor/supabase-js-2.45.4.js?v=50"></script>
-<script src="js/partage.js?v=50"></script>
-<script src="js/app.js?v=50"></script>
+<script src="vendor/jspdf-4.2.1.umd.min.js?v=51"></script>
+<script src="vendor/supabase-js-2.45.4.js?v=51"></script>
+<script src="js/partage.js?v=51"></script>
+<script src="js/app.js?v=51"></script>
 
 </body>
 </html>
