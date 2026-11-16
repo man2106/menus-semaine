@@ -2097,7 +2097,10 @@ function repasPasses(jours=14){
   return out.sort((a,b)=>b.date-a.date);
 }
 const retoursDu = (iso,d) => Object.values(RETOURS).filter(r=>r.semaine===iso&&r.jour===d);
+// Chacun ne note que pour lui-même. Le propriétaire peut noter pour tout le monde.
+function peutNoter(n){ const a=(typeof window.__acces==="function"&&window.__acces())||{}; return a.role==="proprio" || !a.nom || n===a.nom; }
 async function enregistrerRetour(iso,d,nom,patch){
+  if(!peutNoter(nom)){ toast("Vous ne notez que pour vous"); return; }
   const id=retourId(iso,d,nom), rp=repasPasses(21).find(x=>x.iso===iso&&x.d===d); if(!rp) return;
   const prev=RETOURS[id]||{semaine:iso,jour:d,plat:rp.plat,nom,note:null,refaire:null,mots:[],com:""};
   const next={...prev,...patch,plat:rp.plat,nom,cuisinier:rp.cuisinier,quand:new Date().toISOString(),par:ME||null};
@@ -2181,6 +2184,7 @@ function renderRetourSheet(){ const c=sheetCtx;
   $("seyebrow").textContent=`${JOURS[(p.date.getDay()+6)%7]} ${fmtShort(p.date)}`; $("stitle").textContent=r.nom; $("sextra").innerHTML="";
   $("sbody").innerHTML=`<p class="note">Chacun note pour lui, sur son téléphone ou ici. Une seule note suffit, le reste est facultatif.</p>
     ${p.pres.map(n=>{ const v=RETOURS[retourId(p.iso,p.d,n)]||{}, o=c.open===n||(!v.note&&!c.open);
+      if(!peutNoter(n)) return `<section class="rtperson${v.note?" done":""}"><div class="rtname"><b>${esc(n)}</b>${v.note?`<span>${NOTES[v.note-1][1]} ${NOTES[v.note-1][2]}${v.refaire?" · "+REFAIRE.find(x=>x[0]===v.refaire)[1]:""}</span>`:"<span>Pas encore noté</span>"}</div>${v.com?`<p class="note">« ${esc(v.com)} »</p>`:""}<p class="note">Seule cette personne peut noter pour elle-même.</p></section>`;
       return `<section class="rtperson${v.note?" done":""}">
         <div class="rtname"><b>${esc(n)}</b>${v.note?`<span>${NOTES[v.note-1][1]} ${NOTES[v.note-1][2]}${v.refaire?" · "+REFAIRE.find(x=>x[0]===v.refaire)[1]:""}</span>`:""}</div>
         <div class="rtfaces" role="group" aria-label="Note de ${esc(n)}">${NOTES.map(([k,e,l])=>`<button class="rtface${v.note===k?" on":""}" data-rnote="${k}" data-rn="${esc(n)}" aria-label="${l}" title="${l}"><span>${e}</span><small>${l}</small></button>`).join("")}</div>
@@ -2236,6 +2240,7 @@ document.addEventListener("click",e=>{ const b=e.target.closest("[data-retour],[
   if(D.bilan){ const ctx={type:"bilan"}; sheetCtx?(sheetCtx=ctx,renderSheet(),$("sbody").scrollTop=0):openSheet(ctx); return; }
   if(D.retourslist){ const ctx={type:"retour",list:true}; sheetCtx?(sheetCtx=ctx,renderSheet(),$("sbody").scrollTop=0):openSheet(ctx); return; }
   const c=sheetCtx; if(!c||c.type!=="retour"||c.list) return; const n=D.rn;
+  if((D.rnote||D.rref||D.rmot||D.rcomok!=null) && !peutNoter(n)){ toast("Vous ne notez que pour vous"); return; }
   if(D.rnote){ enregistrerRetour(c.iso,c.d,n,{note:+D.rnote}); return; }
   const v=RETOURS[retourId(c.iso,c.d,n)]||{};
   if(D.rref){ enregistrerRetour(c.iso,c.d,n,{refaire:v.refaire===D.rref?null:D.rref}); return; }
