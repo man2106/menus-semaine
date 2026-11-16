@@ -1,5 +1,5 @@
 {
- "maj": "2026-11-14",
+ "maj": "2026-11-16",
  "recettes": [
   {
    "id": "pechesthon",
@@ -343,6 +343,336 @@
    },
    "propose_par": "Manu",
    "ajoute": "2026-11-14"
+  },
+  {
+   "id": "tomatescrevettes",
+   "nom": "Tomates-crevettes à la belge et frites",
+   "acc": "Frites et salade",
+   "t": 25,
+   "b": "plaisir",
+   "p": "poisson",
+   "f": "pdt",
+   "c": "belge",
+   "astuce": "Choisissez des tomates bien fermes et égouttez-les tête en bas pendant que les frites cuisent : la farce reste ferme.",
+   "ing": [
+    [
+     "Tomates",
+     10,
+     "",
+     "fl"
+    ],
+    [
+     "Crevettes grises",
+     500,
+     "g",
+     "bou"
+    ],
+    [
+     "Mayonnaise",
+     1,
+     "pot",
+     "epi"
+    ],
+    [
+     "Citrons",
+     1,
+     "",
+     "fl"
+    ],
+    [
+     "Persil",
+     1,
+     "botte",
+     "fl"
+    ],
+    [
+     "Frites au four",
+     1500,
+     "g",
+     "sur"
+    ],
+    [
+     "Laitue",
+     1,
+     "",
+     "fl"
+    ]
+   ],
+   "etapes": [
+    "Enfournez les frites selon le paquet.",
+    "Coupez un chapeau sur chaque tomate et videz-les à la petite cuillère ; salez l'intérieur et retournez-les pour qu'elles s'égouttent.",
+    "Hachez finement une partie de la chair retirée.",
+    "Mélangez les crevettes avec la mayonnaise, un filet de citron, la chair hachée et un peu de persil.",
+    "Garnissez les tomates, reposez les chapeaux et servez avec les frites et la salade."
+   ],
+   "source": {
+    "titre": "Marmiton",
+    "url": "https://www.marmiton.org/recettes/recette_tomates-crevettes-a-la-belge_39217.aspx"
+   },
+   "ajoute": "2026-11-16"
+  },
+  {
+   "id": "burritosvege",
+   "nom": "Burritos végétariens haricots rouges et maïs",
+   "acc": "Guacamole",
+   "t": 30,
+   "b": "eco",
+   "p": "vege",
+   "f": "riz",
+   "c": "mexicaine",
+   "astuce": "La recette d'origine utilise du quinoa ; le riz marche aussi bien et coûte moins cher.",
+   "ing": [
+    [
+     "Riz",
+     250,
+     "g",
+     "epi"
+    ],
+    [
+     "Bouillon de légumes",
+     1,
+     "cube",
+     "epi"
+    ],
+    [
+     "Oignons",
+     1,
+     "",
+     "fl"
+    ],
+    [
+     "Poivrons",
+     2,
+     "",
+     "fl"
+    ],
+    [
+     "Haricots rouges",
+     2,
+     "boîte",
+     "epi"
+    ],
+    [
+     "Maïs",
+     2,
+     "boîte",
+     "epi"
+    ],
+    [
+     "Coulis de tomate",
+     20,
+     "cl",
+     "epi"
+    ],
+    [
+     "Avocats",
+     2,
+     "",
+     "fl"
+    ],
+    [
+     "Citrons verts",
+     1,
+     "",
+     "fl"
+    ],
+    [
+     "Tortillas",
+     10,
+     "",
+     "epi"
+    ]
+   ],
+   "etapes": [
+    "Cuisez le riz dans de l'eau avec le cube de bouillon.",
+    "Faites revenir l'oignon et les poivrons en lanières 10 minutes.",
+    "Ajoutez haricots rouges et maïs égouttés, le coulis, du paprika et du cumin ; laissez mijoter 5 minutes.",
+    "Écrasez les avocats avec le jus du citron vert et une pincée de sel.",
+    "Garnissez chaque tortilla de riz, de garniture et de guacamole, puis roulez-la.",
+    "Dorez les burritos 2 à 3 minutes de chaque côté dans une poêle sèche."
+   ],
+   "source": {
+    "titre": "Marmiton",
+    "url": "https://www.marmiton.org/recettes/recette_burritos-vegan_528300.aspx"
+   },
+   "ajoute": "2026-11-16"
+  },
+  {
+   "id": "pdtmarocaine",
+   "nom": "Pommes de terre en sauce à la marocaine",
+   "acc": "Pain",
+   "t": 30,
+   "b": "eco",
+   "p": "vege",
+   "f": "pdt",
+   "c": "orientale",
+   "astuce": "Ajoutez les pois chiches pour en faire un plat complet ; un œuf poché dans la sauce est aussi délicieux.",
+   "ing": [
+    [
+     "Pommes de terre",
+     1500,
+     "g",
+     "fl"
+    ],
+    [
+     "Oignons",
+     2,
+     "",
+     "fl"
+    ],
+    [
+     "Tomates",
+     3,
+     "",
+     "fl"
+    ],
+    [
+     "Pois chiches",
+     2,
+     "boîte",
+     "epi"
+    ],
+    [
+     "Persil",
+     1,
+     "botte",
+     "fl"
+    ],
+    [
+     "Pain de campagne",
+     1,
+     "",
+     "bl"
+    ]
+   ],
+   "etapes": [
+    "Faites dorer les oignons émincés dans un peu d'huile.",
+    "Ajoutez les tomates en dés et l'ail, laissez fondre 2 minutes.",
+    "Ajoutez les pommes de terre en cubes, du curcuma, du gingembre, du paprika et la moitié du persil.",
+    "Couvrez presque d'eau, salez et laissez cuire 15 à 18 minutes jusqu'à ce que les pommes de terre soient tendres.",
+    "Ajoutez les pois chiches égouttés 5 minutes avant la fin et parsemez du reste de persil."
+   ],
+   "source": {
+    "titre": "Marmiton",
+    "url": "https://www.marmiton.org/recettes/recette_pommes-de-terre-en-sauce-a-la-marocaine_312958.aspx"
+   },
+   "ajoute": "2026-11-16"
+  },
+  {
+   "id": "poeleechampi",
+   "nom": "Poêlée champignons, carottes, oignons et œufs au plat",
+   "acc": "Baguette",
+   "t": 25,
+   "b": "eco",
+   "p": "oeufs",
+   "f": "pain",
+   "c": "francaise",
+   "astuce": "Coupez les carottes en fines rondelles pour qu'elles cuisent en même temps que les champignons.",
+   "ing": [
+    [
+     "Champignons",
+     1000,
+     "g",
+     "fl"
+    ],
+    [
+     "Carottes",
+     500,
+     "g",
+     "fl"
+    ],
+    [
+     "Oignons",
+     3,
+     "",
+     "fl"
+    ],
+    [
+     "Beurre",
+     40,
+     "g",
+     "cre"
+    ],
+    [
+     "Persil",
+     1,
+     "botte",
+     "fl"
+    ],
+    [
+     "Œufs",
+     10,
+     "",
+     "cre"
+    ],
+    [
+     "Baguettes",
+     2,
+     "",
+     "bl"
+    ]
+   ],
+   "etapes": [
+    "Émincez les oignons, coupez les carottes en fines rondelles et les champignons en lamelles.",
+    "Faites fondre le beurre dans une grande poêle et ajoutez tous les légumes.",
+    "Laissez cuire 15 minutes à feu moyen en remuant, puis salez, poivrez et ajoutez le persil.",
+    "Pendant ce temps, faites cuire les œufs au plat.",
+    "Servez la poêlée avec deux œufs par personne et la baguette."
+   ],
+   "source": {
+    "titre": "Marmiton",
+    "url": "https://www.marmiton.org/recettes/recette_poelee-de-champignons-carottes-et-oignons_25500.aspx"
+   },
+   "ajoute": "2026-11-16"
+  },
+  {
+   "id": "pouletcurryoignons",
+   "nom": "Poulet curry et oignons, riz",
+   "acc": "Riz",
+   "t": 25,
+   "b": "moyen",
+   "p": "volaille",
+   "f": "riz",
+   "c": "indienne",
+   "astuce": "Laissez bien colorer les oignons à feu vif avant d'ajouter le poulet : c'est ce qui donne le goût.",
+   "ing": [
+    [
+     "Blancs de poulet",
+     800,
+     "g",
+     "bou"
+    ],
+    [
+     "Oignons",
+     3,
+     "",
+     "fl"
+    ],
+    [
+     "Crème fraîche",
+     25,
+     "cl",
+     "cre"
+    ],
+    [
+     "Riz",
+     400,
+     "g",
+     "epi"
+    ]
+   ],
+   "etapes": [
+    "Lancez la cuisson du riz.",
+    "Faites revenir les oignons émincés à feu vif dans un peu d'huile.",
+    "Ajoutez le curry et un peu de cumin, puis le poulet en morceaux ; laissez dorer 5 minutes.",
+    "Baissez le feu, ajoutez deux cuillères de crème, puis le reste 5 minutes plus tard.",
+    "Salez, poivrez et servez avec le riz."
+   ],
+   "source": {
+    "titre": "Marmiton",
+    "url": "https://www.marmiton.org/recettes/recette_poulet-curry-et-oignons-facile_13026.aspx"
+   },
+   "ajoute": "2026-11-16"
   }
  ],
  "prix": {
@@ -351,7 +681,7 @@
    "u"
   ],
   "Butternut": [
-   2.0,
+   2,
    "kg"
   ],
   "Pleurotes": [
@@ -377,6 +707,10 @@
   "Origan": [
    1.5,
    "u"
+  ],
+  "Crevettes grises": [
+   60,
+   "kg"
   ]
  }
 }

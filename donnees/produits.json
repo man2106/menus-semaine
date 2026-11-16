@@ -1,5 +1,5 @@
 {
- "maj": "2026-11-14",
+ "maj": "2026-11-16",
  "note": "Descriptions rédigées pour l'application ; photos libres de Wikimedia Commons ; prix par enseigne relevés sur tickets, folders et sources citées.",
  "produits": [
   {
@@ -39,7 +39,20 @@
     12
    ],
    "photo": "photos/produits/pommes-de-terre.jpg",
-   "credit": "https://commons.wikimedia.org/wiki/File:Patates.jpg"
+   "credit": "https://commons.wikimedia.org/wiki/File:Patates.jpg",
+   "magasins": [
+    {
+     "mag": "colruyt",
+     "prix": 5.45,
+     "format": "2,5 kg chair ferme bio (Boni)",
+     "unitaire": [
+      2.18,
+      "kg"
+     ],
+     "date": "2026-11-16",
+     "source": "https://www.colruyt.be/fr/produits/toutes-les-categories/legumes-et-fruits/legumes-frais/pomme-de-terre"
+    }
+   ]
   },
   {
    "n": "Carottes",
@@ -52,7 +65,20 @@
     12
    ],
    "photo": "photos/produits/carottes.jpg",
-   "credit": "https://commons.wikimedia.org/wiki/File:Vegetable-Carrot-Bundle-wStalks.jpg"
+   "credit": "https://commons.wikimedia.org/wiki/File:Vegetable-Carrot-Bundle-wStalks.jpg",
+   "magasins": [
+    {
+     "mag": "delhaize",
+     "prix": 1.49,
+     "format": "1 kg",
+     "unitaire": [
+      1.49,
+      "kg"
+     ],
+     "date": "2026-11-16",
+     "source": "https://www.delhaize.be/fr/shop/Fruits-et-legumes-frais/Legumes-frais/Carottes-et-legumes-racines/Carottes/Carottes/p/F2013100800315600000"
+    }
+   ]
   },
   {
    "n": "Tomates",
@@ -165,6 +191,19 @@
    "saison": [
     6,
     10
+   ],
+   "magasins": [
+    {
+     "mag": "colruyt",
+     "prix": 1.78,
+     "format": "500 g (Everyday)",
+     "unitaire": [
+      3.56,
+      "kg"
+     ],
+     "date": "2026-11-16",
+     "source": "https://www.colruyt.be/fr/produits/29815"
+    }
    ]
   },
   {
@@ -716,14 +755,42 @@
    "ray": "bou",
    "desc": "Petits dés de lard fumé ou nature, pour carbonara, quiche et salade liégeoise.",
    "format": "Barquette de 2 × 100 g ou 200 g",
-   "conserver": "Au frigo : jusqu'à la date indiquée ; entamés, 3 jours"
+   "conserver": "Au frigo : jusqu'à la date indiquée ; entamés, 3 jours",
+   "magasins": [
+    {
+     "mag": "delhaize",
+     "prix": 2.45,
+     "format": "Lardons fumés 200 g (Delhaize)",
+     "unitaire": [
+      12.25,
+      "kg"
+     ],
+     "date": "2026-11-16",
+     "source": "https://www.delhaize.be/fr/shop/Viandes-poissons-et-produits-vegetariens/Charcuterie/Lard/Lard-en-des/Lardons-Fumes/p/F2009070100510810000"
+    }
+   ],
+   "photo": "photos/produits/lardons.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Lardons.jpg"
   },
   {
    "n": "Jambon cuit",
    "ray": "bou",
    "desc": "Jambon cuit (jambon blanc) en tranches.",
    "format": "Barquette de 6 à 10 tranches",
-   "conserver": "Au frigo : 3 jours après ouverture"
+   "conserver": "Au frigo : 3 jours après ouverture",
+   "magasins": [
+    {
+     "mag": "colruyt",
+     "prix": 2.18,
+     "format": "Dés de jambon cuit 250 g (Everyday)",
+     "unitaire": [
+      8.72,
+      "kg"
+     ],
+     "date": "2026-11-16",
+     "source": "https://www.colruyt.be/fr/produits/8383"
+    }
+   ]
   },
   {
    "n": "Jambon cru",
@@ -1051,7 +1118,31 @@
    "ray": "cre",
    "desc": "Crème liquide ou épaisse pour les sauces, les quiches et les gratins ; la version légère (15 %) suffit souvent.",
    "format": "Brique de 20 cl ou pot de 25 à 50 cl",
-   "conserver": "Fermée : jusqu'à la date ; ouverte : 3 à 4 jours au frigo"
+   "conserver": "Fermée : jusqu'à la date ; ouverte : 3 à 4 jours au frigo",
+   "magasins": [
+    {
+     "mag": "colruyt",
+     "prix": 0.79,
+     "format": "Brique 20 cl (Everyday 30 %)",
+     "unitaire": [
+      3.95,
+      "L"
+     ],
+     "date": "2026-11-16",
+     "source": "https://www.colruyt.be/fr/produits/26155"
+    },
+    {
+     "mag": "ah",
+     "prix": 1.49,
+     "format": "Pot 125 g (AH 30 %)",
+     "unitaire": [
+      11.92,
+      "kg"
+     ],
+     "date": "2026-11-16",
+     "source": "https://www.ah.be/producten/product/wi3868/ah-creme-fraiche-30-vet"
+    }
+   ]
   },
   {
    "n": "Œufs",
@@ -1060,14 +1151,51 @@
    "format": "Boîte de 6, 10 ou 12",
    "conserver": "Au frigo, pointe vers le bas : jusqu'à la date indiquée",
    "photo": "photos/produits/ufs.jpg",
-   "credit": "https://commons.wikimedia.org/wiki/File:Chicken_eggs.jpg"
+   "credit": "https://commons.wikimedia.org/wiki/File:Chicken_eggs.jpg",
+   "magasins": [
+    {
+     "mag": "colruyt",
+     "prix": 2.32,
+     "format": "12 œufs de poules au sol M (Everyday)",
+     "unitaire": [
+      0.19,
+      "u"
+     ],
+     "date": "2026-11-16",
+     "source": "https://www.colruyt.be/fr/produits/30635"
+    },
+    {
+     "mag": "delhaize",
+     "prix": 3.05,
+     "format": "6 œufs bio",
+     "unitaire": [
+      0.51,
+      "u"
+     ],
+     "date": "2026-11-16",
+     "source": "https://www.delhaize.be/fr/shop/Cremerie-fromage-et-alternatives-vegetales/Oeufs/Oeufs-frais/oeufs-Mix-calibres-Bio/p/F1993101900107900000"
+    }
+   ]
   },
   {
    "n": "Fromage râpé",
    "ray": "cre",
    "desc": "Emmental ou mélange râpé, pour gratiner les pâtes et les gratins.",
    "format": "Sachet de 150 à 500 g",
-   "conserver": "Ouvert : 5 jours au frigo ; se congèle bien"
+   "conserver": "Ouvert : 5 jours au frigo ; se congèle bien",
+   "magasins": [
+    {
+     "mag": "delhaize",
+     "prix": 1.64,
+     "format": "Emmental râpé 200 g (Delhaize)",
+     "unitaire": [
+      8.2,
+      "kg"
+     ],
+     "date": "2026-11-16",
+     "source": "https://www.delhaize.be/fr/shop/Cremerie-fromage-et-alternatives-vegetales/Fromages/Fromage-rape/Emmental/Emmental-Rape/p/F2020090900067880000"
+    }
+   ]
   },
   {
    "n": "Beurre",
@@ -1076,7 +1204,20 @@
    "format": "Plaquette de 250 g",
    "conserver": "Au frigo : plusieurs semaines",
    "photo": "photos/produits/beurre.jpg",
-   "credit": "https://commons.wikimedia.org/wiki/File:Western-pack-butter.jpg"
+   "credit": "https://commons.wikimedia.org/wiki/File:Western-pack-butter.jpg",
+   "magasins": [
+    {
+     "mag": "okay",
+     "prix": 2.69,
+     "format": "250 g doux (Boni)",
+     "unitaire": [
+      10.76,
+      "kg"
+     ],
+     "date": "2026-11-16",
+     "source": "https://www.okay.be/fr/produits/8023"
+    }
+   ]
   },
   {
    "n": "Parmesan",
@@ -1094,7 +1235,20 @@
    "format": "Brique de 1 L ou pack de 6",
    "conserver": "Fermé : à température ambiante ; ouvert : 3 jours au frigo",
    "photo": "photos/produits/lait.jpg",
-   "credit": "https://commons.wikimedia.org/wiki/File:Milk_glass.jpg"
+   "credit": "https://commons.wikimedia.org/wiki/File:Milk_glass.jpg",
+   "magasins": [
+    {
+     "mag": "colruyt",
+     "prix": 0.85,
+     "format": "1 L demi-écrémé (Everyday)",
+     "unitaire": [
+      0.85,
+      "L"
+     ],
+     "date": "2026-11-16",
+     "source": "https://www.colruyt.be/fr/produits/24583"
+    }
+   ]
   },
   {
    "n": "Mozzarella",
@@ -1119,7 +1273,20 @@
    "ray": "cre",
    "desc": "Yaourt épais et crémeux, pour le tzatziki et les desserts.",
    "format": "Pot de 500 g ou 1 kg",
-   "conserver": "Ouvert : 3 à 4 jours au frigo"
+   "conserver": "Ouvert : 3 à 4 jours au frigo",
+   "magasins": [
+    {
+     "mag": "colruyt",
+     "prix": 2.59,
+     "format": "4 × 115 g (Oikos nature)",
+     "unitaire": [
+      5.63,
+      "kg"
+     ],
+     "date": "2026-11-16",
+     "source": "https://www.colruyt.be/fr/produits/toutes-les-categories/cremerie/yaourt-et-alternative-vegetale/yaourt-nature/yaourt-grec-nature"
+    }
+   ]
   },
   {
    "n": "Fromage en tranches",
@@ -1292,14 +1459,29 @@
    "ray": "epi",
    "desc": "Tomates en morceaux en boîte, la base des sauces rapides.",
    "format": "Boîte de 400 g",
-   "conserver": "Fermée : 2 ans ; ouverte : 3 jours au frigo dans un bol"
+   "conserver": "Fermée : 2 ans ; ouverte : 3 jours au frigo dans un bol",
+   "magasins": [
+    {
+     "mag": "ah",
+     "prix": 0.59,
+     "format": "Boîte 400 g (AH)",
+     "unitaire": [
+      1.48,
+      "kg"
+     ],
+     "date": "2026-11-16",
+     "source": "https://www.ah.be/producten/product/wi30851/ah-tomatenblokjes"
+    }
+   ]
   },
   {
    "n": "Coulis de tomate",
    "ray": "epi",
    "desc": "Purée de tomates lisse (passata), pour la bolognaise et la pizza.",
    "format": "Bouteille ou brique de 500 g à 700 g",
-   "conserver": "Ouvert : 4 jours au frigo"
+   "conserver": "Ouvert : 4 jours au frigo",
+   "photo": "photos/produits/coulis-de-tomate.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Canned_tomatoes.jpg"
   },
   {
    "n": "Moutarde",
@@ -1313,7 +1495,31 @@
    "ray": "epi",
    "desc": "Pâtes courtes striées qui retiennent bien la sauce.",
    "format": "Paquet de 500 g ou 1 kg",
-   "conserver": "Au sec : 2 ans"
+   "conserver": "Au sec : 2 ans",
+   "magasins": [
+    {
+     "mag": "okay",
+     "prix": 0.69,
+     "format": "500 g (Soubry al dente)",
+     "unitaire": [
+      1.38,
+      "kg"
+     ],
+     "date": "2026-11-16",
+     "source": "https://www.okay.be/nl/producten/9644"
+    },
+    {
+     "mag": "okay",
+     "prix": 1.89,
+     "format": "500 g (Barilla n°73)",
+     "unitaire": [
+      3.78,
+      "kg"
+     ],
+     "date": "2026-11-16",
+     "source": "https://www.okay.be/nl/producten/3358"
+    }
+   ]
   },
   {
    "n": "Spaghetti",
@@ -1398,7 +1604,20 @@
    "ray": "epi",
    "desc": "Cubes ou bouillon en poudre pour soupes, risotto et sauces.",
    "format": "Boîte de 10 à 12 cubes",
-   "conserver": "Au sec : 1 an"
+   "conserver": "Au sec : 1 an",
+   "magasins": [
+    {
+     "mag": "delhaize",
+     "prix": 2.25,
+     "format": "12 cubes (Knorr)",
+     "unitaire": [
+      0.19,
+      "u"
+     ],
+     "date": "2026-11-16",
+     "source": "https://www.delhaize.be/fr/shop/Epicerie-salee/Aides-culinaires/Bouillons/c/v2SALCULBOU"
+    }
+   ]
   },
   {
    "n": "Bouillon de volaille",
@@ -1426,7 +1645,9 @@
    "ray": "epi",
    "desc": "Galettes de blé souples pour les wraps et les fajitas.",
    "format": "Paquet de 6 à 8 (25 cm)",
-   "conserver": "Ouvert : 3 à 4 jours"
+   "conserver": "Ouvert : 3 à 4 jours",
+   "photo": "photos/produits/tortillas.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Mexican_tortilla.jpg"
   },
   {
    "n": "Petites tortillas",
@@ -1526,7 +1747,9 @@
    "ray": "epi",
    "desc": "Pois chiches cuits en boîte, pour le curry, le houmous et les salades.",
    "format": "Boîte de 400 g",
-   "conserver": "Fermée : 2 ans"
+   "conserver": "Fermée : 2 ans",
+   "photo": "photos/produits/pois-chiches.jpg",
+   "credit": "https://commons.wikimedia.org/wiki/File:Ordinary_chickpeas_in_a_ceramic_bowl.jpg"
   },
   {
    "n": "Lentilles corail",
@@ -1757,7 +1980,7 @@
    "format": "Paquet de 500 g ou 1 kg",
    "conserver": "Bien fermé, au sec",
    "ref": [
-    8.0,
+    8,
     "u"
    ],
    "photo": "photos/produits/cafe.jpg",
@@ -1781,7 +2004,7 @@
    "format": "Boîte de 20 à 50 sachets",
    "conserver": "Au sec",
    "ref": [
-    2.0,
+    2,
     "u"
    ]
   },
@@ -1803,7 +2026,7 @@
    "format": "Paquet de 1 kg",
    "conserver": "Au sec : 1 an",
    "ref": [
-    1.0,
+    1,
     "u"
    ]
   },
@@ -1836,7 +2059,7 @@
    "format": "Bouteille de 50 cl à 1 L",
    "conserver": "À l'abri de la lumière",
    "ref": [
-    8.0,
+    8,
     "u"
    ]
   },
@@ -1869,7 +2092,7 @@
    "format": "Pot de 400 g à 1 kg",
    "conserver": "À température ambiante",
    "ref": [
-    3.0,
+    3,
     "u"
    ]
   },
@@ -1913,7 +2136,7 @@
    "format": "Paquet de 250 à 500 g",
    "conserver": "Au sec",
    "ref": [
-    2.0,
+    2,
     "u"
    ]
   },
@@ -2036,7 +2259,7 @@
    "format": "Boîte de 250 à 500 g",
    "conserver": "Au sec",
    "ref": [
-    3.0,
+    3,
     "u"
    ]
   },
@@ -2047,7 +2270,7 @@
    "format": "Brique de 1 L ou pack de 6",
    "conserver": "Fermé : plusieurs mois ; ouvert : 3 jours au frigo",
    "ref": [
-    1.0,
+    1,
     "u"
    ],
    "photo": "photos/produits/lait.jpg",
@@ -2060,7 +2283,7 @@
    "format": "Sac de 1 à 4 kg",
    "conserver": "Au sec, sac refermé",
    "ref": [
-    6.0,
+    6,
     "u"
    ]
   },
@@ -2071,7 +2294,7 @@
    "format": "Sac de 3 à 15 kg",
    "conserver": "Au sec, sac refermé",
    "ref": [
-    12.0,
+    12,
     "u"
    ]
   },
@@ -2192,7 +2415,7 @@
    "format": "Pain de 800 g",
    "conserver": "1 à 2 jours ; se congèle",
    "ref": [
-    2.0,
+    2,
     "u"
    ]
   },
@@ -2203,7 +2426,7 @@
    "format": "À la pièce",
    "conserver": "Le jour même",
    "ref": [
-    1.0,
+    1,
     "u"
    ],
    "photo": "photos/produits/baguettes.jpg",
@@ -2253,7 +2476,7 @@
    "format": "À la pièce (400 à 500 g)",
    "conserver": "2 à 3 jours",
    "ref": [
-    3.0,
+    3,
     "u"
    ]
   },
@@ -2324,7 +2547,7 @@
    "format": "Sachet de 750 g à 1 kg",
    "conserver": "Congélateur : plusieurs mois",
    "ref": [
-    2.0,
+    2,
     "u"
    ]
   },
@@ -2370,7 +2593,7 @@
    "format": "Sachet de 300 à 750 g",
    "conserver": "Congélateur : plusieurs mois",
    "ref": [
-    3.0,
+    3,
     "u"
    ]
   },
@@ -2454,7 +2677,7 @@
    "format": "Bouteille de 1,5 L ou pack de canettes",
    "conserver": "Au frais",
    "ref": [
-    2.0,
+    2,
     "u"
    ]
   },
@@ -2509,7 +2732,7 @@
    "format": "Bouteille de 75 cl",
    "conserver": "Couché, au frais",
    "ref": [
-    6.0,
+    6,
     "u"
    ]
   },
@@ -2520,7 +2743,7 @@
    "format": "Bouteille de 75 cl",
    "conserver": "Couché, au frais",
    "ref": [
-    6.0,
+    6,
     "u"
    ]
   },
@@ -2531,7 +2754,7 @@
    "format": "Bouteille de 75 cl",
    "conserver": "Couché, au frais",
    "ref": [
-    6.0,
+    6,
     "u"
    ]
   },
@@ -2542,7 +2765,7 @@
    "format": "Bouteille de 75 cl",
    "conserver": "Couché, au frais",
    "ref": [
-    6.0,
+    6,
     "u"
    ]
   },
@@ -2553,7 +2776,7 @@
    "format": "Boîte de 400 g à 1 kg",
    "conserver": "Au sec",
    "ref": [
-    3.0,
+    3,
     "u"
    ]
   },
@@ -2564,7 +2787,7 @@
    "format": "Paquet de 8 à 24 rouleaux",
    "conserver": "Au sec",
    "ref": [
-    4.0,
+    4,
     "u"
    ]
   },
@@ -2575,7 +2798,7 @@
    "format": "Paquet de 2 à 8 rouleaux",
    "conserver": "Au sec",
    "ref": [
-    3.0,
+    3,
     "u"
    ]
   },
@@ -2586,7 +2809,7 @@
    "format": "Boîte ou paquet de 10 étuis",
    "conserver": "Au sec",
    "ref": [
-    2.0,
+    2,
     "u"
    ]
   },
@@ -2607,7 +2830,7 @@
    "format": "Boîte de 30 à 90",
    "conserver": "Au sec",
    "ref": [
-    6.0,
+    6,
     "u"
    ]
   },
@@ -2618,7 +2841,7 @@
    "format": "Paquet de 1,5 à 4 kg",
    "conserver": "Au sec",
    "ref": [
-    2.0,
+    2,
     "u"
    ]
   },
@@ -2629,7 +2852,7 @@
    "format": "Bidon ou boîte pour 20 à 50 lavages",
    "conserver": "Au sec",
    "ref": [
-    8.0,
+    8,
     "u"
    ]
   },
@@ -2639,7 +2862,7 @@
    "desc": "Adoucissant textile.",
    "format": "Bouteille pour 30 à 60 lavages",
    "ref": [
-    3.0,
+    3,
     "u"
    ]
   },
@@ -2690,7 +2913,7 @@
    "desc": "Sacs à zip pour le congélateur.",
    "format": "Boîte de 15 à 50",
    "ref": [
-    2.0,
+    2,
     "u"
    ]
   },
@@ -2720,7 +2943,7 @@
    "desc": "Shampoing.",
    "format": "Flacon de 250 à 500 ml",
    "ref": [
-    3.0,
+    3,
     "u"
    ]
   },
@@ -2730,7 +2953,7 @@
    "desc": "Après-shampoing.",
    "format": "Flacon de 200 à 500 ml",
    "ref": [
-    3.0,
+    3,
     "u"
    ]
   },
@@ -2760,7 +2983,7 @@
    "desc": "Déodorant en spray ou stick.",
    "format": "À la pièce",
    "ref": [
-    3.0,
+    3,
     "u"
    ]
   },
@@ -2790,7 +3013,7 @@
    "desc": "Rasoirs jetables ou lames.",
    "format": "Paquet de 4 à 10",
    "ref": [
-    5.0,
+    5,
     "u"
    ]
   },
@@ -2800,7 +3023,7 @@
    "desc": "Serviettes hygiéniques.",
    "format": "Paquet de 10 à 20",
    "ref": [
-    3.0,
+    3,
     "u"
    ]
   },
@@ -2810,7 +3033,7 @@
    "desc": "Couches pour bébé (vérifier la taille).",
    "format": "Paquet de 30 à 90",
    "ref": [
-    12.0,
+    12,
     "u"
    ]
   },
@@ -2820,7 +3043,7 @@
    "desc": "Lingettes pour bébé ou nettoyantes.",
    "format": "Paquet de 50 à 80",
    "ref": [
-    2.0,
+    2,
     "u"
    ]
   },
@@ -2830,7 +3053,7 @@
    "desc": "Gel nettoyant détartrant pour toilettes.",
    "format": "Flacon de 750 ml",
    "ref": [
-    2.0,
+    2,
     "u"
    ]
   },
@@ -2840,7 +3063,7 @@
    "desc": "Nettoyant ménager pour toutes les surfaces.",
    "format": "Flacon de 1 L",
    "ref": [
-    2.0,
+    2,
     "u"
    ]
   },
@@ -2860,7 +3083,7 @@
    "desc": "Piles alcalines AA ou AAA.",
    "format": "Paquet de 4 à 12",
    "ref": [
-    5.0,
+    5,
     "u"
    ]
   },
@@ -2870,8 +3093,19 @@
    "desc": "Ampoules LED.",
    "format": "À la pièce ou lot de 2 à 3",
    "ref": [
-    4.0,
+    4,
     "u"
+   ]
+  },
+  {
+   "n": "Crevettes grises",
+   "ray": "bou",
+   "desc": "Petites crevettes de la mer du Nord, déjà décortiquées, pour les tomates-crevettes et les croquettes. Les choisir bien roses et fraîches.",
+   "format": "Barquette de 100 à 250 g",
+   "conserver": "Au frigo : 2 jours maximum",
+   "ref": [
+    60,
+    "kg"
    ]
   }
  ]
