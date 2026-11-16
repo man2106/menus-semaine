@@ -840,9 +840,11 @@ function renderReglages(){
   $("outdef").innerHTML=JOURS.map((j,d)=>`<button class="chip${state.outDefault.includes(d)?" on":""}" data-outdef="${d}" aria-pressed="${state.outDefault.includes(d)}">${j.slice(0,3)}</button>`).join("");
   $("fcount").textContent=state.family.length?"":"!";
 }
-const VUES=["menu","courses","famille","envies","reglages"];
+const VUES=["menu","courses","famille","plus","envies","reglages"];
+const ONGLET_DE={envies:"plus",reglages:"plus"};
 function setTab(t,opts={}){ if(!VUES.includes(t)) t="menu"; const changed=state.tab!==t; state.tab=t; save(); if(t==="envies"&&typeof renderEnvies==="function") renderEnvies();
-  document.querySelectorAll("nav button").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===t));
+  const onglet=ONGLET_DE[t]||t;
+  document.querySelectorAll("nav button").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===onglet));
   VUES.forEach(v=>{const s=$("view-"+v); s.hidden=v!==t; if(v===t&&changed){s.classList.remove("view-in"); void s.offsetWidth; s.classList.add("view-in");}});
   if(location.hash!=="#"+t){ try{history.replaceState(null,"","#"+t);}catch(e){} }
   if(changed&&!opts.keepScroll) window.scrollTo(0,0);
@@ -981,6 +983,7 @@ function replaceDay(d,newId){ if(verrouille()){ toast("Menu verrouillé : la sem
   toast(JOURS[d]+" : "+BYID[newId].nom,()=>{state.week[d]=prev; save(); render(); toast("Plat rétabli");}); }
 
 document.querySelector("nav").addEventListener("click",e=>{const b=e.target.closest("button[data-tab]"); if(b) setTab(b.dataset.tab);});
+document.getElementById("view-plus").addEventListener("click",e=>{const b=e.target.closest("[data-go]"); if(b) setTab(b.dataset.go);});
 $("minus").onclick=()=>{if(state.persons>1){state.persons--;save();render();}};
 $("plus").onclick=()=>{if(state.persons<12){state.persons++;save();render();}};
 $("days").addEventListener("click",e=>{
@@ -2777,8 +2780,8 @@ const VISITE=[
  {sel:"#days .day",t:"Les repas",p:"Touchez un jour pour voir la recette, les courses du plat, changer de plat, choisir qui cuisine ou noter une absence. Les étiquettes Éco, Moyen et Plaisir indiquent le budget."},
  {sel:"#tab-courses",t:"Les courses",p:"La liste se fait toute seule, groupée par magasin et par rayon, en deux passages par semaine. Le mode magasin permet de cocher en avançant dans les rayons."},
  {sel:"#tab-famille",t:"La famille",p:"Qui est là chaque soir, qui cuisine, les goûts de chacun, et les avis donnés après les repas."},
- {sel:"#tab-envies",t:"Vos envies",p:"Répondez au sondage : dites quels plats vous font envie. Les menus proposés en tiennent compte, et des plannings sont suggérés pour les semaines suivantes."},
- {sel:"#tab-reglages",t:"Les réglages",p:"Votre adresse et vos magasins, les jours de courses, les recettes de la famille et l'accès des membres."},
+ {sel:"#tab-plus",t:"Vos envies",p:"Répondez au sondage : dites quels plats vous font envie. Les menus proposés en tiennent compte, et des plannings sont suggérés pour les semaines suivantes."},
+ {sel:"#tab-plus",t:"Les réglages",p:"Votre adresse et vos magasins, les jours de courses, les recettes de la famille et l'accès des membres."},
  {sel:null,t:"C'est parti !",p:"Passez la souris sur un bouton (ou gardez le doigt appuyé sur mobile) pour savoir à quoi il sert. Bon appétit !"}];
 let visite=null;
 function visiteFin(){ if(!visite) return; visite.els.forEach(e=>e.remove()); visite=null; try{ localStorage.setItem(KEY+"-visite","1"); }catch(e){} document.removeEventListener("keydown",visiteClavier,true); window.removeEventListener("resize",visitePlacer); }
