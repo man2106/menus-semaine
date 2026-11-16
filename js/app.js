@@ -586,6 +586,7 @@ function renderDays(){
     const isToday=dayOffset(d).getTime()===TODAY.getTime(), pc=promoCount(r), hc=headcount(d), w=dislikesFor(r,d);
     const et=etatJour(d), vtag=verrouille()?(et==="passe"?`<span class="jstat passe">Passé</span>`:et==="avenir"?`<span class="jstat prevu">Prévu</span>`:""):"";
     return `<article class="day${isToday?" today":""}${et==="passe"?" passe":""}" id="day-${d}">
+      <button class="dgrip" type="button" aria-label="Glisser pour échanger ce repas avec un autre soir" data-tip="Glisser pour échanger ce repas avec un autre soir">⠿</button>
       <button class="dcard" data-open="${d}" aria-label="${JOURS[d]} : ${esc(r.nom)}, ouvrir la fiche">
         <span class="dthumbbox"><img class="dthumb" src="${photoSrc(id)}" alt="" loading="lazy" data-cache-err="1"></span>
         <span class="dinfo">
@@ -598,6 +599,41 @@ function renderDays(){
       </button>
     </article>`}).join("");
 }
+
+// ---- Glisser-déposer : une poignée ⠿ sur chaque soir pour échanger deux repas ----
+let dragRepas=null, dragBouge=false;
+$("days").addEventListener("pointerdown", e=>{
+  const g=e.target.closest(".dgrip"); if(!g) return;
+  if(document.body.classList.contains("verrou")||document.body.classList.contains("readonly")){ toast("Menu verrouillé : impossible de déplacer"); return; }
+  e.preventDefault(); dragBouge=false;
+  const art=g.closest("article.day"); try{ g.setPointerCapture(e.pointerId); }catch(err){}
+  dragRepas={from:+art.id.slice(4), id:e.pointerId, x:e.clientX, y:e.clientY, el:art, over:null};
+  art.classList.add("dragging");
+});
+document.addEventListener("pointermove", e=>{
+  const d=dragRepas; if(!d||e.pointerId!==d.id) return;
+  e.preventDefault(); dragBouge=true;
+  d.el.style.transform=`translate(${e.clientX-d.x}px,${e.clientY-d.y}px)`;
+  document.querySelectorAll(".day.dover").forEach(x=>x.classList.remove("dover"));
+  const cible=document.elementFromPoint(e.clientX,e.clientY)?.closest("article.day:not(.out)");
+  d.over=(cible&&cible.id!==d.el.id)?+cible.id.slice(4):null;
+  if(d.over!=null) cible.classList.add("dover");
+}, {passive:false});
+function finDeplacement(annule){
+  const d=dragRepas; if(!d) return; dragRepas=null;
+  d.el.style.transform=""; d.el.classList.remove("dragging");
+  document.querySelectorAll(".day.dover").forEach(x=>x.classList.remove("dover"));
+  if(!annule && d.over!=null && d.over!==d.from){
+    const a=d.from, b=d.over, prev=[...state.week];
+    [state.week[a],state.week[b]]=[state.week[b],state.week[a]];
+    save(); render();
+    toast(`${JOURS[a]} et ${JOURS[b]} échangés`,()=>{ state.week=prev; save(); render(); toast("Échange annulé"); });
+  }
+}
+document.addEventListener("pointerup", e=>{ if(dragRepas&&e.pointerId===dragRepas.id) finDeplacement(false); });
+document.addEventListener("pointercancel", e=>{ if(dragRepas&&e.pointerId===dragRepas.id) finDeplacement(true); });
+// Après un glisser, le clic qui suit n'ouvre pas la fiche du repas
+document.addEventListener("click", e=>{ if(dragBouge){ e.stopPropagation(); e.preventDefault(); dragBouge=false; } }, true);
 
 // ---- Deux courses par semaine ----
 const STOCKABLE = ["epi","sur"];
