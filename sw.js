@@ -1,6 +1,6 @@
 // Mise en cache simple : le réseau d'abord, la copie locale si l'appareil est hors ligne.
-const CACHE = "menus-v45";
-self.addEventListener("install", e => { self.skipWaiting(); e.waitUntil(caches.open(CACHE).then(c => c.addAll(["./", "index.html", "js/app.js?v=45", "js/partage.js?v=45", "vendor/jspdf-4.2.1.umd.min.js?v=45", "vendor/supabase-js-2.45.4.js?v=45", "manifest.webmanifest", "icons/icon-192.png"]).catch(() => {}))); });
+const CACHE = "menus-v46";
+self.addEventListener("install", e => { self.skipWaiting(); e.waitUntil(caches.open(CACHE).then(c => c.addAll(["./", "index.html", "js/app.js?v=46", "js/partage.js?v=46", "vendor/jspdf-4.2.1.umd.min.js?v=46", "vendor/supabase-js-2.45.4.js?v=46", "manifest.webmanifest", "icons/icon-192.png"]).catch(() => {}))); });
 self.addEventListener("activate", e => e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim())));
 self.addEventListener("fetch", e => {
   const req = e.request;
