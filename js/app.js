@@ -2079,6 +2079,8 @@ function cleanRetour(r){ if(!r||typeof r!=="object") return null; const note=+r.
 function subscribeRetours(){ if(!DB) return; if(unsubRetours) unsubRetours();
   unsubRetours=DB.collection("retours").onSnapshot(q=>{ let ch=false;
     q.docChanges().forEach(c=>{ if(c.type==="removed"){ delete RETOURS[c.doc.id]; ch=true; return; } const r=cleanRetour(c.doc.data()); if(r){ RETOURS[c.doc.id]=r; ch=true; } });
+    // Les avis supprimés dans la base disparaissent aussi du cache local de cet appareil
+    if(q.docs){ const vivants=new Set(q.docs.map(d=>d.id)); Object.keys(RETOURS).forEach(k=>{ if(!vivants.has(k)){ delete RETOURS[k]; ch=true; } }); }
     if(ch){ saveRetoursLocal(); renderRetours(); if(sheetCtx&&(sheetCtx.type==="bilan"||sheetCtx.type==="retour")) renderSheet(); } },()=>{});
   // toutes les semaines partagées, pour retrouver les repas déjà mangés
   if(unsubSemaines) unsubSemaines();
