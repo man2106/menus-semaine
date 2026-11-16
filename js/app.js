@@ -1144,6 +1144,10 @@ async function renderJournal(){
 }
 function ago(iso){ const m=Math.round((Date.now()-new Date(iso).getTime())/60000);
   if(!(m>=0)) return ""; if(m<1) return "à l'instant"; if(m<60) return `il y a ${m} min`; const h=Math.round(m/60); if(h<24) return `il y a ${h} h`; return `il y a ${Math.round(h/24)} j`; }
+function kindTitre(valide){
+  if(state.weekOffset===0) return valide?"Menu officiel de cette semaine":"Menu de cette semaine à valider";
+  return valide?"Menu validé pour la semaine suivante":"Propositions pour la semaine suivante";
+}
 function renderWeekbar(){
   const valide=state.statut==="valide";
   $("weekbar").innerHTML=`<div class="wtop">
@@ -1151,6 +1155,7 @@ function renderWeekbar(){
       <div class="wtitle"><small>${relWeek()}</small><b>Semaine du ${weekLabel()}</b></div>
       <button class="wnav" data-week="${state.weekOffset+1}" ${state.weekOffset===3?"disabled":""} aria-label="Semaine suivante">›</button>
     </div>
+    <div class="kind ${valide?"official":"proposal"}"><b>${kindTitre(valide)}</b><small>${valide?"Figé. Rouvrir pour modifier.":"À discuter en famille avant validation."}</small></div>
     <div class="wstate"><span class="st ${valide?"on":"soon"}">${valide?"Menu validé":"Proposition à discuter"}</span><span class="sync ${syncState}" id="sync"></span></div>
     <div class="actions wact">
       <button class="btn primary" id="share" data-tip="Prépare un message avec le menu et le lien de l'application, à envoyer par WhatsApp ou SMS">Envoyer à la famille</button>
