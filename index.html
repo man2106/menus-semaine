@@ -860,6 +860,12 @@ body.verrou [data-del], body.verrou #autoassign, body.verrou #clearassign, body.
 .plusitem{display:grid;gap:2px;text-align:left;padding:14px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink);font:inherit;cursor:pointer}
 .plusitem b{font-size:16px}
 .plusitem small{color:var(--muted);font-size:13px}
+/* Glisser-déposer des repas */
+.day{position:relative}
+.dgrip{position:absolute;top:6px;right:6px;z-index:2;width:36px;height:36px;border:0;border-radius:10px;background:rgba(255,255,255,.92);color:var(--ink);font-size:18px;line-height:1;cursor:grab;touch-action:none;box-shadow:0 1px 3px rgba(0,0,0,.25);padding:0}
+body.verrou .dgrip,body.readonly .dgrip{display:none}
+.day.dragging{opacity:.92;box-shadow:0 12px 28px rgba(0,0,0,.28);z-index:20;pointer-events:none}
+.day.dover{outline:3px dashed var(--accent);outline-offset:3px}
 </style>
 </head>
 <body>
@@ -871,7 +877,7 @@ body.verrou [data-del], body.verrou #autoassign, body.verrou #clearassign, body.
       <div>
         <h1>Menus de la semaine</h1>
         <p class="sub">Repas du soir · moins de 30 minutes · petit budget</p>
-        <p class="appver" data-appver="47">Version 47</p>
+        <p class="appver" data-appver="48">Version 48</p>
       </div>
       <div class="comptehaut" id="comptehaut" hidden></div>
     </div>
@@ -1127,10 +1133,10 @@ body.verrou [data-del], body.verrou #autoassign, body.verrou #clearassign, body.
   <div class="sfoot" id="sfoot"></div>
 </div>
 
-<script src="vendor/jspdf-4.2.1.umd.min.js?v=47"></script>
-<script src="vendor/supabase-js-2.45.4.js?v=47"></script>
-<script src="js/partage.js?v=47"></script>
-<script src="js/app.js?v=47"></script>
+<script src="vendor/jspdf-4.2.1.umd.min.js?v=48"></script>
+<script src="vendor/supabase-js-2.45.4.js?v=48"></script>
+<script src="js/partage.js?v=48"></script>
+<script src="js/app.js?v=48"></script>
 
 </body>
 </html>
