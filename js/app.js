@@ -518,6 +518,18 @@ document.addEventListener("click",e=>{ const pd=e.target.closest("[data-pdfdirec
   if(e.target.closest("select,button,a")) return; const c=e.target.closest("[data-copen]"); if(c) openMeal(state.week[+c.dataset.copen],+c.dataset.copen); });
 document.addEventListener("keydown",e=>{ if(e.key!=="Enter") return; const c=e.target.closest&&e.target.closest("[data-copen]"); if(c&&e.target===c) openMeal(state.week[+c.dataset.copen],+c.dataset.copen); });
 // ---- Page principale : les soirs sans repas prévu ou sans cuisinier ----
+// ---- Nouveautés : recettes ajoutées (14 derniers jours) et promos nouvelles (7 derniers jours) ----
+const ymd = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+function renderNouveautes(){ const box=$("nouveautes"); if(!box) return;
+  const il14=new Date(TODAY); il14.setDate(il14.getDate()-14); const il7=new Date(TODAY); il7.setDate(il7.getDate()-7);
+  const recs=RECETTES.filter(r=>r.ajoute && r.ajoute>=ymd(il14)).slice(0,8);
+  const proms=PROMOS.filter(p=>p.du>=ymd(il7)).slice(0,8);
+  if(!recs.length && !proms.length){ box.hidden=true; box.innerHTML=""; return; }
+  box.hidden=false;
+  box.innerHTML=`<div class="phead"><h2>Nouveautés</h2></div>
+    ${recs.length?`<h3 class="nvh">Recettes ajoutées</h3><ul class="nvlist">${recs.map(r=>`<li><button class="link" data-openrec="${esc(r.id)}" type="button">${esc(r.nom)}</button> <small>ajoutée le ${esc(r.ajoute.slice(8,10))}/${esc(r.ajoute.slice(5,7))}</small></li>`).join("")}</ul>`:""}
+    ${proms.length?`<h3 class="nvh">Nouvelles promos</h3><ul class="nvlist">${proms.map(p=>`<li><b>${esc(p.produit)}</b> <small>${esc(ENS[p.mag]||p.mag)} · ${p.prix.toFixed(2).replace(".",",")} € · jusqu'au ${esc(p.au.slice(8,10))}/${esc(p.au.slice(5,7))}</small></li>`).join("")}</ul>`:""}`;
+}
 function renderACompleter(){ const box=$("acompleter"); if(!box) return;
   const sansCuisinier=homeDays().filter(d=>headcount(d)>0&&!state.cooks[d]);
   const dehors=JOURS.map((_,d)=>d).filter(d=>isOut(d)), personne=homeDays().filter(d=>headcount(d)===0);
@@ -928,7 +940,7 @@ $("mbody").addEventListener("click",e=>{ if(e.target.id!=="mcopy") return;
 $("recipes").addEventListener("click",e=>{const b=e.target.closest("[data-openrec]"); if(b) openMeal(b.dataset.openrec,null);});
 $("trip1").onchange=e=>{state.trip1=e.target.value;state.checked={};save();render();toast("Jour des courses : "+tripName(0));};
 
-function render(){if(!$("view-menu")) return; document.body.classList.toggle("verrou",verrouille()); $("trip1").value=state.trip1;renderWeekbar();renderCompteHaut();renderACompleter();renderCalendrier();renderPresences();renderBudget();renderStats();renderDays();renderCourses();renderPromos();renderRecettes();renderReglages();if(typeof renderRetours==="function")renderRetours();if(state.tab==="envies"&&typeof renderEnvies==="function")renderEnvies();}
+function render(){if(!$("view-menu")) return; document.body.classList.toggle("verrou",verrouille()); renderNouveautes(); $("trip1").value=state.trip1;renderWeekbar();renderCompteHaut();renderACompleter();renderCalendrier();renderPresences();renderBudget();renderStats();renderDays();renderCourses();renderPromos();renderRecettes();renderReglages();if(typeof renderRetours==="function")renderRetours();if(state.tab==="envies"&&typeof renderEnvies==="function")renderEnvies();}
 $("sugg").addEventListener("change",e=>{const s=e.target.closest("select[data-add]"); if(!s||s.value==="") return;
   replaceDay(+s.value,s.dataset.add);});
 $("cmp").addEventListener("change",e=>{const inp=e.target.closest("input[data-pk]"); if(!inp) return;
@@ -2671,7 +2683,7 @@ function accepterRecette(x){
     .map(([n,q,u,ray])=>[txtOk(n,40),Math.max(0,+q||0),typeof u==="string"?txtOk(u,12):"",RAYKEYS.includes(ray)?ray:"epi"]).filter(i=>i[0]);
   const etapes=(Array.isArray(x.etapes)?x.etapes:[]).map(e=>txtOk(e,400)).filter(Boolean).slice(0,8);
   if(ing.length<2||etapes.length<2) return null;
-  return {id:x.id,nom:txtOk(x.nom,60)||"Recette",acc:txtOk(x.acc,60),t:Math.max(5,Math.min(30,+x.t||30)),
+  return {ajoute:typeof x.ajoute==="string"&&/^\d{4}-\d\d-\d\d$/.test(x.ajoute)?x.ajoute:null,id:x.id,nom:txtOk(x.nom,60)||"Recette",acc:txtOk(x.acc,60),t:Math.max(5,Math.min(30,+x.t||30)),
     b:["eco","moyen","plaisir"].includes(x.b)?x.b:undefined,p:PROT[x.p]?x.p:undefined,f:FECU[x.f]?x.f:undefined,c:CUISINES[x.c]?x.c:undefined,
     astuce:txtOk(x.astuce,200),ing,etapes,nouveau:true,
     source:x.source&&typeof x.source.url==="string"&&/^https:\/\//.test(x.source.url)?{titre:txtOk(x.source.titre,80),url:x.source.url.slice(0,300)}:null,
@@ -2741,6 +2753,18 @@ async function chargerDonnees(){
   }
   if(ch){ render(); if(state.tab==="envies"&&typeof renderEnvies==="function") renderEnvies(); }
 }
+// ---- Rubriques pliables : cliquer sur le titre d'un bloc le replie ou le déplie. Mémorisé sur cet appareil. ----
+const PLIS_KEY="menus-plis";
+let plis={}; try{ plis=JSON.parse(localStorage.getItem(PLIS_KEY)||"{}")||{}; }catch(e){ plis={}; }
+const appliquerPlis = () => document.querySelectorAll(".panel[id]").forEach(p=>{ if(plis[p.id]) p.classList.add("fermee"); else p.classList.remove("fermee"); });
+document.addEventListener("click", e=>{
+  const titre=e.target.closest(".panel[id]>h2:first-child,.panel[id]>h3:first-child,.panel[id]>.phead:first-child");
+  if(!titre || e.target.closest("button,a,select,input,label,textarea,summary")) return;
+  const pn=titre.parentElement; plis[pn.id]=!plis[pn.id]; try{ localStorage.setItem(PLIS_KEY,JSON.stringify(plis)); }catch(err){}
+  pn.classList.toggle("fermee", !!plis[pn.id]);
+});
+if($("nouveautes")) $("nouveautes").addEventListener("click",e=>{const b=e.target.closest("[data-openrec]"); if(b) openMeal(b.dataset.openrec,null);});
+const _renderPlis = render; render = function(){ _renderPlis(); appliquerPlis(); };
 chargerDonnees();
 
 // ===================== Visite guidée (première ouverture sur un appareil) =====================

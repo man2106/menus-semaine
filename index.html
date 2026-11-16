@@ -845,6 +845,16 @@ body.verrou [data-del], body.verrou #autoassign, body.verrou #clearassign, body.
 .day.passe .dcard{opacity:.6}
 .day.passe .dthumb{filter:grayscale(.7)}
 .appver{margin:2px 0 0;font-size:12px;color:var(--muted)}
+/* Nouveautés */
+.nouveautes .nvh{font-size:14px;margin:10px 0 4px;color:var(--accent)}
+.nouveautes .nvlist{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.nouveautes .nvlist li{text-align:left;padding:6px 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+.nouveautes .nvlist small{color:var(--muted);font-size:13px}
+/* Rubriques pliables */
+.panel[id]>h2:first-child,.panel[id]>h3:first-child,.panel[id]>.phead:first-child{cursor:pointer;position:relative;padding-right:26px}
+.panel[id]>h2:first-child::after,.panel[id]>h3:first-child::after,.panel[id]>.phead:first-child::after{content:"▾";position:absolute;right:6px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:14px}
+.panel[id].fermee>h2:first-child::after,.panel[id].fermee>h3:first-child::after,.panel[id].fermee>.phead:first-child::after{content:"▸"}
+.panel[id].fermee>:not(:first-child){display:none!important}
 </style>
 </head>
 <body>
@@ -856,7 +866,7 @@ body.verrou [data-del], body.verrou #autoassign, body.verrou #clearassign, body.
       <div>
         <h1>Menus de la semaine</h1>
         <p class="sub">Repas du soir · moins de 30 minutes · petit budget</p>
-        <p class="appver" data-appver="45">Version 45</p>
+        <p class="appver" data-appver="46">Version 46</p>
       </div>
       <div class="comptehaut" id="comptehaut" hidden></div>
     </div>
@@ -881,6 +891,7 @@ body.verrou [data-del], body.verrou #autoassign, body.verrou #clearassign, body.
   <!-- ===== MENU ===== -->
   <section id="view-menu">
     <div class="col-a">
+    <div class="panel nouveautes" id="nouveautes" hidden></div>
     <div class="panel acomp" id="acompleter"></div>
     <div class="panel mqpanel" id="manquants" hidden></div>
     <div class="panel weekbar" id="weekbar"></div>
@@ -1105,10 +1116,10 @@ body.verrou [data-del], body.verrou #autoassign, body.verrou #clearassign, body.
   <div class="sfoot" id="sfoot"></div>
 </div>
 
-<script src="vendor/jspdf-4.2.1.umd.min.js?v=45"></script>
-<script src="vendor/supabase-js-2.45.4.js?v=45"></script>
-<script src="js/partage.js?v=45"></script>
-<script src="js/app.js?v=45"></script>
+<script src="vendor/jspdf-4.2.1.umd.min.js?v=46"></script>
+<script src="vendor/supabase-js-2.45.4.js?v=46"></script>
+<script src="js/partage.js?v=46"></script>
+<script src="js/app.js?v=46"></script>
 
 </body>
 </html>
