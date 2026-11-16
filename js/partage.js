@@ -178,8 +178,9 @@
     const cle = "menus-identite-" + UID;
     if (localStorage.getItem(cle) && ACCES.nom) return;
     const esc = t => String(t == null ? "" : t).replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
-    const { data } = await sb.from("acces").select("nom").order("joined_at");
-    const noms = [...new Set((data || []).map(r => r.nom).filter(Boolean))];
+    // Les prénoms de la famille (liste des membres de l'app), sinon ceux des accès connus
+    let noms = (typeof state !== "undefined" && state && Array.isArray(state.family)) ? state.family.filter(Boolean) : [];
+    if (!noms.length) { const { data } = await sb.from("acces").select("nom").order("joined_at"); noms = [...new Set((data || []).map(r => r.nom).filter(Boolean))]; }
     const box = document.createElement("div"); box.className = "gate"; box.setAttribute("role", "dialog"); box.setAttribute("aria-modal", "true");
     box.innerHTML = `<div class="gatecard"><h1>Qui êtes-vous ?</h1>
       <p>Chacun ne note que pour lui-même. Touchez votre prénom, ou tapez-le si vous n'êtes pas dans la liste.</p>
