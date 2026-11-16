@@ -165,12 +165,48 @@
       if (!role) { $("g-msg").textContent = "Ce code n'est pas le bon. Vérifiez-le dans votre invitation."; $("g-go").disabled = false; return; }
       const r = await sb.rpc("mon_acces"); ACCES = r.data;
       history.replaceState(null, "", location.pathname + location.hash);
+      localStorage.setItem("menus-identite-" + UID, "1");
       await startDb(); $("gate").hidden = true; resolveReady(true); renderAcces();
     } catch (e) {
       $("g-msg").textContent = /essais/i.test(e.message||"") ? "Trop d'essais de code : réessayez dans un quart d'heure." : "Connexion impossible pour le moment. Vérifiez votre connexion Internet et réessayez.";
     }
     $("g-go").disabled = false;
   }
+  // Au premier passage sur cet appareil, chacun dit qui il est : il ne notera ensuite que pour lui.
+  async function choisirIdentite(){
+    if (!ACCES || !sb) return;
+    const cle = "menus-identite-" + UID;
+    if (localStorage.getItem(cle) && ACCES.nom) return;
+    const esc = t => String(t == null ? "" : t).replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+    const { data } = await sb.from("acces").select("nom").order("joined_at");
+    const noms = [...new Set((data || []).map(r => r.nom).filter(Boolean))];
+    const box = document.createElement("div"); box.className = "gate"; box.setAttribute("role", "dialog"); box.setAttribute("aria-modal", "true");
+    box.innerHTML = `<div class="gatecard"><h1>Qui êtes-vous ?</h1>
+      <p>Chacun ne note que pour lui-même. Touchez votre prénom, ou tapez-le si vous n'êtes pas dans la liste.</p>
+      <div class="mlist" id="idchoix">${noms.map(n => `<button class="btn" type="button" data-id="${esc(n)}"${n === ACCES.nom ? ' aria-pressed="true"' : ""}>${esc(n)}</button>`).join("")}</div>
+      <label class="wfield">Mon prénom<input id="idautre" type="text" maxlength="30" autocomplete="given-name" placeholder="Ex. : Anne"></label>
+      <button class="btn primary" id="idok" type="button">Confirmer</button>
+      <p class="note" id="idmsg" role="status"></p></div>`;
+    document.body.appendChild(box);
+    let choisi = ACCES.nom || "";
+    box.addEventListener("click", e => {
+      const b = e.target.closest("[data-id]"); if (!b) return;
+      choisi = b.dataset.id; box.querySelectorAll("[data-id]").forEach(x => x.classList.toggle("primary", x === b));
+    });
+    await new Promise(resolve => {
+      box.querySelector("#idok").addEventListener("click", async () => {
+        const n = box.querySelector("#idautre").value.trim() || choisi;
+        if (!n) { box.querySelector("#idmsg").textContent = "Choisissez ou tapez votre prénom."; return; }
+        if (n !== ACCES.nom) {
+          const { error } = await sb.rpc("definir_nom", { nom: n });
+          if (error) { box.querySelector("#idmsg").textContent = "Impossible d'enregistrer ce prénom. Réessayez."; return; }
+          ACCES.nom = n; PROFILS.set(UID, n);
+        }
+        localStorage.setItem(cle, "1"); box.remove(); renderAcces(); resolve();
+      });
+    });
+  }
+
   async function boot(){
     if (!sb) { resolveReady(false); return; }
     try {
@@ -178,7 +214,7 @@
       if (!session) { const r = await sb.auth.signInAnonymously(); if (r.error) throw r.error; session = r.data.session; }
       UID = session.user.id;
       const { data, error } = await sb.rpc("mon_acces"); if (error) throw error;
-      if (data) { ACCES = data; await startDb(); resolveReady(true); renderAcces(); }
+      if (data) { ACCES = data; await startDb(); resolveReady(true); renderAcces(); choisirIdentite().catch(() => {}); }
       else showGate();
     } catch (e) {
       console.error(e);
