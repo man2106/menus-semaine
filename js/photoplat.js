@@ -56,7 +56,7 @@ async function ppRemettre(id){ if(!BYID[id]) return; const quand=new Date().toIS
   const r=await ppEnvoyer(id,null,quand);
   toast(r==="ok"?"Photo d'origine remise pour toute la famille":"Photo d'origine remise"+(r==="echec"?" (le partage a échoué)":"")); }
 function ppSousFigure(id){ const a=PHOTOS_PERSO[id]?true:false, en=!!DB&&CAN_WRITE!==false;
-  return `<div class="ppact edit-only"><label class="btn">📷 Ma photo du plat<input id="pp-photo" data-pp="${esc(id)}" type="file" accept="image/*" capture="environment" hidden></label>${a?`<button type="button" class="btn" data-ppreset="${esc(id)}">Remettre la photo d'origine</button>`:""}</div>${a&&!en?`<p class="note ppnote">Photo gardée sur ce téléphone</p>`:""}`; }
+  return `<div class="ppact"><label class="btn">📷 Ma photo du plat<input id="pp-photo" data-pp="${esc(id)}" type="file" accept="image/*" capture="environment" hidden></label>${a?`<button type="button" class="btn" data-ppreset="${esc(id)}">Remettre la photo d'origine</button>`:""}</div>${a&&!en?`<p class="note ppnote">Photo gardée sur ce téléphone</p>`:""}`; }
 document.addEventListener("change",e=>{ if(e.target.id!=="pp-photo") return; const f=e.target.files&&e.target.files[0], id=e.target.dataset.pp; e.target.value=""; if(f) ppChoisir(id,f); });
 document.addEventListener("click",e=>{ const b=e.target.closest("[data-ppreset]"); if(b) ppRemettre(b.dataset.ppreset); });
 
