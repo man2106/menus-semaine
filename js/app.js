@@ -334,7 +334,7 @@ const orderedStores = () => { const l=state.storeOrder.map(MAGBYID).filter(Boole
 function prefBonus(id){ const act=state.storeOrder, r=act.indexOf(id); return r<0?0:(act.length-1-r)*PREF_EUR; }
 const MAGNOM = new Proxy({}, {get:(_,id)=>{ const m=MAGASINS.find(x=>x.id===id); if(!m) return ENS[id]||id; const twin=(state&&state.storeOrder||[]).filter(x=>x!==id&&MAGASINS.find(y=>y.id===x&&y.nom===m.nom)).length; return twin? m.nom+" "+m.lieu.split(", ").pop() : m.nom; }});
 // Promotions relevées le 13/11/2026 (folders et PrijsProfeet). ing = ingrédient des recettes concerné
-let RELEVE = "13 novembre 2026";
+let RELEVE = "13 novembre 2026", RELEVE_ISO = "2026-11-13";
 const PROMOS = [
  {mag:"colruyt",produit:"Barilla Spaghettoni n°7",prix:0.99,avant:1.99,du:"2026-11-04",au:"2026-11-17",ing:"Spaghetti"},
  {mag:"colruyt",produit:"Champignons shimeji Boni",prix:0.99,avant:1.99,du:"2026-11-04",au:"2026-11-17",ing:"Champignons"},
@@ -811,7 +811,9 @@ function renderRecettes(){
 }
 
 function renderPromos(){
-  $("promodate").textContent=`Promotions relevées le ${RELEVE} dans les enseignes autour de chez vous (mise à jour le lundi et le mercredi). Vérifiez en magasin avant d'acheter.`;
+  const ageReleve=Math.round((TODAY-isoDate(RELEVE_ISO))/864e5), vieux=ageReleve>7;
+  $("promodate").className="promodate"+(vieux?" vieux":"");
+  $("promodate").innerHTML=`<b>Promos relevées le ${esc(RELEVE)}</b>${vieux?` · attention, ce relevé a ${ageReleve} jours : les prix ont peut-être changé`:""}<br>Enseignes autour de chez vous (mise à jour le lundi et le mercredi). Vérifiez en magasin avant d'acheter.`;
   const ranked=RECETTES.map(r=>({r,c:promoCount(r)})).filter(x=>x.c).sort((a,b)=>b.c-a.c||a.r.t-b.r.t);
   $("sugg").innerHTML=ranked.map(({r,c})=>{const days=state.week.map((id,d)=>id===r.id?JOURS[d]:null).filter(Boolean);
     const what=[...new Set(r.ing.map(([n])=>n).filter(n=>promosFor(n).length))].map(n=>n.toLowerCase()+" ("+promosFor(n).map(p=>ENS[p.mag]).join(", ")+")").join(", ");
@@ -2792,7 +2794,7 @@ async function chargerDonnees(){
   if(P&&Array.isArray(P.promos)){
     const l=P.promos.filter(x=>x&&ENS[x.mag]&&typeof x.ing==="string"&&+x.prix>0&&/^\d{4}-\d\d-\d\d$/.test(x.du||"")&&/^\d{4}-\d\d-\d\d$/.test(x.au||""))
       .slice(0,400).map(x=>({mag:x.mag,produit:txtOk(x.produit,80),prix:+x.prix,avant:+x.avant>0?+x.avant:null,du:x.du,au:x.au,ing:txtOk(x.ing,40)}));
-    if(l.length){ PROMOS.length=0; PROMOS.push(...l); if(typeof P.releve==="string") RELEVE=txtOk(P.releve,40); ch=true; }
+    if(l.length){ PROMOS.length=0; PROMOS.push(...l); if(typeof P.releve==="string") RELEVE=txtOk(P.releve,40); if(/^\d{4}-\d\d-\d\d$/.test(P.date||"")) RELEVE_ISO=P.date; ch=true; }
   }
   if(R&&Array.isArray(R.recettes)){
     if(R.prix&&typeof R.prix==="object") Object.entries(R.prix).forEach(([k,v])=>{ if(!PRIX[k]&&Array.isArray(v)&&+v[0]>0&&["kg","L","u"].includes(v[1])) PRIX[k]=[+v[0],v[1]]; });
