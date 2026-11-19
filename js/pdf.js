@@ -104,7 +104,8 @@ function menuText(){
   return t+`\n${APP_URL}`;
 }
 // Photo d'un plat en data URL pour le PDF (photos publiées avec la page ou recette de famille)
-async function photoData(id){ try{ const src=photoSrc(id).replace(/\.webp$/,".jpg"); if(src.startsWith("data:image/jpeg")) return src; if(src.startsWith("data:")) return null;
+async function photoData(id){ try{ if(PHOTOS_PERSO[id]){ const j=await ppEnJpeg(PHOTOS_PERSO[id],2.5); if(j) return j; }   // photo de la famille : recadrée en JPEG pour jsPDF
+  const src=photoSrc(id).replace(/\.webp$/,".jpg"); if(src.startsWith("data:image/jpeg")) return src; if(src.startsWith("data:")) return null;
   const blob=await (await fetch(src)).blob(); return await new Promise(res=>{ const fr=new FileReader(); fr.onload=()=>res(fr.result); fr.onerror=()=>res(null); fr.readAsDataURL(blob); }); }catch(e){ return null; } }
 async function buildMenuPdf(){
   const {jsPDF}=window.jspdf; const doc=new jsPDF({unit:"mm",format:"a4",orientation:"landscape"});

@@ -147,7 +147,7 @@ setTimeout(peutEtreVisite,2500);
     IS_OWNER = u ? await u.isOwner() : true; if(!IS_OWNER) document.body.classList.add("notowner");
     DB.doc("validations/menus").onSnapshot(snap=>{ const dd=snap.exists?snap.data():{}; VALID=(dd.semaines&&typeof dd.semaines==="object")?{...dd.semaines}:{}; LIMITES=(dd.limites&&typeof dd.limites==="object")?{...dd.limites}:{}; applyValidation(); saveLocal(); render(); },()=>{});
     if(c===false){ document.body.classList.add("readonly"); }
-    subscribeRecettes(); subscribeGouts(); subscribeWeek(); subscribeFamily(); subscribeRetours(); subscribeSondage(); subscribeSugg(); subscribeGoogle(); subscribePlacard(); subscribeTicketsPh();
+    subscribeRecettes(); subscribeGouts(); subscribeWeek(); subscribeFamily(); subscribeRetours(); subscribeSondage(); subscribeSugg(); subscribeGoogle(); subscribePlacard(); subscribeTicketsPh(); subscribePhotosPlats();
     setTimeout(maybeWizard,1500);
   }catch(e){ setSync("local"); setTimeout(maybeWizard,300); }
 })();
