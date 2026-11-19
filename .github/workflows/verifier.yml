@@ -1,0 +1,19 @@
+name: Vérifier
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  verifier:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Vérifier les données
+        run: node outils/verifier.js
+      - name: Contrôle de syntaxe
+        run: |
+          for f in js/app.js js/partage.js sw.js; do node --check "$f"; done
