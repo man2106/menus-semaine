@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https://ixxtgncailsbvlbumuqs.supabase.co wss://ixxtgncailsbvlbumuqs.supabase.co https://overpass-api.de https://overpass.private.coffee https://maps.mail.ru https://photon.komoot.io https://nominatim.openstreetmap.org https://geoservices.wallonie.be; worker-src 'self' blob:; manifest-src 'self'; base-uri 'self'; form-action 'self'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: blob: https:; connect-src 'self' https://ixxtgncailsbvlbumuqs.supabase.co wss://ixxtgncailsbvlbumuqs.supabase.co https://overpass-api.de https://overpass.private.coffee https://maps.mail.ru https://photon.komoot.io https://nominatim.openstreetmap.org https://geoservices.wallonie.be; worker-src 'self' blob:; manifest-src 'self'; base-uri 'self'; form-action 'self'; object-src 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#2E7A4C">
@@ -119,9 +119,11 @@
 </style>
 <title>Menus de la semaine</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Inter:wght@400;500;600&display=swap">
+<link rel="preload" href="fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
 <style>
+/* Polices hébergées ici (licence OFL, voir fonts/LICENSE-*.txt) : plus aucun appel à Google */
+@font-face{font-family:"Bricolage Grotesque";font-style:normal;font-weight:200 800;font-display:swap;src:url(fonts/bricolage-grotesque-latin.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"Inter";font-style:normal;font-weight:100 900;font-display:swap;src:url(fonts/inter-latin.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
 /* Mise en page : une colonne type carnet de cuisine, onglets collants, cartes-jours numérotées par le jour de la semaine */
 :root{
   --bg:#F5F7F1; --surface:#FFFFFF; --ink:#1E2A21; --muted:#5D6A60; --line:#DCE3D6;
@@ -259,6 +261,8 @@ table.cmp{border-collapse:collapse;width:100%;min-width:420px;font-size:13px}
 .cmp tfoot td{font-weight:700;text-align:right;font-variant-numeric:tabular-nums;border-top:2px solid var(--ink)}
 .cmp tfoot td.best{color:var(--accent)}
 .note{font-size:12px;color:var(--muted);margin:0}
+.promodate{font-size:13px;color:var(--muted);margin:6px 0}.promodate b{color:var(--ink)}
+.promodate.vieux{background:var(--warm-soft);color:var(--warm);border-left:4px solid var(--warm);border-radius:10px;padding:8px 10px;font-weight:600}.promodate.vieux b{color:var(--warm)}
 .overlay{position:fixed;inset:0;z-index:30;background:rgba(10,16,12,.55);display:flex;align-items:flex-end;justify-content:center;
   padding:calc(12px + env(safe-area-inset-top, 0px)) max(0px, env(safe-area-inset-right, 0px)) 0 max(0px, env(safe-area-inset-left, 0px))}
 .modal{background:var(--surface);color:var(--ink);width:100%;max-width:640px;max-height:100%;overflow-y:auto;border-radius:18px 18px 0 0;
@@ -835,6 +839,11 @@ details.sum>summary{cursor:pointer;font-weight:700;padding:4px 0;font-size:15px}
 .btn.small{min-height:36px}
 .mq,.hprow,.mixrow{padding:10px 12px}
 :focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+/* Zones de touche d'au moins 44 px pour les boutons principaux */
+.stepper button,.mclose,.sback,.wnav,.sbtn,.mdel,.qpm,.dgrip,.dejabtn,nav button,.plusitem{min-width:44px;min-height:44px}
+.member button{width:44px;height:44px;margin:-10px -6px -10px 0}
+@media (pointer:coarse){button.chip{min-height:44px}}
+.chip,.btn{touch-action:manipulation}
 .badge{font-size:12px;min-width:20px;padding:1px 6px}
 /* Verrou : menu validé dont la semaine a commencé. Repères visibles pour les jours passés et à venir. */
 body.verrou .edit-only, body.verrou [data-swap], body.verrou [data-pick], body.verrou select[data-cook], body.verrou #addform,
@@ -878,7 +887,7 @@ body.verrou .dgrip,body.readonly .dgrip{display:none}
       <div>
         <h1>Menus de la semaine</h1>
         <p class="sub">Repas du soir · moins de 30 minutes · petit budget</p>
-        <p class="appver" data-appver="58">Version 58</p>
+        <p class="appver" data-appver="60">Version 60</p>
       </div>
       <div class="comptehaut" id="comptehaut" hidden></div>
     </div>
@@ -1134,10 +1143,10 @@ body.verrou .dgrip,body.readonly .dgrip{display:none}
   <div class="sfoot" id="sfoot"></div>
 </div>
 
-<script src="vendor/jspdf-4.2.1.umd.min.js?v=51"></script>
-<script src="vendor/supabase-js-2.45.4.js?v=51"></script>
-<script src="js/partage.js?v=51"></script>
-<script src="js/app.js?v=51"></script>
+<script src="vendor/supabase-js-2.45.4.js?v=60"></script>
+<script src="js/partage.js?v=60"></script>
+<!-- Les scripts de data-scripts sont chargés dans cet ordre par js/demarrage.js, une fois donnees/recettes-base.json arrivé (jsPDF n'est chargé qu'à l'export PDF) -->
+<script src="js/demarrage.js?v=60" defer data-scripts="js/donnees.js js/menus.js js/courses.js js/promos.js js/vues.js js/fenetres.js js/pdf.js js/famille.js js/app.js"></script>
 
 </body>
 </html>

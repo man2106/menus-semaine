@@ -290,5 +290,6 @@
   // Application installable : mise en cache pour l'ouverture hors ligne
   if ("serviceWorker" in navigator) window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(()=>{}));
 
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot); else boot();
+  // Démarrage une fois les scripts de l'application chargés (js/demarrage.js envoie « app-pret »)
+  if (window.__appPret) boot(); else window.addEventListener("app-pret", boot, { once: true });
 })();
