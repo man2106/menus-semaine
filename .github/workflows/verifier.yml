@@ -16,4 +16,4 @@ jobs:
         run: node outils/verifier.js
       - name: Contrôle de syntaxe
         run: |
-          for f in js/app.js js/partage.js sw.js; do node --check "$f"; done
+          for f in js/*.js sw.js; do node --check "$f"; done

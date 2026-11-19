@@ -3,14 +3,16 @@
 Deux fichiers sont lus par l'application à chaque ouverture. Une tâche planifiée les met à jour le lundi et le mercredi matin, jours de sortie des folders en Belgique.
 
 - `donnees/promos.json` : promotions en cours dans les supermarchés.
-- `donnees/recettes.json` : recettes ajoutées à la bibliothèque (en plus de celles écrites dans `index.html`).
+- `donnees/recettes.json` : recettes ajoutées à la bibliothèque (en plus des recettes de base).
 
-Ne jamais modifier `index.html`, `js/`, `supabase/` ni les autres fichiers pendant la mise à jour automatique.
+Les recettes de base (celles de départ, avec leurs étapes et les prix de référence des ingrédients) sont dans `donnees/recettes-base.json`, au même format que `recettes.json` (avec en plus les étapes de chaque recette). Ce fichier est lu au démarrage par `js/demarrage.js`. La tâche planifiée ne le modifie jamais : elle ajoute ses recettes dans `recettes.json` seulement.
+
+Ne jamais modifier `index.html`, `js/`, `supabase/`, `donnees/recettes-base.json` ni les autres fichiers pendant la mise à jour automatique.
 
 ## Outils
 
-- `node outils/inventaire.js` : liste les recettes existantes, les ingrédients connus (avec leur prix de référence) et les codes des enseignes.
-- `node outils/verifier.js` : vérifie les deux fichiers. À lancer avant chaque publication ; ne rien publier s'il signale une erreur. Il refuse une promo expirée (`au` avant aujourd'hui) ou qui commence dans plus de 7 jours. Il affiche seulement un avertissement si le relevé (`date`) a plus de 7 jours.
+- `node outils/inventaire.js` : liste les recettes existantes (`recettes-base.json` puis `recettes.json`), les ingrédients connus (avec leur prix de référence) et les codes des enseignes (lus dans `js/`).
+- `node outils/verifier.js` : vérifie les fichiers de données (et que `recettes-base.json` se lit bien : un id de `recettes.json` ne doit pas déjà exister dans la base). À lancer avant chaque publication ; ne rien publier s'il signale une erreur. Il refuse une promo expirée (`au` avant aujourd'hui) ou qui commence dans plus de 7 jours. Il affiche seulement un avertissement si le relevé (`date`) a plus de 7 jours.
 - `node outils/nettoyer-promos.js` : retire de `donnees/promos.json` les promos dont la date de fin est passée (le fichier est réécrit sur place). Utile entre deux relevés.
 
 ## promos.json

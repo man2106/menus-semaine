@@ -2,10 +2,13 @@
 // Utilisation : node outils/verifier.js
 const fs = require("fs"), path = require("path");
 const racine = path.join(__dirname, "..");
-const html = fs.readFileSync(path.join(racine, "index.html"), "utf8") + "\n" + fs.readFileSync(path.join(racine, "js/app.js"), "utf8"); // le code de l'application est dans js/app.js
+const code = fs.readdirSync(path.join(racine, "js")).filter(f => f.endsWith(".js")).sort().map(f => fs.readFileSync(path.join(racine, "js", f), "utf8")).join("\n"); // le code de l'application est dans js/*.js
 const err = [], avert = []; const ok = (c, m) => { if (!c) err.push(m); };
-const ENS = Object.keys(eval("(" + html.match(/const ENS = (\{[^}]+\})/)[1] + ")"));
-const idsApp = new Set([...html.matchAll(/^ \{id:"([a-z0-9]+)",nom:/gm)].map(m => m[1]));
+const ENS = Object.keys(eval("(" + code.match(/const ENS = (\{[^}]+\})/)[1] + ")"));
+let B; // recettes de base (donnees/recettes-base.json), non modifiées par la tâche planifiée
+try { B = JSON.parse(fs.readFileSync(path.join(racine, "donnees/recettes-base.json"), "utf8")); } catch (e) { err.push("recettes-base.json illisible : " + e.message); }
+const idsApp = new Set(((B && B.recettes) || []).map(r => r.id));
+ok(!B || (Array.isArray(B.recettes) && B.recettes.length && idsApp.size === B.recettes.length), "recettes-base.json : liste « recettes » vide ou ids en double");
 const jour = /^\d{4}-\d\d-\d\d$/;
 const iso = d => d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
 const plusJours = n => { const d = new Date(); d.setDate(d.getDate() + n); return iso(d); };
