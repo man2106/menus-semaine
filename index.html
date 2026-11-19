@@ -887,7 +887,7 @@ body.verrou .dgrip,body.readonly .dgrip{display:none}
       <div>
         <h1>Menus de la semaine</h1>
         <p class="sub">Repas du soir · moins de 30 minutes · petit budget</p>
-        <p class="appver" data-appver="59">Version 59</p>
+        <p class="appver" data-appver="60">Version 60</p>
       </div>
       <div class="comptehaut" id="comptehaut" hidden></div>
     </div>
@@ -1143,11 +1143,10 @@ body.verrou .dgrip,body.readonly .dgrip{display:none}
   <div class="sfoot" id="sfoot"></div>
 </div>
 
-<script src="vendor/jspdf-4.2.1.umd.min.js?v=59"></script>
-<script src="vendor/supabase-js-2.45.4.js?v=59"></script>
-<script src="js/partage.js?v=59"></script>
-<!-- Les scripts de data-scripts sont chargés dans cet ordre par js/demarrage.js, une fois donnees/recettes-base.json arrivé -->
-<script src="js/demarrage.js?v=59" defer data-scripts="js/donnees.js js/menus.js js/courses.js js/promos.js js/vues.js js/fenetres.js js/pdf.js js/famille.js js/app.js"></script>
+<script src="vendor/supabase-js-2.45.4.js?v=60"></script>
+<script src="js/partage.js?v=60"></script>
+<!-- Les scripts de data-scripts sont chargés dans cet ordre par js/demarrage.js, une fois donnees/recettes-base.json arrivé (jsPDF n'est chargé qu'à l'export PDF) -->
+<script src="js/demarrage.js?v=60" defer data-scripts="js/donnees.js js/menus.js js/courses.js js/promos.js js/vues.js js/fenetres.js js/pdf.js js/famille.js js/app.js"></script>
 
 </body>
 </html>

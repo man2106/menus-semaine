@@ -1,5 +1,12 @@
 // ======================= Export de la liste : PDF, e-mail, message =======================
 let DL=null; // capacité de téléchargement (null si indisponible)
+// jsPDF (vendor/) n'est chargé qu'au premier export PDF ; le service worker le garde pour l'usage hors ligne
+let jsPdfEnCours=null;
+function chargerJsPdf(){ if(window.jspdf) return Promise.resolve();
+  if(!jsPdfEnCours) jsPdfEnCours=new Promise((ok,ko)=>{ const s=document.createElement("script"); s.src="vendor/jspdf-4.2.1.umd.min.js"+(window.APP_V?"?v="+window.APP_V:"");
+    s.onload=()=>window.jspdf?ok():ko(new Error("jsPDF absent")); s.onerror=()=>ko(new Error("jsPDF introuvable")); document.head.appendChild(s); })
+    .catch(e=>{ jsPdfEnCours=null; throw e; });
+  return jsPdfEnCours; }
 function pdfSafe(t){ return String(t).replace(/[  ]/g," ").replace(/≈\s?/g,"env. ").replace(/→/g,"->").replace(/[‘’]/g,"'").replace(/[“”]/g,'"').replace(/…/g,"...").replace(/✓/g,"x"); }
 function exportTrips(){ return [0]; }
 function exportItems(t,items){ const c=sheetCtx||{}; return c.onlyLeft? items.filter(i=>!state.checked[i.ck]) : items; }
@@ -66,8 +73,8 @@ function renderExport(){ const c=sheetCtx; c.kind=c.kind||"courses"; if(c.kind==
     <label class="xcheck"><input type="checkbox" id="xleft"${c.onlyLeft?" checked":""}> Seulement les articles qui restent à acheter</label>
     <p class="note">${exportTrips().map(t=>`${cnt(t)} article${cnt(t)>1?"s":""}`).join(" · ")}</p>
     <div class="xopt"><div><b>En PDF</b><small>Un document imprimable, avec les cases à cocher, classé par magasin et par rayon. Sur téléphone, le menu de partage s'ouvre : choisissez Mail, Messages ou WhatsApp.</small></div>
-      <button class="btn primary big" data-xpdf="1"${DL&&window.jspdf?"":" disabled"}>Créer le PDF</button>
-      ${DL&&window.jspdf?"":`<small class="xwarn">L'export PDF n'est pas disponible dans cette vue. Ouvrez l'application depuis claude.ai ou l'app Claude.</small>`}</div>
+      <button class="btn primary big" data-xpdf="1"${DL?"":" disabled"}>Créer le PDF</button>
+      ${DL?"":`<small class="xwarn">L'export PDF n'est pas disponible dans cette vue. Ouvrez l'application depuis claude.ai ou l'app Claude.</small>`}</div>
     <div class="xopt"><div><b>Par e-mail</b><small>${mails.length?`À ${mails.length} membre${mails.length>1?"s":""} de la famille : ${esc(mails.join(", "))}.`:"Ajoutez les adresses dans l'onglet Famille pour les remplir automatiquement."} Si votre messagerie ne s'ouvre pas, utilisez le PDF ou copiez le texte.</small></div>
       <a class="btn big" href="${esc(mailtoHref())}" target="_blank" rel="noopener" data-xmail="1">Préparer l'e-mail</a></div>
     <div class="xopt"><div><b>Par message</b><small>Copie la liste en texte, prête à coller dans un SMS, WhatsApp ou Messenger.</small></div>
@@ -76,9 +83,9 @@ function renderExport(){ const c=sheetCtx; c.kind=c.kind||"courses"; if(c.kind==
   $("sfoot").innerHTML=`<button class="btn primary big" data-sclose="1">Terminé</button>`;
 }
 async function exportPdf(btn){
-  if(!DL||!window.jspdf){ toast("Export PDF indisponible ici"); return; }
+  if(!DL){ toast("Export PDF indisponible ici"); return; }
   btn.disabled=true; btn.textContent="Création du PDF…";
-  try{ const blob=buildPdf(); const res=await DL.save({filename:`courses-semaine-${curIso()}.pdf`,data:blob});
+  try{ await chargerJsPdf(); const blob=buildPdf(); const res=await DL.save({filename:`courses-semaine-${curIso()}.pdf`,data:blob});
     toast(res&&res.status==="shared"?"PDF partagé":"PDF téléchargé : joignez-le à un e-mail ou un message"); }
   catch(e){ const code=e&&e.code; if(code==="declined") toast("Export annulé"); else if(code==="rate_limited") toast("Un export est déjà en cours, réessayez dans un instant"); else toast("Le PDF n'a pas pu être créé"); }
   btn.disabled=false; btn.textContent="Créer le PDF";
@@ -175,8 +182,8 @@ function renderExportMenu(){ const c=sheetCtx, mails=state.family.map(n=>state.e
     <p class="note">Le menu jour par jour avec le plat, qui cuisine, le nombre de couverts, les absents et invités${state.family.length?`, puis qui a validé (${ok.length}/${state.family.length})`:""}${limiteTxt()?` et la date limite de réponse (${esc(limiteTxt())})`:""}.</p>
     <label class="xcheck"><input type="checkbox" id="xrec"${c.withRecipes?" checked":""}> Ajouter les recettes détaillées (ingrédients et étapes, une page par repas)</label>
     <div class="xopt"><div><b>En PDF</b><small>À imprimer ou à envoyer. Sur téléphone, le menu de partage s'ouvre : choisissez Mail, Messages ou WhatsApp.</small></div>
-      <button class="btn primary big" data-xpdfmenu="1"${DL&&window.jspdf?"":" disabled"}>Créer le PDF</button>
-      ${DL&&window.jspdf?"":`<small class="xwarn">L'export PDF n'est pas disponible dans cette vue. Ouvrez l'application depuis claude.ai ou l'app Claude.</small>`}</div>
+      <button class="btn primary big" data-xpdfmenu="1"${DL?"":" disabled"}>Créer le PDF</button>
+      ${DL?"":`<small class="xwarn">L'export PDF n'est pas disponible dans cette vue. Ouvrez l'application depuis claude.ai ou l'app Claude.</small>`}</div>
     <div class="xopt"><div><b>Par e-mail</b><small>${mails.length?`À ${mails.length} membre${mails.length>1?"s":""} de la famille.`:"Ajoutez les adresses dans l'onglet Famille pour les remplir automatiquement."}${wait.length?` Pensez à relancer : ${esc(wait.join(", "))}.`:""}</small></div>
       <a class="btn big" href="${esc(menuMailto())}" target="_blank" rel="noopener" data-xmail="1">Préparer l'e-mail</a></div>
     <div class="xopt"><div><b>Par message</b><small>Le menu en texte, prêt à coller dans un SMS ou WhatsApp.</small></div>
@@ -184,9 +191,9 @@ function renderExportMenu(){ const c=sheetCtx, mails=state.family.map(n=>state.e
     <textarea class="copybox" id="xtext" readonly hidden aria-label="Menu en texte"></textarea>`;
   $("sfoot").innerHTML=`<button class="btn primary big" data-sclose="1">Terminé</button>`; }
 async function exportMenuPdf(btn){
-  if(!DL||!window.jspdf){ toast("Export PDF indisponible ici"); return; }
+  if(!DL){ toast("Export PDF indisponible ici"); return; }
   btn.disabled=true; btn.textContent="Création du PDF…";
-  try{ const pdf=await buildMenuPdf(); const res=await DL.save({filename:`menu-semaine-${curIso()}.pdf`,data:pdf}); toast(res&&res.status==="shared"?"PDF partagé":"PDF téléchargé : joignez-le à un e-mail ou un message"); }
+  try{ await chargerJsPdf(); const pdf=await buildMenuPdf(); const res=await DL.save({filename:`menu-semaine-${curIso()}.pdf`,data:pdf}); toast(res&&res.status==="shared"?"PDF partagé":"PDF téléchargé : joignez-le à un e-mail ou un message"); }
   catch(e){ const code=e&&e.code; toast(code==="declined"?"Export annulé":code==="rate_limited"?"Un export est déjà en cours, réessayez dans un instant":"Le PDF n'a pas pu être créé"); }
   btn.disabled=false; btn.textContent="Créer le PDF"; }
 function handleExportClick(D,T){
