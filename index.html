@@ -1146,8 +1146,8 @@ body.verrou .dgrip,body.readonly .dgrip{display:none}
 <script src="vendor/jspdf-4.2.1.umd.min.js?v=59"></script>
 <script src="vendor/supabase-js-2.45.4.js?v=59"></script>
 <script src="js/partage.js?v=59"></script>
-<!-- js/app.js est chargé par js/demarrage.js une fois donnees/recettes-base.json arrivé -->
-<script src="js/demarrage.js?v=59" defer data-scripts="js/app.js"></script>
+<!-- Les scripts de data-scripts sont chargés dans cet ordre par js/demarrage.js, une fois donnees/recettes-base.json arrivé -->
+<script src="js/demarrage.js?v=59" defer data-scripts="js/donnees.js js/menus.js js/courses.js js/promos.js js/vues.js js/fenetres.js js/pdf.js js/famille.js js/app.js"></script>
 
 </body>
 </html>
