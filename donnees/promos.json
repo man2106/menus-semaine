@@ -76,42 +76,6 @@
    "ing": "Haricots verts"
   },
   {
-   "mag": "colruyt",
-   "produit": "Choux de Bruxelles",
-   "prix": 2.29,
-   "avant": 3.49,
-   "du": "2026-11-04",
-   "au": "2026-11-17",
-   "ing": "Choux de Bruxelles"
-  },
-  {
-   "mag": "colruyt",
-   "produit": "Danone yaourt à la grecque 2 × 110 g",
-   "prix": 2.39,
-   "avant": 4.78,
-   "du": "2026-11-04",
-   "au": "2026-11-17",
-   "ing": "Yaourt grec"
-  },
-  {
-   "mag": "colruyt",
-   "produit": "Barilla Spaghettoni n°7",
-   "prix": 0.99,
-   "avant": 1.99,
-   "du": "2026-11-04",
-   "au": "2026-11-17",
-   "ing": "Spaghetti"
-  },
-  {
-   "mag": "colruyt",
-   "produit": "Champignons shimeji Boni",
-   "prix": 0.99,
-   "avant": 1.99,
-   "du": "2026-11-04",
-   "au": "2026-11-17",
-   "ing": "Champignons"
-  },
-  {
    "mag": "lidl",
    "produit": "Oignons XXL",
    "prix": 2.99,
@@ -155,60 +119,6 @@
    "du": "2026-11-16",
    "au": "2026-11-21",
    "ing": "Moules"
-  },
-  {
-   "mag": "delhaize",
-   "produit": "Soubry penne rigate (lot, 2e gratuit)",
-   "prix": 4.65,
-   "avant": 9.3,
-   "du": "2026-11-12",
-   "au": "2026-11-18",
-   "ing": "Penne"
-  },
-  {
-   "mag": "delhaize",
-   "produit": "Nouilles pour la cuisine asiatique (-30 %)",
-   "prix": 2.79,
-   "avant": 3.99,
-   "du": "2026-11-12",
-   "au": "2026-11-18",
-   "ing": "Nouilles chinoises"
-  },
-  {
-   "mag": "delhaize",
-   "produit": "Mozzarella & scamorza râpées (-30 %)",
-   "prix": 2.09,
-   "avant": 2.99,
-   "du": "2026-11-12",
-   "au": "2026-11-18",
-   "ing": "Fromage râpé"
-  },
-  {
-   "mag": "delhaize",
-   "produit": "Mifroma emmental (-30 %)",
-   "prix": 4.12,
-   "avant": 5.89,
-   "du": "2026-11-12",
-   "au": "2026-11-18",
-   "ing": "Fromage en tranches"
-  },
-  {
-   "mag": "delhaize",
-   "produit": "Herta jambon cuit (folder)",
-   "prix": 4.49,
-   "avant": null,
-   "du": "2026-11-12",
-   "au": "2026-11-18",
-   "ing": "Jambon cuit"
-  },
-  {
-   "mag": "okay",
-   "produit": "Danone yaourt à la grecque nature 4 × 110 g, 1+1 gratuit",
-   "prix": 2.39,
-   "avant": 4.78,
-   "du": "2026-11-04",
-   "au": "2026-11-17",
-   "ing": "Yaourt grec"
   }
  ]
 }

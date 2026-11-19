@@ -10,7 +10,8 @@ Ne jamais modifier `index.html`, `js/`, `supabase/` ni les autres fichiers penda
 ## Outils
 
 - `node outils/inventaire.js` : liste les recettes existantes, les ingrédients connus (avec leur prix de référence) et les codes des enseignes.
-- `node outils/verifier.js` : vérifie les deux fichiers. À lancer avant chaque publication ; ne rien publier s'il signale un problème.
+- `node outils/verifier.js` : vérifie les deux fichiers. À lancer avant chaque publication ; ne rien publier s'il signale une erreur. Il refuse une promo expirée (`au` avant aujourd'hui) ou qui commence dans plus de 7 jours. Il affiche seulement un avertissement si le relevé (`date`) a plus de 7 jours.
+- `node outils/nettoyer-promos.js` : retire de `donnees/promos.json` les promos dont la date de fin est passée (le fichier est réécrit sur place). Utile entre deux relevés.
 
 ## promos.json
 

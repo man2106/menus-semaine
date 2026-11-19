@@ -3,10 +3,13 @@
 const fs = require("fs"), path = require("path");
 const racine = path.join(__dirname, "..");
 const html = fs.readFileSync(path.join(racine, "index.html"), "utf8") + "\n" + fs.readFileSync(path.join(racine, "js/app.js"), "utf8"); // le code de l'application est dans js/app.js
-const err = []; const ok = (c, m) => { if (!c) err.push(m); };
+const err = [], avert = []; const ok = (c, m) => { if (!c) err.push(m); };
 const ENS = Object.keys(eval("(" + html.match(/const ENS = (\{[^}]+\})/)[1] + ")"));
 const idsApp = new Set([...html.matchAll(/^ \{id:"([a-z0-9]+)",nom:/gm)].map(m => m[1]));
 const jour = /^\d{4}-\d\d-\d\d$/;
+const iso = d => d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+const plusJours = n => { const d = new Date(); d.setDate(d.getDate() + n); return iso(d); };
+const aujourdhui = iso(new Date()), dans7j = plusJours(7), ilYa7j = plusJours(-7);
 let P, R;
 try { P = JSON.parse(fs.readFileSync(path.join(racine, "donnees/promos.json"), "utf8")); } catch (e) { err.push("promos.json illisible : " + e.message); }
 try { R = JSON.parse(fs.readFileSync(path.join(racine, "donnees/recettes.json"), "utf8")); } catch (e) { err.push("recettes.json illisible : " + e.message); }
@@ -22,7 +25,10 @@ if (P) {
     ok(x.avant === null || +x.avant > +x.prix, q + " : « avant » doit être null ou plus élevé que le prix");
     ok(jour.test(x.du || "") && jour.test(x.au || "") && x.du <= x.au, q + " : dates du/au invalides");
     ok(typeof x.ing === "string" && x.ing, q + " : ingrédient « ing » manquant");
+    if (jour.test(x.au || "")) ok(x.au >= aujourdhui, q + " : promo expirée (fin le " + x.au + ", nous sommes le " + aujourdhui + "). Lancer « node outils/nettoyer-promos.js » ou refaire le relevé");
+    if (jour.test(x.du || "")) ok(x.du <= dans7j, q + " : promo qui commence trop tard (début le " + x.du + ", maximum " + dans7j + " : 7 jours à l'avance)");
   });
+  if (jour.test(P.date || "") && P.date < ilYa7j) avert.push("promos.json : le relevé date du " + P.date + ", il a plus de 7 jours. Refaire le relevé des folders.");
 }
 if (R) {
   ok(Array.isArray(R.recettes), "recettes.json : liste « recettes » manquante");
@@ -77,5 +83,6 @@ if (D) {
       ok(jour.test(m.date || ""), q + " : date du relevé AAAA-MM-JJ"); ok(/^https:\/\//.test(m.source || ""), q + " : source (lien) du prix relevé"); });
   });
 }
+if (avert.length) console.warn("AVERTISSEMENT (" + avert.length + ") :\n- " + avert.join("\n- "));
 if (err.length) { console.error("PROBLÈMES (" + err.length + ") :\n- " + err.join("\n- ")); process.exit(1); }
 console.log("Tout est correct : " + (P ? P.promos.length : 0) + " promos, " + (R ? R.recettes.length : 0) + " recettes ajoutées, " + (X ? X.releves.length : 0) + " prix relevés sur tickets, " + (D ? D.produits.length : 0) + " fiches produits (" + (D ? D.produits.filter(p => p.photo).length : 0) + " avec photo).");
