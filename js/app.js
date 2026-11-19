@@ -157,7 +157,9 @@ const EMOJI={veloutepotiron:"🎃",chouxbxl:"🥬",stoemppoireaux:"🥔",potee:"
 const ILLU={}; const TEINTES=["#E2F0E6","#FBEBD2","#E6ECF7","#F6E3E3","#EDE6F5","#E8F1D8"];
 function illustration(id){ if(ILLU[id]) return ILLU[id]; const e=EMOJI[id]||"🍽️", bg=TEINTES[[...id].reduce((s,c)=>s+c.charCodeAt(0),0)%TEINTES.length];
   return ILLU[id]="data:image/svg+xml,"+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 120"><rect width="160" height="120" fill="${bg}"/><text x="80" y="64" font-size="60" text-anchor="middle" dominant-baseline="middle">${e}</text></svg>`); }
-const photoSrc = id => { const r=BYID[id]; if(r&&r.perso) return r.photo||PLACEHOLDER; return PHOTOS[id]?"photos/"+id+".jpg":illustration(id); };
+const photoSrc = id => { const r=BYID[id]; if(r&&r.perso) return r.photo||PLACEHOLDER; return PHOTOS[id]?"photos/"+id+".webp":illustration(id); };
+// Si un navigateur ne sait pas lire le WebP, on retombe sur la photo JPEG (gardée à côté)
+document.addEventListener("error",e=>{ const i=e.target; if(i&&i.tagName==="IMG"&&/^photos\/[a-z0-9]+\.webp$/.test(i.getAttribute("src")||"")) i.src=i.getAttribute("src").replace(/\.webp$/,".jpg"); },true);
 const photoPage = id => PHOTOS[id]?"https://commons.wikimedia.org/wiki/File:"+encodeURIComponent(PHOTOS[id]):null;
 // Étapes de préparation
 const ETAPES = {
@@ -502,7 +504,7 @@ function renderCalendrier(){ const box=$("calendrier"), liste=$("days"); if(!box
     if(!x.r) return `<div class="cbox manque">${head}<span class="cvide"><b>Aucun plat prévu</b><button class="chip on edit-only" data-cpick="${x.d}" type="button">Choisir un plat</button></span></div>`;
     const sansCuisinier=!x.cook;
     return `<div class="cbox${today?" today":""}${sansCuisinier?" manque":""}" data-copen="${x.d}" role="button" tabindex="0" aria-label="${JOURS[x.d]} : ${esc(x.r.nom)}">${head}
-      <img src="${photoSrc(x.r.id)}" alt="" loading="lazy" data-cache-err="1">
+      <img src="${photoSrc(x.r.id)}" alt="" loading="lazy" data-cache-err="1" decoding="async">
       <span class="cbody"><b>${esc(x.r.nom)}</b>${x.r.acc?`<small>avec ${esc(x.r.acc.toLowerCase())}</small>`:""}<small><span class="bdg b-${budgetOf(x.r)}">${BUDGETS[budgetOf(x.r)].court}</span> ${x.r.t} min${x.abs.length?` · absent : ${x.abs.map(esc).join(", ")}`:""}${x.inv?` · +${x.inv} invité${x.inv>1?"s":""}`:""}</small></span>
       <span class="cfoot"><span><small>Cuisine</small>${sansCuisinier?(state.family.length?`<span class="edit-only">${cookSelect(x.d)}</span>`:"<b>à définir</b>"):`<b>${esc(x.cook)}</b>`}</span><span><small>Couverts</small><span class="ccouv">${x.hc}</span></span></span></div>`; });
   const m=manques(), {ok}=approvalStats();
@@ -588,7 +590,7 @@ function renderDays(){
     return `<article class="day${isToday?" today":""}${et==="passe"?" passe":""}" id="day-${d}">
       <button class="dgrip" type="button" aria-label="Glisser pour échanger ce repas avec un autre soir" data-tip="Glisser pour échanger ce repas avec un autre soir">⠿</button>
       <button class="dcard" data-open="${d}" aria-label="${JOURS[d]} : ${esc(r.nom)}, ouvrir la fiche">
-        <span class="dthumbbox"><img class="dthumb" src="${photoSrc(id)}" alt="" loading="lazy" data-cache-err="1"></span>
+        <span class="dthumbbox"><img class="dthumb" src="${photoSrc(id)}" alt="" loading="lazy" data-cache-err="1" decoding="async"></span>
         <span class="dinfo">
           <span class="dday">${JOURS[d]} ${fmtShort(dayOffset(d))}${isToday?' <span class="tonight">Ce soir</span>':""}${vtag}</span>
           <b class="dish">${esc(r.nom)}</b>
@@ -806,7 +808,7 @@ function renderBudget(){
 function renderRecettes(){
   const list=[...RECETTES].sort((x,y)=>(y.perso?1:0)-(x.perso?1:0)||x.nom.localeCompare(y.nom,"fr"));
   $("recipes").innerHTML=list.map(r=>{const days=state.week.map((id,d)=>id===r.id?JOURS[d].slice(0,3):null).filter(Boolean), lk=likeScore(r);
-    return `<button class="rrow" data-openrec="${r.id}"><img class="rthumb" src="${photoSrc(r.id)}" alt="" loading="lazy"><span class="rinfo"><span class="rtitle">${esc(r.nom)}</span>
+    return `<button class="rrow" data-openrec="${r.id}"><img class="rthumb" src="${photoSrc(r.id)}" alt="" loading="lazy" decoding="async"><span class="rinfo"><span class="rtitle">${esc(r.nom)}</span>
       <span class="rmeta">${r.t} min${r.perso?" · recette de famille":""}${lk>0?` · aimé par ${lk}`:""}${days.length?` · au menu ${days.join(", ")}`:""}</span></span><span class="dchev" aria-hidden="true">›</span></button>`}).join("");
 }
 
@@ -904,7 +906,7 @@ function renderNext(){
   const items=trips[t], plan=planTrip(t,items), left=items.filter(i=>!state.checked[i.ck]).length;
   const days=Math.round((tripDate(t)-TODAY)/DAY);
   const when=days===0?"aujourd'hui":days===1?"demain":fmtD(tripDate(t));
-  $("next").innerHTML=`<button class="ncard" data-open="${d}"><img src="${photoSrc(r.id)}" alt="" data-cache-err="1"><div><small>${isToday?"Ce soir":"Prochain repas · "+fmtD(dayOffset(d))}</small><b>${esc(r.nom)}</b><span class="nsub">${r.t} min${state.cooks[d]?" · "+esc(state.cooks[d])+" cuisine":""} · voir la recette</span></div></button>
+  $("next").innerHTML=`<button class="ncard" data-open="${d}"><img src="${photoSrc(r.id)}" alt="" data-cache-err="1" decoding="async"><div><small>${isToday?"Ce soir":"Prochain repas · "+fmtD(dayOffset(d))}</small><b>${esc(r.nom)}</b><span class="nsub">${r.t} min${state.cooks[d]?" · "+esc(state.cooks[d])+" cuisine":""} · voir la recette</span></div></button>
     <button class="ncard" data-gotrip="${t}"><span class="nicon"><svg viewBox="0 0 24 24"><path d="M3 4h2l2.4 11h10.2L20 8H6.2"/><circle cx="9" cy="19.5" r="1.4"/><circle cx="17" cy="19.5" r="1.4"/></svg></span><div><small>Prochaine course · ${when}</small><b>${MAGNOM[plan.primary]}${plan.secondary?" + "+MAGNOM[plan.secondary]:""}</b><span class="nsub">${left?`${left} article${left>1?"s":""} à acheter`:"Tout est dans le caddie"} · ≈ ${kmTxt(plan.route)}</span></div></button>`;
 }
 $("next").addEventListener("click",e=>{const o=e.target.closest("[data-open]"); if(o) openMeal(state.week[+o.dataset.open],+o.dataset.open);});
@@ -941,7 +943,7 @@ function renderModal(){
       <div class="avislist">${state.family.map((n,i)=>{const v=(state.avis[id]||{})[n]||0;
         return `<div class="avisrow"><span>${esc(n)}</span><button class="avb up edit-ctl" data-avis="${i}|1" aria-pressed="${v===1}">J'aime</button><button class="avb down edit-ctl" data-avis="${i}|-1" aria-pressed="${v===-1}">Pas pour moi</button></div>`}).join("")}</div>
       <p class="note">Les plats aimés reviennent plus souvent dans les propositions, les autres sont évités les soirs où la personne est là.</p></section>` : "";
-  $("mbody").innerHTML = `<figure class="mphoto"><img src="${photoSrc(id)}" alt="${esc(r.nom)}" data-cache-parent="1">${pp?`<figcaption>Photo d'illustration : <a href="${pp}" target="_blank" rel="noopener">Wikimedia Commons</a> (auteur et licence libre sur la page du fichier)</figcaption>`:(r.perso?`<figcaption>Recette de la famille</figcaption>`:"")}</figure>
+  $("mbody").innerHTML = `<figure class="mphoto"><img src="${photoSrc(id)}" alt="${esc(r.nom)}" data-cache-parent="1" decoding="async">${pp?`<figcaption>Photo d'illustration : <a href="${pp}" target="_blank" rel="noopener">Wikimedia Commons</a> (auteur et licence libre sur la page du fichier)</figcaption>`:(r.perso?`<figcaption>Recette de la famille</figcaption>`:"")}</figure>
     ${w.length?`<div class="mwarn">${esc(w.join(", "))} n'aime${w.length>1?"nt":""} pas ce plat${d!==null?" et sera là ce soir":""}.</div>`:""}
     ${ctrl}
     <section><h3><span>Courses pour ce repas</span><span class="mtotal">${items.length} ingrédients</span></h3>${lists}
@@ -1432,7 +1434,7 @@ function renderGalleryGrid(){ const c=sheetCtx, d=c.d, q=(c.q||"").toLowerCase()
   if(c.cuis) list=list.filter(r=>r.c===c.cuis); if(["eco","moyen","plaisir"].includes(f)) list=list.filter(r=>budgetOf(r)===f); if(f==="vege") list=list.filter(r=>r.p==="vege"||r.p==="oeufs"); if(f==="rapides") list=list.filter(r=>r.t<=20); if(f==="promo") list=list.filter(r=>promoCount(r)); if(f==="aimes") list=list.filter(r=>likeScore(r)>0); if(f==="famille") list=list.filter(r=>r.perso);
   list.sort((a,b)=>(dislikesFor(a,d).length-dislikesFor(b,d).length)||(likeScore(b)-likeScore(a))||(promoCount(b)-promoCount(a))||a.t-b.t);
   $("ggrid").innerHTML=list.length?list.map(r=>{const w=dislikesFor(r,d), cur=d!==null&&state.week[d]===r.id, other=state.week.map((id,i)=>id===r.id&&i!==d?JOURS[i].slice(0,3):null).filter(Boolean);
-    return `<button class="gcard${cur?" cur":""}" data-pickrec="${r.id}"><img src="${photoSrc(r.id)}" alt="" loading="lazy"><span class="gname">${esc(r.nom)}</span>
+    return `<button class="gcard${cur?" cur":""}" data-pickrec="${r.id}"><img src="${photoSrc(r.id)}" alt="" loading="lazy" decoding="async"><span class="gname">${esc(r.nom)}</span>
       <span class="gmeta"><span class="bdg b-${budgetOf(r)}">${BUDGETS[budgetOf(r)].court}</span> ${r.t} min${r.c?" · "+CUISINES[r.c]:""}${promoCount(r)?' · <span class="promo">promo</span>':""}${likeScore(r)?` · aimé par ${likeScore(r)}`:""}</span>
       ${cur?'<span class="gtag">Plat actuel</span>':other.length?`<span class="gtag soft">Déjà ${other.join(", ")}</span>`:""}
       ${w.length?`<span class="gwarn">${esc(w.join(", "))} n'aime${w.length>1?"nt":""} pas</span>`:""}</button>`}).join("")
@@ -1953,7 +1955,7 @@ function menuText(){
   return t+`\n${APP_URL}`;
 }
 // Photo d'un plat en data URL pour le PDF (photos publiées avec la page ou recette de famille)
-async function photoData(id){ try{ const src=photoSrc(id); if(src.startsWith("data:image/jpeg")) return src; if(src.startsWith("data:")) return null;
+async function photoData(id){ try{ const src=photoSrc(id).replace(/\.webp$/,".jpg"); if(src.startsWith("data:image/jpeg")) return src; if(src.startsWith("data:")) return null;
   const blob=await (await fetch(src)).blob(); return await new Promise(res=>{ const fr=new FileReader(); fr.onload=()=>res(fr.result); fr.onerror=()=>res(null); fr.readAsDataURL(blob); }); }catch(e){ return null; } }
 async function buildMenuPdf(){
   const {jsPDF}=window.jspdf; const doc=new jsPDF({unit:"mm",format:"a4",orientation:"landscape"});
@@ -2153,7 +2155,7 @@ function hitParade(max=10){ const now=classement(false), prev=classement(true), 
   return now.slice(0,max).map(x=>({...x,avant:pr[x.id]||null})); }
 function htmlHitParade(l,compact){ const med=["🥇","🥈","🥉"], aHisto=l.some(x=>x.avant!=null);
   return `<ol class="hp${compact?" compact":""}">${l.map(x=>{ const mv=!aHisto?"":x.avant==null?`<span class="hpmv new">nouveau</span>`:x.avant>x.rang?`<span class="hpmv up" title="${x.avant-x.rang} place${x.avant-x.rang>1?"s":""} gagnée${x.avant-x.rang>1?"s":""}">▲ ${x.avant-x.rang}</span>`:x.avant<x.rang?`<span class="hpmv down" title="${x.rang-x.avant} place${x.rang-x.avant>1?"s":""} perdue${x.rang-x.avant>1?"s":""}">▼ ${x.rang-x.avant}</span>`:`<span class="hpmv same" title="Même place que la semaine dernière">=</span>`;
-    return `<li class="hprow"><span class="hprank">${x.rang<=3?med[x.rang-1]:x.rang}</span>${compact?"":`<img src="${photoSrc(x.id)}" alt="" data-cache-err="1">`}<span class="hpinfo"><b>${esc(x.nom)}</b><small>${n1(x.m)}/5 · ${x.votes} vote${x.votes>1?"s":""}${!compact&&x.pctOui!=null?` · ${Math.round(x.pctOui*100)} % à refaire`:""}${!compact&&x.fans.length?` · fans : ${x.fans.map(esc).join(", ")}`:""}</small></span>${mv}</li>`; }).join("")}</ol>`; }
+    return `<li class="hprow"><span class="hprank">${x.rang<=3?med[x.rang-1]:x.rang}</span>${compact?"":`<img src="${photoSrc(x.id)}" alt="" data-cache-err="1" decoding="async" loading="lazy">`}<span class="hpinfo"><b>${esc(x.nom)}</b><small>${n1(x.m)}/5 · ${x.votes} vote${x.votes>1?"s":""}${!compact&&x.pctOui!=null?` · ${Math.round(x.pctOui*100)} % à refaire`:""}${!compact&&x.fans.length?` · fans : ${x.fans.map(esc).join(", ")}`:""}</small></span>${mv}</li>`; }).join("")}</ol>`; }
 // Influence sur les propositions de menus : bonus aux valeurs sûres, pause d'un mois pour les plats à retirer
 function bonusRetours(r){ const l=Object.values(RETOURS).filter(x=>x.plat===r.id&&x.note); if(!l.length) return 0;
   const G=3.5, K=2, s=(l.length*moy(l.map(x=>x.note))+K*G)/(l.length+K);
@@ -2167,7 +2169,7 @@ function renderRetours(){
   else if(!aNoter.length){ box.hidden=false; box.innerHTML=`<div class="rthead"><h2>🔔 Rappel : notez les repas</h2></div><p class="note">Rien à noter pour l'instant. Le repas du soir se note à partir de 19 h, après le souper.</p><div class="actions"><button class="btn" data-retourslist="1">Noter un repas</button></div>`; }
   else { box.hidden=false; box.innerHTML=`<div class="rthead"><h2>🔔 Rappel : notez les repas</h2><span class="note">Une note suffit. Un mot facultatif peut suivre pour le cuisinier : les plats aimés reviendront plus souvent.</span></div>
     <div class="rtlist">${aNoter.map(p=>{ const nb=retoursDu(p.iso,p.d).filter(r=>r.note).length;
-      return `<button class="rtitem" data-retour="${p.iso}|${p.d}"><img src="${photoSrc(p.plat)}" alt="" data-cache-err="1"><span><small>${JOURS[(p.date.getDay()+6)%7]} ${fmtShort(p.date)}</small><b>${esc(BYID[p.plat].nom)}</b><small>${nb?`${nb} avis sur ${p.pres.length}`:"Pas encore noté"}</small></span><span class="rtgo">Noter</span></button>`; }).join("")}</div>`; }
+      return `<button class="rtitem" data-retour="${p.iso}|${p.d}"><img src="${photoSrc(p.plat)}" alt="" data-cache-err="1" decoding="async" loading="lazy"><span><small>${JOURS[(p.date.getDay()+6)%7]} ${fmtShort(p.date)}</small><b>${esc(BYID[p.plat].nom)}</b><small>${nb?`${nb} avis sur ${p.pres.length}`:"Pas encore noté"}</small></span><span class="rtgo">Noter</span></button>`; }).join("")}</div>`; }
   const A=analyse();
   fam.innerHTML=`<div class="phead"><h2>Retours sur les repas</h2><button class="btn primary" data-bilan="1" data-tip="Classement des plats, goûts de chacun et conseils tirés des avis">Voir le bilan</button></div>
     ${A.all.length?`<div class="rtkpis"><div><b>${n1(A.G)}</b><small>note moyenne sur 5</small></div><div><b>${A.all.length}</b><small>avis donnés</small></div><div><b>${A.part==null?"–":Math.round(A.part*100)+" %"}</b><small>de participation (4 semaines)</small></div></div>`
@@ -2180,7 +2182,7 @@ function renderRetourSheet(){ const c=sheetCtx;
   if(c.list){ const l=repasPasses(14);
     $("seyebrow").textContent="Retours"; $("stitle").textContent="Noter un repas"; $("sextra").innerHTML="";
     $("sbody").innerHTML=l.length?`<div class="rtlist">${l.map(p=>{ const nb=retoursDu(p.iso,p.d).filter(r=>r.note).length;
-      return `<button class="rtitem" data-retour="${p.iso}|${p.d}"><img src="${photoSrc(p.plat)}" alt="" data-cache-err="1"><span><small>${JOURS[(p.date.getDay()+6)%7]} ${fmtShort(p.date)}</small><b>${esc(BYID[p.plat].nom)}</b><small>${nb?`${nb} avis sur ${p.pres.length}`:"Pas encore noté"}</small></span><span class="rtgo">${nb>=p.pres.length?"Voir":"Noter"}</span></button>`; }).join("")}</div>`
+      return `<button class="rtitem" data-retour="${p.iso}|${p.d}"><img src="${photoSrc(p.plat)}" alt="" data-cache-err="1" decoding="async" loading="lazy"><span><small>${JOURS[(p.date.getDay()+6)%7]} ${fmtShort(p.date)}</small><b>${esc(BYID[p.plat].nom)}</b><small>${nb?`${nb} avis sur ${p.pres.length}`:"Pas encore noté"}</small></span><span class="rtgo">${nb>=p.pres.length?"Voir":"Noter"}</span></button>`; }).join("")}</div>`
       :`<p class="note">Aucun repas des deux dernières semaines pour l'instant. Les repas apparaissent ici le soir même, à partir de 19 h.</p>`;
     $("sfoot").innerHTML=`<button class="btn" data-bilan="1">Voir le bilan</button>`; return; }
   const p=repasPasses(21).find(x=>x.iso===c.iso&&x.d===c.d); if(!p){ closeSheet(); return; }
@@ -2226,7 +2228,7 @@ function renderBilan(){ const A=analyse();
     ${A.tendance.length>1?`<section class="rtsec"><h3>Évolution par semaine</h3><div class="rttrend">${A.tendance.map(t=>`<div class="rtbar"><i style="height:${Math.round(t.m/maxM*100)}%"></i><b>${n1(t.m)}</b><small>${fmtShort(isoDate(t.iso))}</small></div>`).join("")}</div></section>`:""}
     ${CATS.map(([k,t,d])=>{ const l=A.plats.filter(p=>p.cat===k).sort((a,b)=>b.score-a.score); if(!l.length) return "";
       return `<section class="rtsec"><h3>${t} <span class="badge">${l.length}</span></h3><p class="note">${d}</p>
-        <div class="rtplats">${l.map(p=>`<div class="rtplat"><img src="${photoSrc(p.id)}" alt="" data-cache-err="1"><span><b>${esc(p.nom)}</b>
+        <div class="rtplats">${l.map(p=>`<div class="rtplat"><img src="${photoSrc(p.id)}" alt="" data-cache-err="1" decoding="async" loading="lazy"><span><b>${esc(p.nom)}</b>
           <small>${n1(p.m)}/5 · ${p.n} avis · servi ${p.servi} fois${p.refTot?` · ${Math.round(p.oui/p.refTot*100)} % à refaire`:""}${p.cout?` · ${eur(p.cout)}/pers.`:""}</small>
           ${p.topMots.length?`<small class="rtwarn">Souvent : ${p.topMots.map(esc).join(", ").toLowerCase()}</small>`:""}
           ${k==="divise"?`<small>${p.l.filter(r=>r.note>=4).map(r=>esc(r.nom)).filter((v,i,a)=>a.indexOf(v)===i).join(", ")||"–"} aiment · ${p.l.filter(r=>r.note<=2).map(r=>esc(r.nom)).filter((v,i,a)=>a.indexOf(v)===i).join(", ")||"–"} n'aiment pas</small>`:""}</span>
@@ -2666,7 +2668,7 @@ function renderEnvies(){ const box=$("view-envies"); if(!box) return;
     const tri=inconnus.map(r=>({r,s:(servis.has(r.id)?0:1)+(r.c&&p.cuisines.includes(r.c)?0.5:0)+((r.id.charCodeAt(0)*7+r.id.length*13+(envCible))%10)/10})).sort((a,b)=>b.s-a.s).slice(0,8).map(x=>x.r);
     const nbRep=Object.keys(sd.envies).length;
     html+=`<h3 class="shopray">Ces plats vous font-ils envie ? <span class="badge">${nbRep} réponse${nbRep>1?"s":""}</span></h3>
-      ${tri.length?`<div class="envgrid">${tri.map(r=>`<div class="envcard"><img src="${photoSrc(r.id)}" alt="" loading="lazy" data-cache-err="1"><div class="envtxt"><b>${esc(r.nom)}</b><small><span class="bdg b-${budgetOf(r)}">${BUDGETS[budgetOf(r)].court}</span> ${r.t} min${r.c?" · "+CUISINES[r.c]:""}${servis.has(r.id)?"":" · jamais servi"}</small></div>
+      ${tri.length?`<div class="envgrid">${tri.map(r=>`<div class="envcard"><img src="${photoSrc(r.id)}" alt="" loading="lazy" data-cache-err="1" decoding="async"><div class="envtxt"><b>${esc(r.nom)}</b><small><span class="bdg b-${budgetOf(r)}">${BUDGETS[budgetOf(r)].court}</span> ${r.t} min${r.c?" · "+CUISINES[r.c]:""}${servis.has(r.id)?"":" · jamais servi"}</small></div>
         <div class="envbtns">${ENVIE.map(([v,e,l])=>`<button class="envbtn" data-envie="${r.id}" data-v="${v}" title="${l}" aria-label="${l} : ${esc(r.nom)}"><span>${e}</span><small>${l}</small></button>`).join("")}</div></div>`).join("")}</div>
         <p class="note">Chaque réponse fait apparaître un nouveau plat. Revenez quand vous voulez : les nouvelles recettes de la bibliothèque s'ajoutent ici.</p>`
       :`<p class="note">Vous avez donné votre avis sur toutes les recettes. Merci !</p>`}
@@ -2752,7 +2754,7 @@ function accepterProduit(x){ if(!x||typeof x!=="object") return null; const n=tx
 function produitDe(n){ const k=norm(n); if(!k) return null; return PRODUITS.get(k)||PRODUITS.get(k.replace(/s$/,""))||PRODUITS.get(k+"s")||PRODUITS.get(k.replace(/x$/,""))||null; }
 function deSaison(p,m){ if(!p||!p.saison) return null; const [a,b]=p.saison; return a<=b ? (m>=a&&m<=b) : (m>=a||m<=b); }
 function vignetteProduit(n){ const p=produitDe(n); if(!p) return "";
-  return `<button type="button" class="pthumb" data-prod="${esc(n)}" aria-label="Fiche produit : ${esc(n)}" data-tip="Photo, description et prix">${p.photo?`<img src="${p.photo}" alt="" loading="lazy">`:`<span aria-hidden="true">i</span>`}</button>`; }
+  return `<button type="button" class="pthumb" data-prod="${esc(n)}" aria-label="Fiche produit : ${esc(n)}" data-tip="Photo, description et prix">${p.photo?`<img src="${p.photo}" alt="" loading="lazy" decoding="async">`:`<span aria-hidden="true">i</span>`}</button>`; }
 const UNOM={kg:"kg",L:"litre",u:"pièce"};
 function ouvrirProduit(n){ const p=produitDe(n); if(!p) return; const nom=p.n, m=new Date().getMonth()+1;
   const ref=PRIX[nom]||p.ref, reel=PRIX_DETAIL[nom]||[], promos=promosFor(nom).filter(x=>isoDate(x.au)>=TODAY);
@@ -2761,7 +2763,7 @@ function ouvrirProduit(n){ const p=produitDe(n); if(!p) return; const nom=p.n, m
   const lignesMag=p.magasins.map(x=>`<li><b>${esc(ENS[x.mag])}</b> · ${eur(x.prix)}${x.format?" ("+esc(x.format)+")":""}${x.unitaire?` · ${eur(x.unitaire[0])} / ${UNOM[x.unitaire[1]]}`:""}<small>relevé du ${fmtShort(isoDate(x.date))}${x.source?` · <a href="${esc(x.source)}" target="_blank" rel="noopener">source</a>`:""}</small></li>`).join("");
   const lignesPromo=promos.map(x=>`<li><b>${esc(ENS[x.mag])}</b> · ${eur(x.prix)}${x.avant?` <s>${eur(x.avant)}</s>`:""}<small>${esc(x.produit||"")} · du ${fmtShort(isoDate(x.du))} au ${fmtShort(isoDate(x.au))}</small></li>`).join("");
   $("ptitle").textContent=nom; $("peyebrow").textContent=RAYONS[p.ray]||"";
-  $("pbody").innerHTML=`${p.photo?`<figure class="mphoto pphoto"><img src="${p.photo}" alt="${esc(nom)}">${p.credit?`<figcaption>Photo d'illustration : <a href="${esc(p.credit)}" target="_blank" rel="noopener">Wikimedia Commons</a> (auteur et licence libre sur la page du fichier)</figcaption>`:""}</figure>`:""}
+  $("pbody").innerHTML=`${p.photo?`<figure class="mphoto pphoto"><img src="${p.photo}" alt="${esc(nom)}" decoding="async" loading="lazy">${p.credit?`<figcaption>Photo d'illustration : <a href="${esc(p.credit)}" target="_blank" rel="noopener">Wikimedia Commons</a> (auteur et licence libre sur la page du fichier)</figcaption>`:""}</figure>`:""}
     ${p.desc?`<p class="pdesc">${esc(p.desc)}</p>`:""}
     <dl class="pinfo">${p.format?`<dt>Conditionnement courant</dt><dd>${esc(p.format)}</dd>`:""}${p.conserver?`<dt>Conservation</dt><dd>${esc(p.conserver)}</dd>`:""}
     ${p.saison?`<dt>Saison</dt><dd>${(p.saison[0]===1&&p.saison[1]===12)||p.saison[1]===p.saison[0]-1?"Disponible toute l'année":`${sais?`<span class="pseason">De saison en ${MOIS[m-1]}</span> · `:`Pas de saison en ${MOIS[m-1]} · `}de ${MOIS[p.saison[0]-1]} à ${MOIS[p.saison[1]-1]}`}</dd>`:""}</dl>
