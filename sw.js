@@ -1,7 +1,7 @@
 // Mise en cache : les fichiers du site d'abord depuis le réseau (copie locale si hors ligne),
 // les données (donnees/*.json) idem, les photos, icônes et polices : copie locale tout de suite, mise à jour en arrière-plan.
-const CACHE = "menus-v58";
-const FICHIERS = ["./", "index.html", "js/app.js?v=58", "js/partage.js?v=58", "vendor/jspdf-4.2.1.umd.min.js?v=58", "vendor/supabase-js-2.45.4.js?v=58", "manifest.webmanifest", "icons/icon-180.png", "icons/icon-192.png", "icons/icon-512.png", "fonts/bricolage-grotesque-latin.woff2", "fonts/inter-latin.woff2", "donnees/promos.json", "donnees/recettes.json", "donnees/prix.json", "donnees/produits.json"];
+const CACHE = "menus-v59";
+const FICHIERS = ["./", "index.html", "js/app.js?v=59", "js/partage.js?v=59", "vendor/jspdf-4.2.1.umd.min.js?v=59", "vendor/supabase-js-2.45.4.js?v=59", "manifest.webmanifest", "icons/icon-180.png", "icons/icon-192.png", "icons/icon-512.png", "fonts/bricolage-grotesque-latin.woff2", "fonts/inter-latin.woff2", "donnees/promos.json", "donnees/recettes.json", "donnees/prix.json", "donnees/produits.json"];
 // Chaque fichier est mis en cache seul : un fichier qui échoue ne bloque pas les autres, et l'échec est écrit dans la console.
 self.addEventListener("install", e => { self.skipWaiting(); e.waitUntil(caches.open(CACHE).then(c => Promise.all(FICHIERS.map(f => c.add(f).catch(err => console.warn("[sw] fichier non mis en cache : " + f, err)))))); });
 self.addEventListener("activate", e => e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim())));

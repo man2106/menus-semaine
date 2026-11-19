@@ -3,5 +3,5 @@
 cd "$(dirname "$0")/.." || exit 1
 v=$(grep -o 'menus-v[0-9]*' sw.js | head -1 | tr -dc 0-9); n=$((v+1))
 sed -i "s/menus-v$v/menus-v$n/; s/?v=$v\"/?v=$n\"/g" sw.js
-sed -i "s/?v=$v\"/?v=$n\"/g; s/data-appver=\"$v\">Version $v</data-appver=\"$n\">Version $n</" index.html
+sed -i "s/\(\.js?v=\)[0-9]*\"/\1$n\"/g; s/data-appver=\"$v\">Version $v</data-appver=\"$n\">Version $n</" index.html
 echo "Version $n"
