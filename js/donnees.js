@@ -46,7 +46,8 @@ const EMOJI={veloutepotiron:"🎃",chouxbxl:"🥬",stoemppoireaux:"🥔",potee:"
 const ILLU={}; const TEINTES=["#E2F0E6","#FBEBD2","#E6ECF7","#F6E3E3","#EDE6F5","#E8F1D8"];
 function illustration(id){ if(ILLU[id]) return ILLU[id]; const e=EMOJI[id]||"🍽️", bg=TEINTES[[...id].reduce((s,c)=>s+c.charCodeAt(0),0)%TEINTES.length];
   return ILLU[id]="data:image/svg+xml,"+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 120"><rect width="160" height="120" fill="${bg}"/><text x="80" y="64" font-size="60" text-anchor="middle" dominant-baseline="middle">${e}</text></svg>`); }
-const photoSrc = id => { const r=BYID[id]; if(r&&r.perso) return r.photo||PLACEHOLDER; return PHOTOS[id]?"photos/"+id+".webp":illustration(id); };
+const PHOTOS_PERSO={};   // photos choisies par la famille (js/photoplat.js) : id de recette -> data URL
+const photoSrc = id => { if(PHOTOS_PERSO[id]) return PHOTOS_PERSO[id]; const r=BYID[id]; if(r&&r.perso) return r.photo||PLACEHOLDER; return PHOTOS[id]?"photos/"+id+".webp":illustration(id); };
 // Si un navigateur ne sait pas lire le WebP, on retombe sur la photo JPEG (gardée à côté)
 document.addEventListener("error",e=>{ const i=e.target; if(i&&i.tagName==="IMG"&&/^photos\/[a-z0-9]+\.webp$/.test(i.getAttribute("src")||"")) i.src=i.getAttribute("src").replace(/\.webp$/,".jpg"); },true);
 const photoPage = id => PHOTOS[id]?"https://commons.wikimedia.org/wiki/File:"+encodeURIComponent(PHOTOS[id]):null;
