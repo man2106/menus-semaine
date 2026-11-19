@@ -570,6 +570,10 @@ details.sum>div{display:grid;gap:12px}
 .rgrid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .ppact{display:flex;gap:8px;flex-wrap:wrap;margin:2px 0 0}
 .ppnote{margin:0}
+.ppact .btn{min-height:44px;display:inline-flex;align-items:center;justify-content:center;padding:10px 16px;font-size:15px}
+.mphoto.ppdrop img{outline:3px dashed var(--accent);outline-offset:3px}
+.ppastuce{display:none}
+@media (hover:hover) and (pointer:fine){.ppcam{display:none!important}.ppastuce{display:block}}
 .rphoto{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .rphoto img{width:120px;height:90px;object-fit:cover;border-radius:10px}
 .ringr{border:1px solid var(--line);border-radius:12px;padding:10px;display:grid;gap:8px;margin:0}
@@ -889,7 +893,7 @@ body.verrou .dgrip,body.readonly .dgrip{display:none}
       <div>
         <h1>Menus de la semaine</h1>
         <p class="sub">Repas du soir · moins de 30 minutes · petit budget</p>
-        <p class="appver" data-appver="63" data-appdate="19/11/2026 à 18:27">Version 63 · mise à jour le 19/11/2026 à 18:27</p>
+        <p class="appver" data-appver="64" data-appdate="19/11/2026 à 18:36">Version 64 · mise à jour le 19/11/2026 à 18:36</p>
       </div>
       <div class="comptehaut" id="comptehaut" hidden></div>
     </div>
@@ -1145,10 +1149,10 @@ body.verrou .dgrip,body.readonly .dgrip{display:none}
   <div class="sfoot" id="sfoot"></div>
 </div>
 
-<script src="vendor/supabase-js-2.45.4.js?v=63"></script>
-<script src="js/partage.js?v=63"></script>
+<script src="vendor/supabase-js-2.45.4.js?v=64"></script>
+<script src="js/partage.js?v=64"></script>
 <!-- Les scripts de data-scripts sont chargés dans cet ordre par js/demarrage.js, une fois donnees/recettes-base.json arrivé (jsPDF n'est chargé qu'à l'export PDF) -->
-<script src="js/demarrage.js?v=63" defer data-scripts="js/donnees.js js/menus.js js/courses.js js/promos.js js/vues.js js/fenetres.js js/pdf.js js/famille.js js/photoplat.js js/app.js"></script>
+<script src="js/demarrage.js?v=64" defer data-scripts="js/donnees.js js/menus.js js/courses.js js/promos.js js/vues.js js/fenetres.js js/pdf.js js/famille.js js/photoplat.js js/app.js"></script>
 
 </body>
 </html>

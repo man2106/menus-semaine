@@ -45,7 +45,9 @@ async function ppEnvoyer(id,photo,quand){ if(!DB||CAN_WRITE===false||!ppIdOk(id)
 
 // ---------- Actions ----------
 async function ppChoisir(id,file){ if(!BYID[id]||!file) return;
-  let photo; try{ photo=await ppReduire(file); }catch(e){ toast("Cette photo n'a pas pu être préparée. Essayez-en une autre."); return; }
+  let photo; try{ photo=await ppReduire(file); }catch(e){
+    const heic=/hei[cf]/i.test(file.type||"")||/\.hei[cf]$/i.test(file.name||"");
+    toast(heic?"Ce format (HEIC) n'est pas lu par ce navigateur. Essayez avec Safari, ou exportez la photo en JPEG.":"Cette photo n'a pas pu être préparée. Essayez-en une autre."); return; }
   const quand=new Date().toISOString(); const gardee=await ppGarderLocal(id,photo,quand); ppRecalc(id); ppAfficher();
   const r=await ppEnvoyer(id,photo,quand);
   if(r==="ok") toast("Photo enregistrée pour toute la famille");
@@ -55,9 +57,18 @@ async function ppRemettre(id){ if(!BYID[id]) return; const quand=new Date().toIS
   await ppGarderLocal(id,null,quand); ppRecalc(id); ppAfficher();
   const r=await ppEnvoyer(id,null,quand);
   toast(r==="ok"?"Photo d'origine remise pour toute la famille":"Photo d'origine remise"+(r==="echec"?" (le partage a échoué)":"")); }
-function ppSousFigure(id){ const a=PHOTOS_PERSO[id]?true:false, en=!!DB&&CAN_WRITE!==false;
-  return `<div class="ppact"><label class="btn">📷 Ma photo du plat<input id="pp-photo" data-pp="${esc(id)}" type="file" accept="image/*" capture="environment" hidden></label>${a?`<button type="button" class="btn" data-ppreset="${esc(id)}">Remettre la photo d'origine</button>`:""}</div>${a&&!en?`<p class="note ppnote">Photo gardée sur ce téléphone</p>`:""}`; }
-document.addEventListener("change",e=>{ if(e.target.id!=="pp-photo") return; const f=e.target.files&&e.target.files[0], id=e.target.dataset.pp; e.target.value=""; if(f) ppChoisir(id,f); });
+function ppSousFigure(id){ const a=PHOTOS_PERSO[id]?true:false, en=!!DB&&CAN_WRITE!==false, i=esc(id);
+  return `<div class="ppact"><label class="btn ppcam">📷 Prendre une photo<input id="pp-photo-cam" data-pp="${i}" type="file" accept="image/*" capture="environment" hidden></label><label class="btn pplib">🖼️ Choisir dans mes photos<input id="pp-photo-lib" data-pp="${i}" type="file" accept="image/*,.heic,.heif" hidden></label>${a?`<button type="button" class="btn" data-ppreset="${i}">Remettre la photo d'origine</button>`:""}</div><p class="note ppnote ppastuce">Vous pouvez aussi glisser une image sur la photo, ou la coller (Cmd+V).</p>${a&&!en?`<p class="note ppnote">Photo gardée sur ce téléphone</p>`:""}`; }
+document.addEventListener("change",e=>{ const t=e.target; if(!t||(t.id!=="pp-photo-cam"&&t.id!=="pp-photo-lib")) return; const f=t.files&&t.files[0], id=t.dataset.pp; t.value=""; if(f) ppChoisir(id,f); });
+// Glisser-déposer sur la photo du plat + coller (Cmd+V / Ctrl+V) pendant que le détail est ouvert
+const ppImgDe=dt=>{ const l=dt&&dt.files?Array.from(dt.files):[]; return l.find(f=>/^image\//.test(f.type)||/\.(hei[cf]|jpe?g|png|webp|gif)$/i.test(f.name||""))||null; };
+const ppAvecFichier=dt=>!!dt&&Array.from(dt.types||[]).includes("Files");
+document.addEventListener("dragover",e=>{ const z=e.target.closest&&e.target.closest(".mphoto"); if(!z||!ppAvecFichier(e.dataTransfer)) return; e.preventDefault(); z.classList.add("ppdrop"); });
+document.addEventListener("dragleave",e=>{ const z=e.target.closest&&e.target.closest(".mphoto"); if(z&&!z.contains(e.relatedTarget)) z.classList.remove("ppdrop"); });
+document.addEventListener("drop",e=>{ const z=e.target.closest&&e.target.closest(".mphoto"); if(!z) return; z.classList.remove("ppdrop"); if(!ppAvecFichier(e.dataTransfer)) return; e.preventDefault();
+  const f=ppImgDe(e.dataTransfer); if(!f){ toast("Ce fichier n'est pas une image."); return; } if(modalCtx&&modalCtx.id) ppChoisir(modalCtx.id,f); });
+document.addEventListener("paste",e=>{ if(!modalCtx||!modalCtx.id||!BYID[modalCtx.id]) return; const t=e.target; if(t&&/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)||(t&&t.isContentEditable)) return;
+  const f=ppImgDe(e.clipboardData); if(f){ e.preventDefault(); ppChoisir(modalCtx.id,f); } });
 document.addEventListener("click",e=>{ const b=e.target.closest("[data-ppreset]"); if(b) ppRemettre(b.dataset.ppreset); });
 
 // ---------- Lecture du partage (appelée par app.js une fois la base prête) ----------
