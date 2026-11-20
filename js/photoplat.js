@@ -1,9 +1,10 @@
 // « Ma photo du plat » : chacun peut remplacer la photo d'un plat par la sienne.
-// - La photo est réduite sur le téléphone (1200 px max, WebP ou JPEG) puis gardée dans IndexedDB (marche hors ligne et sans famille).
+// - La photo est réduite sur le téléphone (800 px max, WebP ou JPEG, environ 100 Ko) puis gardée dans IndexedDB (marche hors ligne et sans famille).
+//   Elle ne sert qu'à l'affichage à l'écran (pas à l'impression) : on ne garde pas une définition plus haute que nécessaire.
 // - Si le partage famille est actif, elle est aussi envoyée dans la base partagée (rubrique « platsphotos », voir supabase/photos-plats.sql).
 //   Si l'envoi échoue (script SQL pas encore exécuté, pas de réseau…), la photo reste sur ce téléphone : rien ne casse.
 // - photoSrc() (js/donnees.js) lit PHOTOS_PERSO : la photo remplace l'originale partout (cartes, détail, galerie, menu, retours).
-const PP_BASE="menus-photos-plats", PP_STORE="plats", PP_MAX_OCTETS=200000, PP_MAX_DUR=280000;
+const PP_BASE="menus-photos-plats", PP_STORE="plats", PP_MAX_OCTETS=100000, PP_MAX_DUR=150000;
 const PP_LOCAL={}, PP_SHARED={}; let ppPartageLu=false;
 const ppIdOk=id=>typeof id==="string"&&/^[A-Za-z0-9_-][A-Za-z0-9_.-]{0,99}$/.test(id);
 const ppValide=p=>typeof p==="string"&&/^data:image\/(webp|jpeg);base64,[A-Za-z0-9+/=]+$/.test(p)&&p.length<390000;
@@ -30,7 +31,7 @@ function ppReduire(file){ return new Promise((ok,ko)=>{ const img=new Image(), u
     const lire=b=>new Promise((res,rej)=>{ const fr=new FileReader(); fr.onload=()=>res(fr.result); fr.onerror=()=>rej(fr.error); fr.readAsDataURL(b); });
     const blob=(c,type,q)=>new Promise(res=>c.toBlob(res,type,q));
     try{ let dernier=null;
-      for(const maxW of [1200,1000,800,640]) for(const q of [0.8,0.7,0.6,0.5]){
+      for(const maxW of [800,640,480]) for(const q of [0.7,0.6,0.5]){
         const m=Math.min(1,maxW/img.naturalWidth), c=document.createElement("canvas"); c.width=Math.max(1,Math.round(img.naturalWidth*m)); c.height=Math.max(1,Math.round(img.naturalHeight*m));
         c.getContext("2d").drawImage(img,0,0,c.width,c.height);
         let b=await blob(c,"image/webp",q); if(!b||b.type!=="image/webp") b=await blob(c,"image/jpeg",q);   // navigateur sans WebP : JPEG
