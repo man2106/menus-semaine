@@ -79,7 +79,8 @@ function subscribePhotosPlats(){ if(!DB) return;
       if(d.photo===null) PP_SHARED[id]={photo:null,quand:typeof d.quand==="string"?d.quand:""}; else if(ppValide(d.photo)) PP_SHARED[id]={photo:d.photo,quand:typeof d.quand==="string"?d.quand:""}; else delete PP_SHARED[id]; } ids.push(id); });
     ids.forEach(ppRecalc); ppAfficher();
     if(!ppPartageLu){ ppPartageLu=true;   // photos prises avant d'être connecté : on les partage maintenant
-      Object.keys(PP_LOCAL).forEach(id=>{ const l=PP_LOCAL[id], s=PP_SHARED[id]; if(l.photo&&(!s||(s.quand||"")<(l.quand||""))) ppEnvoyer(id,l.photo,l.quand); }); }
+      Object.keys(PP_LOCAL).forEach(id=>{ const l=PP_LOCAL[id], s=PP_SHARED[id]; if(l.photo&&(!s||(s.quand||"")<(l.quand||""))) ppEnvoyer(id,l.photo,l.quand); });
+      setTimeout(ppRecompresserAnciennes,2000); }
   }catch(e){ console.error(e); } },()=>{}); }
 
 // ---------- Pour le PDF : JPEG recadré à la forme de la case (jsPDF ne lit pas le WebP) ----------
@@ -88,4 +89,22 @@ function ppEnJpeg(src,ratio){ return new Promise(res=>{ const img=new Image(); i
     const s=Math.max(W/img.naturalWidth,H/img.naturalHeight), w=img.naturalWidth*s, h=img.naturalHeight*s; x.drawImage(img,(W-w)/2,(H-h)/2,w,h); res(c.toDataURL("image/jpeg",0.85)); }catch(e){ res(null); } };
   img.src=src; }); }
 
+// ---------- Anciennes photos trop lourdes : recompressées une fois (sur ce téléphone, et dans la base partagée si elle est accessible) ----------
+// Une photo est retouchée seulement si elle dépasse PP_SEUIL_LONG caractères (environ 100 Ko) et si la nouvelle version est plus petite.
+// Sans partage famille, seules les copies du téléphone sont traitées. Avec le partage, on attend la première lecture de la base.
+const PP_SEUIL_LONG=140000; let ppAncienneEnCours=false, ppAncienneFaite=false;
+function ppDataVersBlob(d){ const m=d.match(/^data:([^;,]+);base64,(.*)$/); if(!m) throw new Error("format"); const bin=atob(m[2]), u=new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) u[i]=bin.charCodeAt(i); return new Blob([u],{type:m[1]}); }
+async function ppRecompresserAnciennes(){ if(ppAncienneEnCours||ppAncienneFaite) return; ppAncienneEnCours=true;
+  try{ const ids=[...new Set([...Object.keys(PP_LOCAL),...Object.keys(PP_SHARED)])];
+    for(const id of ids){ const l=PP_LOCAL[id], s=PP_SHARED[id];
+      if(l&&l.photo&&l.photo.length>PP_SEUIL_LONG){ try{ const n=await ppReduire(ppDataVersBlob(l.photo)); if(n.length<l.photo.length) await ppGarderLocal(id,n,l.quand); }catch(e){} }
+      if(s&&s.photo&&s.photo.length>PP_SEUIL_LONG&&DB&&CAN_WRITE!==false){ try{ const n=await ppReduire(ppDataVersBlob(s.photo)); if(n.length<s.photo.length) await ppEnvoyer(id,n,s.quand); }catch(e){} }
+      ppRecalc(id); }
+    ppAfficher();
+  } finally{ ppAncienneEnCours=false; }
+  ppAncienneFaite=true; }
+
 ppChargerLocal();
+// Sans base partagée, on traite tout de suite les copies du téléphone (sinon, c'est fait après la première lecture de la base).
+setTimeout(()=>{ if(!DB) ppRecompresserAnciennes(); },5000);
