@@ -7,7 +7,7 @@
 -- de la personne qui l'a prise (message « Photo gardée sur ce téléphone »).
 -- Avec ce script, la photo est vue par toute la famille, sur tous les téléphones.
 --
--- Comment ça marche : comme pour les photos de tickets, la photo (réduite, environ 100 à 200 Ko)
+-- Comment ça marche : comme pour les photos de tickets, la photo (réduite, environ 50 à 100 Ko)
 -- est rangée dans la table « docs », rubrique « platsphotos », un document par recette.
 -- Les droits existants (code famille, propriétaire, taille maximale de 400 Ko par document) s'appliquent déjà.
 -- Pas besoin de « Storage » : il n'y a pas de bucket dans ce projet, et rien à créer de plus.

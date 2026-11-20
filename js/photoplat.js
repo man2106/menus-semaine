@@ -1,9 +1,10 @@
 // « Ma photo du plat » : chacun peut remplacer la photo d'un plat par la sienne.
-// - La photo est réduite sur le téléphone (1200 px max, WebP ou JPEG) puis gardée dans IndexedDB (marche hors ligne et sans famille).
+// - La photo est réduite sur le téléphone (800 px max, WebP ou JPEG, environ 100 Ko) puis gardée dans IndexedDB (marche hors ligne et sans famille).
+//   Elle ne sert qu'à l'affichage à l'écran (pas à l'impression) : on ne garde pas une définition plus haute que nécessaire.
 // - Si le partage famille est actif, elle est aussi envoyée dans la base partagée (rubrique « platsphotos », voir supabase/photos-plats.sql).
 //   Si l'envoi échoue (script SQL pas encore exécuté, pas de réseau…), la photo reste sur ce téléphone : rien ne casse.
 // - photoSrc() (js/donnees.js) lit PHOTOS_PERSO : la photo remplace l'originale partout (cartes, détail, galerie, menu, retours).
-const PP_BASE="menus-photos-plats", PP_STORE="plats", PP_MAX_OCTETS=200000, PP_MAX_DUR=280000;
+const PP_BASE="menus-photos-plats", PP_STORE="plats", PP_MAX_OCTETS=100000, PP_MAX_DUR=150000;
 const PP_LOCAL={}, PP_SHARED={}; let ppPartageLu=false;
 const ppIdOk=id=>typeof id==="string"&&/^[A-Za-z0-9_-][A-Za-z0-9_.-]{0,99}$/.test(id);
 const ppValide=p=>typeof p==="string"&&/^data:image\/(webp|jpeg);base64,[A-Za-z0-9+/=]+$/.test(p)&&p.length<390000;
@@ -30,7 +31,7 @@ function ppReduire(file){ return new Promise((ok,ko)=>{ const img=new Image(), u
     const lire=b=>new Promise((res,rej)=>{ const fr=new FileReader(); fr.onload=()=>res(fr.result); fr.onerror=()=>rej(fr.error); fr.readAsDataURL(b); });
     const blob=(c,type,q)=>new Promise(res=>c.toBlob(res,type,q));
     try{ let dernier=null;
-      for(const maxW of [1200,1000,800,640]) for(const q of [0.8,0.7,0.6,0.5]){
+      for(const maxW of [800,640,480]) for(const q of [0.7,0.6,0.5]){
         const m=Math.min(1,maxW/img.naturalWidth), c=document.createElement("canvas"); c.width=Math.max(1,Math.round(img.naturalWidth*m)); c.height=Math.max(1,Math.round(img.naturalHeight*m));
         c.getContext("2d").drawImage(img,0,0,c.width,c.height);
         let b=await blob(c,"image/webp",q); if(!b||b.type!=="image/webp") b=await blob(c,"image/jpeg",q);   // navigateur sans WebP : JPEG
@@ -78,7 +79,8 @@ function subscribePhotosPlats(){ if(!DB) return;
       if(d.photo===null) PP_SHARED[id]={photo:null,quand:typeof d.quand==="string"?d.quand:""}; else if(ppValide(d.photo)) PP_SHARED[id]={photo:d.photo,quand:typeof d.quand==="string"?d.quand:""}; else delete PP_SHARED[id]; } ids.push(id); });
     ids.forEach(ppRecalc); ppAfficher();
     if(!ppPartageLu){ ppPartageLu=true;   // photos prises avant d'être connecté : on les partage maintenant
-      Object.keys(PP_LOCAL).forEach(id=>{ const l=PP_LOCAL[id], s=PP_SHARED[id]; if(l.photo&&(!s||(s.quand||"")<(l.quand||""))) ppEnvoyer(id,l.photo,l.quand); }); }
+      Object.keys(PP_LOCAL).forEach(id=>{ const l=PP_LOCAL[id], s=PP_SHARED[id]; if(l.photo&&(!s||(s.quand||"")<(l.quand||""))) ppEnvoyer(id,l.photo,l.quand); });
+      setTimeout(ppRecompresserAnciennes,2000); }
   }catch(e){ console.error(e); } },()=>{}); }
 
 // ---------- Pour le PDF : JPEG recadré à la forme de la case (jsPDF ne lit pas le WebP) ----------
@@ -87,4 +89,22 @@ function ppEnJpeg(src,ratio){ return new Promise(res=>{ const img=new Image(); i
     const s=Math.max(W/img.naturalWidth,H/img.naturalHeight), w=img.naturalWidth*s, h=img.naturalHeight*s; x.drawImage(img,(W-w)/2,(H-h)/2,w,h); res(c.toDataURL("image/jpeg",0.85)); }catch(e){ res(null); } };
   img.src=src; }); }
 
+// ---------- Anciennes photos trop lourdes : recompressées une fois (sur ce téléphone, et dans la base partagée si elle est accessible) ----------
+// Une photo est retouchée seulement si elle dépasse PP_SEUIL_LONG caractères (environ 100 Ko) et si la nouvelle version est plus petite.
+// Sans partage famille, seules les copies du téléphone sont traitées. Avec le partage, on attend la première lecture de la base.
+const PP_SEUIL_LONG=140000; let ppAncienneEnCours=false, ppAncienneFaite=false;
+function ppDataVersBlob(d){ const m=d.match(/^data:([^;,]+);base64,(.*)$/); if(!m) throw new Error("format"); const bin=atob(m[2]), u=new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) u[i]=bin.charCodeAt(i); return new Blob([u],{type:m[1]}); }
+async function ppRecompresserAnciennes(){ if(ppAncienneEnCours||ppAncienneFaite) return; ppAncienneEnCours=true;
+  try{ const ids=[...new Set([...Object.keys(PP_LOCAL),...Object.keys(PP_SHARED)])];
+    for(const id of ids){ const l=PP_LOCAL[id], s=PP_SHARED[id];
+      if(l&&l.photo&&l.photo.length>PP_SEUIL_LONG){ try{ const n=await ppReduire(ppDataVersBlob(l.photo)); if(n.length<l.photo.length) await ppGarderLocal(id,n,l.quand); }catch(e){} }
+      if(s&&s.photo&&s.photo.length>PP_SEUIL_LONG&&DB&&CAN_WRITE!==false){ try{ const n=await ppReduire(ppDataVersBlob(s.photo)); if(n.length<s.photo.length) await ppEnvoyer(id,n,s.quand); }catch(e){} }
+      ppRecalc(id); }
+    ppAfficher();
+  } finally{ ppAncienneEnCours=false; }
+  ppAncienneFaite=true; }
+
 ppChargerLocal();
+// Sans base partagée, on traite tout de suite les copies du téléphone (sinon, c'est fait après la première lecture de la base).
+setTimeout(()=>{ if(!DB) ppRecompresserAnciennes(); },5000);
