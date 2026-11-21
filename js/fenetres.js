@@ -163,11 +163,12 @@ function renderRecipeForm(){ const c=sheetCtx, dr=c.draft;
         <button type="button" class="mdel" data-rfdel="${k}" aria-label="Retirer cet ingrédient">×</button></div>`).join("")}
       <datalist id="inglist">${ALL_ING().map(x=>`<option value="${esc(x)}">`).join("")}</datalist>
       <button type="button" class="btn" data-rfadd="1">Ajouter un ingrédient</button></fieldset>
-    <label class="wfield">Étapes (une par ligne)<textarea id="rf-etapes" rows="6" placeholder="Faire revenir l'oignon 3 minutes.&#10;Ajouter la viande…">${esc(dr.etapes)}</textarea></label>
+    <label class="wfield">Étapes : une par ligne, sans numéro (la numérotation est automatique)<textarea id="rf-etapes" rows="6" placeholder="Faire revenir l'oignon 3 minutes.&#10;Ajouter la viande…">${esc(dr.etapes)}</textarea><small id="rf-etapes-cpt" class="note">${compteEtapes(dr.etapes)}</small></label>
     <label class="wfield">Astuce (facultatif)<input id="rf-astuce" type="text" maxlength="200" value="${esc(dr.astuce)}"></label>
     <label class="wfield">Coût estimé du plat en euros (facultatif, pour les ingrédients inconnus de l'application)<input id="rf-prix" type="number" inputmode="decimal" min="0" step="0.5" value="${esc(dr.prix)}"></label>
   </form>`;
   $("sfoot").innerHTML=`<button class="btn big" data-sclose="1">Annuler</button><button class="btn primary big" data-rfsave="1">Enregistrer</button>`; }
+function compteEtapes(txt){ const n=String(txt||"").split(/\n+/).filter(x=>x.trim()).length; return n+(n>1?" étapes":n?" étape":"")+" (20 maximum)"; }
 function readRecipeForm(){ const dr=sheetCtx.draft, v=id=>{const e=$(id); return e?e.value:"";};
   dr.nom=v("rf-nom").trim(); dr.acc=v("rf-acc").trim(); dr.t=+v("rf-t")||30; dr.pers=+v("rf-pers")||5; dr.etapes=v("rf-etapes"); dr.astuce=v("rf-astuce").trim(); dr.prix=v("rf-prix");
   document.querySelectorAll("#rform [data-rf]").forEach(el=>{ const k=+el.dataset.k, f=el.dataset.rf; if(!dr.ing[k]) return;
@@ -181,7 +182,11 @@ function saveRecipe(){ readRecipeForm(); const c=sheetCtx, dr=c.draft;
   const k=5/Math.max(1,dr.pers);
   const ing=dr.ing.filter(([n])=>n.trim()).map(([n,q,u,ray])=>[n.trim(),Math.round(q*k*100)/100,u,ray]);
   if(!ing.length){ toast("Ajoutez au moins un ingrédient"); return; }
-  const raw={id:c.editId||("p"+Date.now().toString(36)),nom:dr.nom,acc:dr.acc,t:dr.t,ing,etapes:dr.etapes.split(/\n+/).map(x=>x.trim()).filter(Boolean),astuce:dr.astuce,photo:dr.photo,prix:dr.prix?Math.round(+dr.prix*k*100)/100:null,auteur:ME};
+  // Étapes : une par ligne ; la numérotation collée (« 1. », « 2) », « - ») est retirée
+  const etapes=dr.etapes.split(/\n+/).map(x=>x.trim().replace(/^(\d+[.)]|[-•*])\s+/,"")).filter(Boolean);
+  if(etapes.length>20){ toast("20 étapes maximum : regroupez certaines étapes"); $("rf-etapes").focus(); return; }
+  if(ing.length>30){ toast("30 ingrédients maximum"); return; }
+  const raw={id:c.editId||("p"+Date.now().toString(36)),nom:dr.nom,acc:dr.acc,t:dr.t,ing,etapes,astuce:dr.astuce,photo:dr.photo,prix:dr.prix?Math.round(+dr.prix*k*100)/100:null,auteur:ME};
   const r=registerRecipe(raw); if(!r){ toast("Recette invalide"); return; }
   state.perso=[...state.perso.filter(p=>p.id!==r.id),r]; saveLocal(); saveRecipeShared(r);
   const d=c.forDay; sheetCtx.after=null; closeSheet();
@@ -231,7 +236,8 @@ $("sheet").addEventListener("submit",e=>{ if(e.target.id==="wform"){ e.preventDe
   if(e.target.id==="rform"){ e.preventDefault(); } });
 $("sheet").addEventListener("change",async e=>{ if(e.target.id==="rf-photo"&&e.target.files&&e.target.files[0]){ readRecipeForm();
     try{ sheetCtx.draft.photo=await resizePhoto(e.target.files[0]); renderRecipeForm(); }catch(err){ toast("Impossible de lire cette photo"); } } });
-$("sheet").addEventListener("input",e=>{ if(e.target.id==="rf-nom") $("stitle").textContent=e.target.value||"Recette"; });
+$("sheet").addEventListener("input",e=>{ if(e.target.id==="rf-nom") $("stitle").textContent=e.target.value||"Recette";
+  if(e.target.id==="rf-etapes") $("rf-etapes-cpt").textContent=compteEtapes(e.target.value); });
 
 // --- Avis ---
 function setAvis(rid,n,v){ if(!n) return; const a={...(state.avis[rid]||{})}; if(a[n]===v) delete a[n]; else a[n]=v;

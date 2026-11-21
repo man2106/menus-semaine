@@ -2,7 +2,7 @@
 window.addEventListener("error",e=>{ const t=e.target; if(t&&t.tagName==="IMG"){ if(t.dataset.cacheParent) t.parentNode.hidden=true; else t.style.visibility="hidden"; } },true);
 
 // Nettoie un texte venu de la base partagée ou d'un fichier : jamais de balise ni de caractère dangereux à l'affichage
-function propre(v,max){ return typeof v==="string" ? v.replace(/[<>&"'`]/g,"").replace(/[\u0000-\u001f]/g," ").trim().slice(0,max||200) : ""; }
+function propre(v,max){ return typeof v==="string" ? v.replace(/[<>]/g,"").replace(/[\u0000-\u001f]/g," ").trim().slice(0,max||200) : ""; }
 const RAYONS = {bou:"Boucherie & charcuterie", cre:"Crèmerie", fl:"Fruits & légumes", bl:"Boulangerie", epi:"Épicerie", sur:"Surgelés", boi:"Boissons", dro:"Droguerie & hygiène"};
 const ORDRE = ["fl","bou","cre","bl","epi","boi","sur","dro"];
 // Quantités pour 5 personnes : [nom, quantité, unité, rayon]
