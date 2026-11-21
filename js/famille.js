@@ -494,17 +494,19 @@ function compresserPhoto(file){ return new Promise((ok,ko)=>{ const img=new Imag
 function htmlSuggestions(){ const qui=envQui||(window.__acces&&window.__acces()&&window.__acces().nom)||"";
   const T=[["lien","🔗 Un lien internet"],["envie","💬 Une envie, une idée"],["photo","📷 La photo d'une recette"]], f=suggForm;
   const liste=Object.entries(SUGG).sort((a,b)=>String(b[1].quand).localeCompare(String(a[1].quand)));
-  return `<div class="panel" id="suggbox"><h2>Proposer une recette</h2>
-    <p>Un plat que vous aimeriez manger ? Donnez un lien vers une recette, décrivez votre envie (« des lasagnes végétariennes », « un plat thaï pas trop épicé ») ou photographiez une page de livre. Les propositions sont ajoutées à la bibliothèque le lundi ou le mercredi.</p>
+  return `<div class="panel" id="suggbox"><h2>Suggérer un plat</h2>
+    <p><b>Une suggestion</b> est une idée, un lien ou une photo. Elle n'entre pas tout de suite dans la bibliothèque : le propriétaire la reprend le lundi ou le mercredi.</p>
+    <p class="note">Une <b>recette complète</b> (ingrédients, étapes, photo) s'ajoute directement à la bibliothèque.</p>
+    <button class="btn edit-only" type="button" data-newlib="1">Ajouter une recette complète à la bibliothèque</button>
     <div class="gfilters wrapchips">${T.map(([k,l])=>`<button class="chip${f.type===k?" on":""}" data-sgtype="${k}" type="button">${l}</button>`).join("")}</div>
     <form class="addrform" id="suggform" autocomplete="off">
       ${f.type==="lien"?`<label class="wfield">Lien de la recette<input id="sg-url" type="url" inputmode="url" maxlength="400" placeholder="https://www.exemple.be/recette-de-…" required></label>`:""}
       ${f.type==="photo"?`<label class="wfield">Photo de la recette<input id="sg-photo" type="file" accept="image/*" capture="environment"></label>${f.photo?`<img class="sgprev" src="${f.photo}" alt="Aperçu de la photo">`:""}`:""}
       <label class="wfield">${f.type==="envie"?"Votre envie":"Un mot sur cette recette (facultatif)"}<textarea id="sg-texte" rows="3" maxlength="600" placeholder="${f.type==="envie"?"Ex. : un gratin de chicons, des wraps végétariens, quelque chose avec du saumon…":"Ex. : on l'a mangée chez mamie, sans les champignons pour les enfants"}"${f.type==="envie"?" required":""}></textarea></label>
       <label class="wfield">Proposé par<select id="sg-nom" class="pick">${state.family.map(n=>`<option${n===qui?" selected":""}>${esc(n)}</option>`).join("")}<option value="">Quelqu'un de la famille</option></select></label>
-      <button class="btn primary edit-only" type="submit">Envoyer la proposition</button>
+      <button class="btn primary edit-only" type="submit">Envoyer la suggestion</button>
     </form>
-    ${liste.length?`<h3 class="shopray">Propositions de la famille (${liste.length})</h3><div class="sglist">${liste.map(([id,x])=>{ const r=x.recette&&BYID[x.recette];
+    ${liste.length?`<h3 class="shopray">Suggestions de la famille (${liste.length})</h3><div class="sglist">${liste.map(([id,x])=>{ const r=x.recette&&BYID[x.recette];
       const st=x.statut==="ajoutee"?`<span class="bdg b-eco">Ajoutée</span>`:x.statut==="refusee"?`<span class="bdg b-plaisir">Pas retenue</span>`:`<span class="bdg b-moyen">En attente</span>`;
       return `<div class="sgitem">${x.photo?`<img src="${x.photo}" alt="">`:`<span class="sgicon" aria-hidden="true">${x.type==="lien"?"🔗":"💬"}</span>`}<span class="sginfo"><b>${esc(x.texte||x.url||"Photo d'une recette")}</b>
         <small>${st} ${esc(x.nom||"Quelqu'un")} · ${x.quand?new Date(x.quand).toLocaleDateString("fr-BE"):""}${x.url?` · <a href="${esc(x.url)}" target="_blank" rel="noopener noreferrer">voir le lien</a>`:""}</small>
@@ -513,9 +515,10 @@ function htmlSuggestions(){ const qui=envQui||(window.__acces&&window.__acces()&
   </div>`; }
 document.addEventListener("click",async e=>{ const o=e.target.closest("#suggbox [data-openrec]"); if(o){ openMeal(o.dataset.openrec,null); return; }
   const o2=e.target.closest("[data-openrec2]"); if(o2){ openMeal(o2.dataset.openrec2,null); return; }
+  const nl=e.target.closest("[data-newlib]"); if(nl){ if(typeof openSheet==="function"&&typeof newDraft==="function") openSheet({type:"recipe",draft:newDraft()}); return; }
   const b=e.target.closest("[data-sgtype],[data-sgdel]"); if(!b) return;
   if(b.dataset.sgtype){ suggForm={type:b.dataset.sgtype,photo:null}; renderEnvies(); return; }
-  if(b.dataset.sgdel){ const id=b.dataset.sgdel; if(!DB) { delete SUGG[id]; renderEnvies(); return; } try{ await DB.collection("suggestions").doc(id).delete(); toast("Proposition supprimée"); }catch(err){ toast("Seul le propriétaire peut supprimer une proposition"); } } });
+  if(b.dataset.sgdel){ const id=b.dataset.sgdel; if(!DB) { delete SUGG[id]; renderEnvies(); return; } try{ await DB.collection("suggestions").doc(id).delete(); toast("Suggestion supprimée"); }catch(err){ toast("Seul le propriétaire peut supprimer une proposition"); } } });
 document.addEventListener("change",async e=>{ if(e.target.id!=="sg-photo") return; const f=e.target.files&&e.target.files[0]; if(!f) return;
   try{ suggForm.photo=await compresserPhoto(f); renderEnvies(); const s=$("suggbox"); if(s) s.scrollIntoView({block:"start"}); }catch(err){ toast("Cette photo n'a pas pu être lue"); } });
 document.addEventListener("submit",async e=>{ if(e.target.id!=="suggform") return; e.preventDefault();
@@ -525,8 +528,8 @@ document.addEventListener("submit",async e=>{ if(e.target.id!=="suggform") retur
   if(f.type==="envie"&&texte.trim().length<3){ toast("Décrivez votre envie en quelques mots"); return; }
   const doc=cleanSugg({nom,type:f.type,texte,url,photo:f.photo,quand:new Date().toISOString(),statut:"attente"}); const id=Date.now().toString(36)+"-"+slugNom(nom||"famille");
   if(!DB){ SUGG[id]=doc; suggForm={type:f.type,photo:null}; renderEnvies(); toast("Proposition notée sur cet appareil (partage non activé)"); return; }
-  try{ await DB.collection("suggestions").doc(id).set(doc); suggForm={type:f.type,photo:null}; toast("Merci ! Votre proposition sera ajoutée lundi ou mercredi"); }
-  catch(err){ toast("La proposition n'a pas pu être envoyée. Réessayez dans un instant."); } });
+  try{ await DB.collection("suggestions").doc(id).set(doc); suggForm={type:f.type,photo:null}; toast("Merci ! Votre suggestion sera examinée lundi ou mercredi"); }
+  catch(err){ toast("La suggestion n'a pas pu être envoyée. Réessayez dans un instant."); } });
 
 // ===================== Envies : sondage, goûts de chacun et plannings suggérés =====================
 const ENVIE=[[1,"😍","J'en ai envie"],[0,"😐","Bof"],[-1,"🙅","Non merci"]];

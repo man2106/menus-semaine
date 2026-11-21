@@ -7,7 +7,10 @@ const isoOf = d => d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-
 const curIso = () => isoOf(MONDAY);
 const dayOffset = n => { const d=new Date(MONDAY); d.setDate(MONDAY.getDate()+n); return d; };
 // Menu validé dont la semaine a commencé : figé. Jours passés = « Passé », jour en cours = « Ce soir », autres = « Prévu ».
-const verrouille = () => state.statut==="valide" && MONDAY.getTime()<=TODAY.getTime();
+// Menu figé : semaine commencée, ou validé par toute la famille (sauf pour le propriétaire)
+const estProprio = () => { try{ return IS_OWNER; }catch(e){ return true; } };
+const validePourTous = () => { try{ const f=state.family||[]; return f.length>0 && f.every(n=>{ const a=state.approbations&&state.approbations[n]; return !!a && a.menu===menuKey(); }); }catch(e){ return false; } };
+const verrouille = () => (state.statut==="valide" && MONDAY.getTime()<=TODAY.getTime()) || (validePourTous() && !estProprio());
 const etatJour = d => { const t=dayOffset(d).getTime(); return t<TODAY.getTime()?"passe":t===TODAY.getTime()?"today":"avenir"; };
 const fmtD = d => d.toLocaleDateString("fr-BE",{weekday:"short",day:"2-digit",month:"2-digit"});
 const fmtShort = d => d.toLocaleDateString("fr-BE",{day:"2-digit",month:"2-digit"});

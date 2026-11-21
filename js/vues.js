@@ -152,7 +152,7 @@ function toast(msg,undo,label){const t=$("toast");t.textContent=msg;
   if(undo){const b=document.createElement("button");b.textContent=label||"Annuler";b.onclick=()=>{undo();t.hidden=true;};t.appendChild(b);}
   t.hidden=false;clearTimeout(toast.h);toast.h=setTimeout(()=>t.hidden=true,undo?4500:2000);}
 // Remplacement d'un plat avec possibilité d'annuler
-function replaceDay(d,newId){ if(verrouille()){ toast("Menu verrouillé : la semaine a commencé"); return; } const prev=state.week[d]; state.week[d]=newId; state.picking=null; save(); render();
+function replaceDay(d,newId){ if(verrouille()){ toast("Menu figé : validé par toute la famille ou semaine commencée"); return; } const prev=state.week[d]; state.week[d]=newId; state.picking=null; save(); render();
   toast(JOURS[d]+" : "+BYID[newId].nom,()=>{state.week[d]=prev; save(); render(); toast("Plat rétabli");}); }
 
 document.querySelector("nav").addEventListener("click",e=>{const b=e.target.closest("button[data-tab]"); if(b) setTab(b.dataset.tab);});
@@ -434,7 +434,7 @@ $("weekbar").addEventListener("click",e=>{
   if(e.target.id==="copymsg"){ const txt=shareMessage(), box=$("sharemsg"); box.value=txt;
     try{ navigator.clipboard.writeText(txt).then(()=>toast("Message copié"),()=>{box.focus();box.select();toast("Sélectionnez le texte puis copiez-le");}); }catch(err){box.focus();box.select();} return; }
   if(e.target.id==="valider"){ if(DB&&!IS_OWNER){ toast("Seul le propriétaire valide le menu"); return; }
-    if(verrouille()){ toast("Menu verrouillé : la semaine a commencé"); return; }
+    if(verrouille()){ toast("Menu figé : validé par toute la famille ou semaine commencée"); return; }
     if(state.statut!=="valide"){ const m=manques(); if(m.length){ toast(`Validation impossible : ${manquesTexte(m)}.`); const b=$("acompleter"); if(b){ b.scrollIntoView({behavior:"smooth",block:"center"}); b.classList.remove("pulse"); void b.offsetWidth; b.classList.add("pulse"); } return; } }
     state.statut=state.statut==="valide"?"proposition":"valide";
     if(DB){ VALID={...VALID,[curIso()]:state.statut}; DB.doc("validations/menus").set({semaines:VALID,limites:LIMITES}).catch(()=>toast("La validation n'a pas pu être enregistrée"));
