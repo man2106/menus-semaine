@@ -1,4 +1,7 @@
 // ---- Deux courses par semaine ----
+// Un article coché garde le prénom de celui qui l'a coché (valeur vraie, donc rien d'autre ne change)
+const quiCoche = () => { const a=(window.__acces&&window.__acces())||{}; return a.nom||"quelqu'un"; };
+const nomCoche = v => (typeof v==="string" && v) ? v : "quelqu'un";
 const STOCKABLE = ["epi","sur"];
 const trip1Day = () => state.trip1==="sam" ? -2 : 0;   // samedi avant la semaine = -2
 const tripOf = d => 0; // une seule course par semaine (la liste n'est plus scindée)

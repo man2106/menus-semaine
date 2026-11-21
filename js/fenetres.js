@@ -85,7 +85,7 @@ function renderShop(){ const c=sheetCtx, t=c.t, items=coursesTrips()[t], plan=pl
   $("sbody").innerHTML=(stores.length>1?`<div class="gfilters">${stores.map((m,i)=>`<button class="chip${i===c.stop?" on":""}" data-stop="${i}">Arrêt ${i+1} · ${MAGNOM[m]}</button>`).join("")}</div>`:"")+
     (sitems.length?ORDRE.map(ray=>{const its=sitems.filter(i=>i.ray===ray); if(!its.length) return "";
       return `<h3 class="shopray">${RAYONS[ray]}</h3>`+its.map(i=>{const ck=!!state.checked[i.ck], pr=promosFor(i.n).find(p=>p.mag===ensOf(mag)&&validOn(p,tripDate(t)));
-        return `<div class="shoprow"><button class="shopitem${ck?" done":""}" data-shopk="${esc(i.ck)}" aria-pressed="${ck}"><span class="sbox" aria-hidden="true">${ck?"✓":""}</span><span class="sname">${esc(i.n)}${pr?`<small>Promo ${eur(pr.prix)}</small>`:""}</span></button><button type="button" class="sqty sqtybtn${ck?" done":""}" data-qedit="${esc(i.k)}" aria-label="Changer la quantité de ${esc(i.n)}">${esc(qtyOf(i))||"Qté"}<i class="qtpen" aria-hidden="true">✎</i></button></div>`}).join("")}).join("")
+        return `<div class="shoprow"><button class="shopitem${ck?" done":""}" data-shopk="${esc(i.ck)}" aria-pressed="${ck}"><span class="sbox" aria-hidden="true">${ck?"✓":""}</span><span class="sname">${esc(i.n)}${pr?`<small>Promo ${eur(pr.prix)}</small>`:""}${ck?`<small class="parqui">acheté par ${esc(nomCoche(state.checked[i.ck]))}</small>`:""}</span></button><button type="button" class="sqty sqtybtn${ck?" done":""}" data-qedit="${esc(i.k)}" aria-label="Changer la quantité de ${esc(i.n)}">${esc(qtyOf(i))||"Qté"}<i class="qtpen" aria-hidden="true">✎</i></button></div>`}).join("")}).join("")
      :`<p class="note">Rien à acheter ici.</p>`)+
     (done===sitems.length&&sitems.length?`<div class="shopdone">Tout est dans le caddie.</div>`:"");
   $("sfoot").innerHTML=`<div class="track big"><i style="width:${sitems.length?done/sitems.length*100:0}%"></i></div><button class="btn primary" data-shopend="1">${done===sitems.length?"Terminer":"Fermer"}</button>`; }
@@ -196,7 +196,7 @@ $("sheet").addEventListener("click",async e=>{ const c=sheetCtx; if(!c) return; 
     if(D.pickrec){ const d=c.d; closeSheet(); if(d===null){ openMeal(D.pickrec,null); return; } if(state.week[d]!==D.pickrec) replaceDay(d,D.pickrec); if(modalCtx&&modalCtx.d===d){ modalCtx.id=state.week[d]; renderModal(); } return; }
     if(D.newrec){ const d=c.d; closeSheet(); openSheet({type:"recipe",draft:newDraft(),forDay:d}); return; } }
   if(c.type==="shop"){ if(D.stop){ c.stop=+D.stop; renderShop(); return; }
-    if(D.shopk){ const k=D.shopk; if(state.checked[k]) delete state.checked[k]; else state.checked[k]=true; save(); renderCourses(); renderShop(); try{navigator.vibrate&&navigator.vibrate(15);}catch(err){} return; }
+    if(D.shopk){ const k=D.shopk; if(state.checked[k]) delete state.checked[k]; else state.checked[k]=quiCoche(); save(); renderCourses(); renderShop(); try{navigator.vibrate&&navigator.vibrate(15);}catch(err){} return; }
     if(D.shopend){ closeSheet(); return; } }
   if(c.type==="cook"){ if(D.cstep){ c.step=Math.max(0,c.step+(+D.cstep)); renderCook(); $("sbody").scrollTop=0; return; }
     if(D.timer){ startTimer(+D.timer,BYID[c.id].nom+" · étape "+(c.step+1)); return; }

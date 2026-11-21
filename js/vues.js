@@ -106,7 +106,7 @@ document.addEventListener("keydown",e=>{ if(!modalCtx||modalCtx.d===null) return
 $("overlay").addEventListener("click",e=>{ if(e.target===$("overlay")) closeMeal(); });
 document.addEventListener("keydown",e=>{ if(e.key==="Escape"&&modalCtx) closeMeal(); });
 $("mbody").addEventListener("change",e=>{const k=e.target.dataset&&e.target.dataset.mk; if(!k) return;
-  if(e.target.checked) state.checked[k]=true; else delete state.checked[k]; save(); renderCourses(); renderModal();});
+  if(e.target.checked) state.checked[k]=quiCoche(); else delete state.checked[k]; save(); renderCourses(); renderModal();});
 $("mbody").addEventListener("click",e=>{ if(e.target.id!=="mcopy") return;
   const {id,d}=modalCtx, items=mealItems(id,d);
   const txt=BYID[id].nom+(d!==null?" ("+JOURS[d]+")":"")+" · "+headcount(d)+" pers.\n"+items.map(i=>"- "+i.n+" : "+qtyOf(i)).join("\n");
@@ -169,7 +169,7 @@ $("days").addEventListener("click",e=>{
 });
 $("days").addEventListener("change",e=>{const sel=e.target.closest("select.pick"); if(!sel) return;
   replaceDay(+sel.dataset.day,sel.value);});
-$("aisles").addEventListener("change",e=>{const k=e.target.dataset.k; if(!k) return; if(e.target.checked) state.checked[k]=true; else delete state.checked[k]; save(); renderCourses();});
+$("aisles").addEventListener("change",e=>{const k=e.target.dataset.k; if(!k) return; if(e.target.checked) state.checked[k]=quiCoche(); else delete state.checked[k]; save(); renderCourses();});
 $("aisles").addEventListener("change",e=>{const s=e.target.closest("select[data-store]"); if(!s) return;
   state.tripStore[+s.dataset.store]=s.value||null; save(); renderCourses();});
 $("plan").addEventListener("change",e=>{
@@ -356,6 +356,7 @@ function renderWeekbar(){
       <button class="btn edit-only owner-only${!valide&&manques().length?" incomplet":""}" id="valider" data-tip="${valide?"Permet à nouveau de changer les plats et les cuisiniers":manques().length?"Impossible pour l'instant : "+esc(manquesTexte(manques()))+". Complétez d'abord ces soirs.":"Fige le menu de la semaine : il devient le menu officiel"}">${valide?"Rouvrir aux modifications":"Valider le menu"}</button>
       <button class="btn" id="exportmenu" data-tip="Calendrier de la semaine en PDF (ou en texte), avec les plats, les cuisiniers et les couverts">📄 Menu en PDF</button>
       <button class="btn edit-only" id="propose" data-tip="Tire un nouveau menu selon la répartition des budgets, la variété et les goûts de chacun">Nouvelle proposition</button>
+      ${valide?"":`<button class="btn edit-only" id="reprendre" data-tip="Copie le menu de la semaine précédente dans cette semaine. Les cuisiniers sont à redésigner.">Reprendre la semaine précédente</button>`}
       ${state.weekOffset===0?`<button class="btn" data-week="1" data-tip="Passe à la semaine prochaine pour préparer son menu à l'avance">Préparer la semaine suivante →</button>`:""}
     </div>
     ${renderApprovals()}
@@ -440,6 +441,15 @@ $("weekbar").addEventListener("click",e=>{
     if(DB){ VALID={...VALID,[curIso()]:state.statut}; DB.doc("validations/menus").set({semaines:VALID,limites:LIMITES}).catch(()=>toast("La validation n'a pas pu être enregistrée"));
       state.journal=[{par:ME,quand:new Date().toISOString(),texte:state.statut==="valide"?"a validé le menu":"a rouvert le menu aux modifications"},...state.journal].slice(0,15); if(shareReady) queueWrite(); }
     saveLocal(); render(); toast(state.statut==="valide"?"Menu validé":"Menu rouvert"); return; }
+  if(e.target.id==="reprendre"){
+    if(verrouille()){ toast("Menu verrouillé : la semaine a commencé"); return; }
+    const prevIso=isoOf(new Date(MONDAY.getFullYear(),MONDAY.getMonth(),MONDAY.getDate()-7));
+    const w=state.weeks[prevIso];
+    if(!w||!Array.isArray(w.menu)||w.menu.length!==7||!w.menu.every(id=>BYID[id])){ toast("Pas de menu enregistré pour la semaine précédente"); return; }
+    const avant={week:[...state.week],cooks:[...state.cooks],checked:{...state.checked},statut:state.statut};
+    state.week=[...w.menu]; state.cooks=Array(7).fill(null); state.checked={}; state.statut="proposition";
+    save(); render();
+    toast("Menu de la semaine précédente repris",()=>{ Object.assign(state,avant); save(); render(); toast("Ancien menu rétabli"); }); return; }
   if(e.target.id==="propose"){ const prev=[...state.week]; state.week=proposeMenu(); state.statut="proposition"; save(); render();
     toast("Nouvelle proposition",()=>{state.week=prev; save(); render(); toast("Proposition précédente rétablie");}); return; }
 });
