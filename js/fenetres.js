@@ -150,6 +150,7 @@ function newDraft(){ return {nom:"",acc:"",t:30,pers:5,ing:[["",0,"g","fl"],["",
 function renderRecipeForm(){ const c=sheetCtx, dr=c.draft;
   $("seyebrow").textContent=c.editId?"Modifier la recette":"Nouvelle recette de famille"; $("stitle").textContent=dr.nom||"Recette"; $("sextra").innerHTML="";
   $("sbody").innerHTML=`<form id="rform" class="rform">
+    <div class="wfield"><span>Importer depuis un lien (facultatif)</span><div style="display:flex;gap:8px"><input id="rf-lien" type="url" inputmode="url" placeholder="https://…" style="flex:1;min-width:0"><button type="button" class="btn" data-rflien="1">Remplir</button></div><small class="note">Remplit le nom, les ingrédients et les étapes. Vérifiez avant d'enregistrer.</small></div>
     <label class="wfield">Nom du plat<input id="rf-nom" type="text" maxlength="60" value="${esc(dr.nom)}" placeholder="Ex. : lasagnes de mamie" required></label>
     <label class="wfield">Accompagnement<input id="rf-acc" type="text" maxlength="60" value="${esc(dr.acc)}" placeholder="Ex. : salade verte"></label>
     <div class="rgrid2"><label class="wfield">Temps (minutes)<input id="rf-t" type="number" inputmode="numeric" min="5" max="240" value="${esc(dr.t)}"></label>
@@ -168,6 +169,21 @@ function renderRecipeForm(){ const c=sheetCtx, dr=c.draft;
     <label class="wfield">Coût estimé du plat en euros (facultatif, pour les ingrédients inconnus de l'application)<input id="rf-prix" type="number" inputmode="decimal" min="0" step="0.5" value="${esc(dr.prix)}"></label>
   </form>`;
   $("sfoot").innerHTML=`<button class="btn big" data-sclose="1">Annuler</button><button class="btn primary big" data-rfsave="1">Enregistrer</button>`; }
+const API_RECETTE="https://menus-semaine-man20671.vercel.app/api/recette";
+function parseLigneIng(l){
+  const m=/^(\d+(?:[.,]\d+)?)\s*(kg|g|gr|cl|ml|l)?\.?\s+(?:de |d'|d’)?(.+)$/i.exec(String(l).trim());
+  if(!m) return [String(l).trim().slice(0,40),0,"","fl"];
+  let q=parseFloat(m[1].replace(",",".")), u=(m[2]||"").toLowerCase(), nom=m[3].trim();
+  if(u==="kg"){ q*=1000; u="g"; } else if(u==="gr"){ u="g"; } else if(u==="l"){ q*=100; u="cl"; } else if(u==="ml"){ q/=10; u="cl"; }
+  else if(u!=="g"&&u!=="cl"){ if(u) nom=(m[2]+" "+nom); u=""; }
+  return [nom.slice(0,40),Math.round(q*100)/100,u,"fl"];
+}
+async function importerLien(url){
+  const r=await fetch(API_RECETTE+"?url="+encodeURIComponent(url));
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok) throw new Error(j.erreur||"Lecture impossible");
+  return j;
+}
 function readRecipeForm(){ const dr=sheetCtx.draft, v=id=>{const e=$(id); return e?e.value:"";};
   dr.nom=v("rf-nom").trim(); dr.acc=v("rf-acc").trim(); dr.t=+v("rf-t")||30; dr.pers=+v("rf-pers")||5; dr.etapes=v("rf-etapes"); dr.astuce=v("rf-astuce").trim(); dr.prix=v("rf-prix");
   document.querySelectorAll("#rform [data-rf]").forEach(el=>{ const k=+el.dataset.k, f=el.dataset.rf; if(!dr.ing[k]) return;
@@ -219,6 +235,16 @@ $("sheet").addEventListener("click",async e=>{ const c=sheetCtx; if(!c) return; 
       const ex={...state.exclus}; if(cur.size) ex[n]=[...cur]; else delete ex[n]; state.exclus=ex; save(); render(); renderGouts(); return; }
     if(D.gavis){ const [rid,v]=D.gavis.split("|"); setAvis(rid,state.family[c.i],+v); renderGouts(); return; } }
   if(c.type==="recipe"){
+    if(D.rflien){ readRecipeForm(); const lien=($("rf-lien")||{}).value||"";
+      if(!/^https?:\/\//.test(lien)){ toast("Collez un lien complet (https://…)"); return; }
+      toast("Lecture de la recette…");
+      try{ const j=await importerLien(lien); const dr=c.draft;
+        dr.nom=j.titre||dr.nom; dr.t=j.tempsMinutes||dr.t; dr.pers=j.portions||dr.pers;
+        const ing=(j.ingredients||[]).map(parseLigneIng).filter(x=>x[0]).slice(0,30);
+        dr.ing=ing.length?ing:dr.ing; dr.etapes=(j.etapes||[]).join("\n");
+        renderRecipeForm(); toast("Recette remplie : vérifiez avant d'enregistrer"); }
+      catch(err){ toast(err.message||"Lecture impossible : saisissez la recette à la main"); }
+      return; }
     if(D.rfadd){ readRecipeForm(); c.draft.ing.push(["",0,"g","fl"]); renderRecipeForm(); return; }
     if(D.rfdel){ readRecipeForm(); c.draft.ing.splice(+D.rfdel,1); if(!c.draft.ing.length) c.draft.ing.push(["",0,"g","fl"]); renderRecipeForm(); return; }
     if(D.rfnophoto){ readRecipeForm(); c.draft.photo=null; renderRecipeForm(); return; }
