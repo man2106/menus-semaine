@@ -13,7 +13,7 @@ function cleanRetour(r){ if(!r||typeof r!=="object") return null; const note=+r.
   if(typeof r.plat!=="string"||typeof r.semaine!=="string"||!/^\d{4}-\d\d-\d\d$/.test(r.semaine)) return null;
   return {semaine:r.semaine,jour:Math.max(0,Math.min(6,+r.jour||0)),plat:r.plat,nom:propre(r.nom,30),note:Math.round(note),
     refaire:["oui","peut","non"].includes(r.refaire)?r.refaire:null,mots:Array.isArray(r.mots)?r.mots.filter(m=>MOTS.includes(m)).slice(0,6):[],
-    com:propre(r.com,200),quand:typeof r.quand==="string"?r.quand.slice(0,40):null,cuisinier:propre(r.cuisinier,30)||null}; }
+    com:String(r.com||"").replace(/[\u0000-\u001f]/g," ").trim().slice(0,200),quand:typeof r.quand==="string"?r.quand.slice(0,40):null,cuisinier:propre(r.cuisinier,30)||null}; }
 function subscribeRetours(){ if(!DB) return; if(unsubRetours) unsubRetours();
   unsubRetours=DB.collection("retours").onSnapshot(q=>{ let ch=false;
     q.docChanges().forEach(c=>{ if(c.type==="removed"){ delete RETOURS[c.doc.id]; ch=true; return; } const r=cleanRetour(c.doc.data()); if(r){ RETOURS[c.doc.id]=r; ch=true; } });
@@ -41,12 +41,22 @@ const retoursDu = (iso,d) => Object.values(RETOURS).filter(r=>r.semaine===iso&&r
 function peutNoter(n){ const a=(typeof window.__acces==="function"&&window.__acces())||{}; return !!a.nom && n===a.nom; }
 async function enregistrerRetour(iso,d,nom,patch){
   if(!peutNoter(nom)){ toast("Vous ne notez que pour vous"); return; }
-  const id=retourId(iso,d,nom), rp=repasPasses(21).find(x=>x.iso===iso&&x.d===d); if(!rp) return;
+  const id=retourId(iso,d,nom), rp=repasPasses(21).find(x=>x.iso===iso&&x.d===d);
+  if(!rp){ toast("Ce repas n'est pas encore disponible à noter"); return; }
   const prev=RETOURS[id]||{semaine:iso,jour:d,plat:rp.plat,nom,note:null,refaire:null,mots:[],com:""};
   const next={...prev,...patch,plat:rp.plat,nom,cuisinier:rp.cuisinier,quand:new Date().toISOString(),par:ME||null};
   if(!next.note){ RETOURS[id]=next; renderSheet(); return; } // on attend la note avant d'enregistrer
-  RETOURS[id]=cleanRetour(next); saveRetoursLocal(); renderRetours(); renderSheet();
-  if(DB){ try{ await DB.collection("retours").doc(id).set({...cleanRetour(next),par:ME||null}); }catch(e){ toast("L'avis n'a pas pu être partagé, il reste sur cet appareil"); } }
+  const propre_=cleanRetour(next);
+  if(!propre_){ toast("Avis incomplet, il n'a pas été enregistré"); return; }
+  const avant=RETOURS[id];
+  RETOURS[id]=propre_; saveRetoursLocal(); renderRetours(); renderSheet();
+  if(!DB){ toast("Pas de connexion : l'avis n'a pas été enregistré"); return; }
+  try{ await DB.collection("retours").doc(id).set({...propre_,par:ME||null}); }
+  catch(e){ console.warn("[avis] envoi refusé", e);
+    // Pas d'avis fantôme : l'avis refusé disparaît de l'écran, l'utilisateur est prévenu
+    if(avant) RETOURS[id]=avant; else delete RETOURS[id];
+    saveRetoursLocal(); renderRetours(); renderSheet();
+    toast("L'avis n'a pas été enregistré. Vérifiez que cet appareil est bien rattaché à la famille (code famille), puis réessayez."); }
 }
 // ---- Calculs du bilan ----
 const moy = a => a.length? a.reduce((s,x)=>s+x,0)/a.length : null;
