@@ -110,8 +110,8 @@ function renderRetours(){
   const box=$("retoursbox"), fam=$("retoursfam"); if(!box||!fam) return;
   const passes=repasPasses(4).filter(p=>p.pres.length), aNoter=passes.filter(p=>retoursDu(p.iso,p.d).filter(r=>r.note).length<p.pres.length).slice(0,3);
   if(!state.family.length){ box.hidden=true; }
-  else if(!aNoter.length){ box.hidden=false; box.innerHTML=`<div class="rthead"><h2>🔔 Rappel : notez les repas</h2></div><p class="note">Rien à noter pour l'instant. Le repas du soir se note à partir de 19 h, après le souper.</p><div class="actions"><button class="btn" data-retourslist="1">Noter un repas</button></div>`; }
-  else { box.hidden=false; box.innerHTML=`<div class="rthead"><h2>🔔 Rappel : notez les repas</h2><span class="note">Une note suffit. Un mot facultatif peut suivre pour le cuisinier : les plats aimés reviendront plus souvent.</span></div>
+  else if(!aNoter.length){ box.hidden=false; box.classList.add("vide"); box.innerHTML=`<div class="rthead"><h2>🔔 Rappel</h2><span class="note">Rien à noter pour l'instant. Le repas du soir se note dès 19 h.</span></div><div class="actions"><button class="btn" data-retourslist="1">Noter un repas</button></div>`; }
+  else { box.hidden=false; box.classList.remove("vide"); box.innerHTML=`<div class="rthead"><h2>🔔 Rappel : notez les repas</h2><span class="note">Une note suffit. Un mot facultatif peut suivre pour le cuisinier : les plats aimés reviendront plus souvent.</span></div>
     <div class="rtlist">${aNoter.map(p=>{ const nb=retoursDu(p.iso,p.d).filter(r=>r.note).length;
       return `<button class="rtitem" data-retour="${p.iso}|${p.d}"><img src="${photoSrc(p.plat)}" alt="" data-cache-err="1" decoding="async" loading="lazy"><span><small>${JOURS[(p.date.getDay()+6)%7]} ${fmtShort(p.date)}</small><b>${esc(BYID[p.plat].nom)}</b><small>${nb?`${nb} avis sur ${p.pres.length}`:"Pas encore noté"}</small></span><span class="rtgo">Noter</span></button>`; }).join("")}</div>`; }
   const A=analyse();

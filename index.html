@@ -882,6 +882,7 @@ body.verrou .dgrip,body.readonly .dgrip{display:none}
 .day.dragging{opacity:.92;box-shadow:0 12px 28px rgba(0,0,0,.28);z-index:20;pointer-events:none}
 .day.dover{outline:3px dashed var(--accent);outline-offset:3px}
 .rappel-notes{border:2px solid var(--warm);background:var(--warm-soft)}
+.rappel-notes.vide{padding:10px 14px}.rappel-notes.vide .rthead h2{font-size:16px}.rappel-notes.vide .rthead{gap:8px;align-items:center}.rappel-notes.vide .note{margin:0}
 </style>
 </head>
 <body>
@@ -893,7 +894,7 @@ body.verrou .dgrip,body.readonly .dgrip{display:none}
       <div>
         <h1>Menus de la semaine</h1>
         <p class="sub">Repas du soir · moins de 30 minutes · petit budget</p>
-        <p class="appver" data-appver="67" data-appdate="21/11/2026 à 10:04">Version 67 · mise à jour le 21/11/2026 à 10:04</p>
+        <p class="appver" data-appver="68" data-appdate="21/11/2026 à 10:54">Version 68 · mise à jour le 21/11/2026 à 10:54</p>
       </div>
       <div class="comptehaut" id="comptehaut" hidden></div>
     </div>
@@ -1149,10 +1150,10 @@ body.verrou .dgrip,body.readonly .dgrip{display:none}
   <div class="sfoot" id="sfoot"></div>
 </div>
 
-<script src="vendor/supabase-js-2.45.4.js?v=67"></script>
-<script src="js/partage.js?v=67"></script>
+<script src="vendor/supabase-js-2.45.4.js?v=68"></script>
+<script src="js/partage.js?v=68"></script>
 <!-- Les scripts de data-scripts sont chargés dans cet ordre par js/demarrage.js, une fois donnees/recettes-base.json arrivé (jsPDF n'est chargé qu'à l'export PDF) -->
-<script src="js/demarrage.js?v=67" defer data-scripts="js/donnees.js js/menus.js js/courses.js js/promos.js js/vues.js js/fenetres.js js/pdf.js js/famille.js js/photoplat.js js/app.js"></script>
+<script src="js/demarrage.js?v=68" defer data-scripts="js/donnees.js js/menus.js js/courses.js js/promos.js js/vues.js js/fenetres.js js/pdf.js js/famille.js js/photoplat.js js/app.js"></script>
 
 </body>
 </html>
