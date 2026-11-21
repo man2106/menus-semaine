@@ -883,6 +883,16 @@ body.verrou .dgrip,body.readonly .dgrip{display:none}
 .day.dover{outline:3px dashed var(--accent);outline-offset:3px}
 .rappel-notes{border:2px solid var(--warm);background:var(--warm-soft)}
 </style>
+<style id="style-iphone">
+/* Style iPhone : onglets en bas de l'écran, au-dessus de la zone d'accueil ; sur écran large, rien ne change */
+@media (max-width:700px){
+  body{padding-bottom:calc(68px + env(safe-area-inset-bottom,0px))}
+  nav{position:fixed;top:auto;bottom:0;left:0;right:0;margin:0;padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line);border-bottom:0;background:var(--bg);background:color-mix(in srgb,var(--bg) 94%,transparent);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);z-index:20;justify-content:space-around;gap:2px}
+  nav button{flex:1 1 0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:52px;padding:4px 2px;border-radius:12px;font-size:11px;font-weight:600;background:none;color:var(--muted)}
+  nav button[aria-selected="true"]{background:none;color:var(--accent)}
+  nav button[aria-selected="true"] svg{stroke-width:2.4}
+}
+</style>
 </head>
 <body>
 
@@ -893,7 +903,7 @@ body.verrou .dgrip,body.readonly .dgrip{display:none}
       <div>
         <h1>Menus de la semaine</h1>
         <p class="sub">Repas du soir · moins de 30 minutes · petit budget</p>
-        <p class="appver" data-appver="67" data-appdate="21/11/2026 à 10:04">Version 67 · mise à jour le 21/11/2026 à 10:04</p>
+        <p class="appver" data-appver="69" data-appdate="21/11/2026 à 10:55">Version 69 · mise à jour le 21/11/2026 à 10:55</p>
       </div>
       <div class="comptehaut" id="comptehaut" hidden></div>
     </div>
@@ -1149,10 +1159,10 @@ body.verrou .dgrip,body.readonly .dgrip{display:none}
   <div class="sfoot" id="sfoot"></div>
 </div>
 
-<script src="vendor/supabase-js-2.45.4.js?v=67"></script>
-<script src="js/partage.js?v=67"></script>
+<script src="vendor/supabase-js-2.45.4.js?v=69"></script>
+<script src="js/partage.js?v=69"></script>
 <!-- Les scripts de data-scripts sont chargés dans cet ordre par js/demarrage.js, une fois donnees/recettes-base.json arrivé (jsPDF n'est chargé qu'à l'export PDF) -->
-<script src="js/demarrage.js?v=67" defer data-scripts="js/donnees.js js/menus.js js/courses.js js/promos.js js/vues.js js/fenetres.js js/pdf.js js/famille.js js/photoplat.js js/app.js"></script>
+<script src="js/demarrage.js?v=69" defer data-scripts="js/donnees.js js/menus.js js/courses.js js/promos.js js/vues.js js/fenetres.js js/pdf.js js/famille.js js/photoplat.js js/app.js"></script>
 
 </body>
 </html>
