@@ -1,5 +1,5 @@
 {
- "maj": "2026-11-16",
+ "maj": "2026-11-22",
  "recettes": [
   {
    "id": "pechesthon",
@@ -673,6 +673,278 @@
     "url": "https://www.marmiton.org/recettes/recette_poulet-curry-et-oignons-facile_13026.aspx"
    },
    "ajoute": "2026-11-16"
+  },
+  {
+   "id": "dindecampagnarde",
+   "nom": "Émincés de dinde campagnarde",
+   "acc": "Riz blanc",
+   "t": 30,
+   "b": "moyen",
+   "p": "volaille",
+   "f": "riz",
+   "c": "francaise",
+   "astuce": "Le poulet peut remplacer la dinde sans rien changer.",
+   "ing": [
+    [
+     "Escalopes de dinde",
+     700,
+     "g",
+     "bou"
+    ],
+    [
+     "Carottes",
+     250,
+     "g",
+     "fl"
+    ],
+    [
+     "Petits pois",
+     300,
+     "g",
+     "sur"
+    ],
+    [
+     "Crème fraîche",
+     25,
+     "cl",
+     "cre"
+    ],
+    [
+     "Riz",
+     250,
+     "g",
+     "epi"
+    ]
+   ],
+   "etapes": [
+    "Coupez les escalopes en lanières et faites-les dorer à feu vif dans un peu de beurre ou d'huile, puis salez et poivrez.",
+    "Ajoutez la crème fraîche et laissez frémir deux minutes.",
+    "Pendant ce temps, cuisez les carottes en rondelles et les petits pois à la vapeur, environ 10 minutes.",
+    "Mélangez les légumes à la viande et laissez réchauffer ensemble quelques minutes.",
+    "Servez chaud avec le riz cuit en même temps."
+   ],
+   "source": {
+    "titre": "Marmiton",
+    "url": "https://www.marmiton.org/recettes/recette_eminces-de-dinde-campagnarde_72162.aspx"
+   },
+   "ajoute": "2026-11-22"
+  },
+  {
+   "id": "coliscitron",
+   "nom": "Filets de colin au beurre, citron et persil",
+   "acc": "Pommes de terre vapeur",
+   "t": 25,
+   "b": "moyen",
+   "p": "poisson",
+   "f": "pdt",
+   "c": "francaise",
+   "astuce": "Un filet de citron au dernier moment réveille tout le plat.",
+   "ing": [
+    [
+     "Filets de colin",
+     750,
+     "g",
+     "sur"
+    ],
+    [
+     "Pommes de terre",
+     1000,
+     "g",
+     "fl"
+    ],
+    [
+     "Beurre",
+     40,
+     "g",
+     "cre"
+    ],
+    [
+     "Citrons",
+     1,
+     "",
+     "fl"
+    ],
+    [
+     "Persil",
+     1,
+     "",
+     "fl"
+    ]
+   ],
+   "etapes": [
+    "Épluchez les pommes de terre, coupez-les en morceaux et cuisez-les à la vapeur ou à l'eau salée, environ 15 minutes.",
+    "Faites fondre le beurre dans une grande poêle et déposez les filets de colin.",
+    "Laissez-les cuire environ 4 à 5 minutes de chaque côté, selon leur épaisseur.",
+    "Ajoutez le jus du citron et le persil ciselé, puis retournez les filets une dernière fois.",
+    "Servez aussitôt avec les pommes de terre."
+   ],
+   "source": {
+    "titre": "Marmiton",
+    "url": "https://www.marmiton.org/recettes/recette_filets-de-julienne-aux-amandes_26814.aspx"
+   },
+   "ajoute": "2026-11-22"
+  },
+  {
+   "id": "lentillescorail",
+   "nom": "Lentilles corail façon risotto aux champignons",
+   "acc": "Salade verte",
+   "t": 25,
+   "b": "eco",
+   "p": "vege",
+   "f": "lentilles",
+   "c": "orientale",
+   "astuce": "Ajoutez un peu d'eau en cours de cuisson pour garder une texture crémeuse.",
+   "ing": [
+    [
+     "Lentilles corail",
+     500,
+     "g",
+     "epi"
+    ],
+    [
+     "Oignons",
+     2,
+     "",
+     "fl"
+    ],
+    [
+     "Tomates",
+     2,
+     "",
+     "fl"
+    ],
+    [
+     "Champignons",
+     250,
+     "g",
+     "fl"
+    ]
+   ],
+   "etapes": [
+    "Rincez les lentilles corail plusieurs fois à l'eau froide, jusqu'à ce que l'eau de rinçage soit claire.",
+    "Faites fondre l'oignon émincé dans un peu d'huile d'olive, dans un grand faitout.",
+    "Ajoutez les champignons émincés et les tomates coupées, puis faites revenir quelques minutes.",
+    "Versez les lentilles égouttées et deux verres d'eau, puis laissez mijoter à feu doux en remuant.",
+    "Après une dizaine de minutes, les lentilles sont tendres : assaisonnez et servez."
+   ],
+   "source": {
+    "titre": "Marmiton",
+    "url": "https://www.marmiton.org/recettes/recette_lentilles-corail-vegetariennes_308245.aspx"
+   },
+   "ajoute": "2026-11-22"
+  },
+  {
+   "id": "canardcidre",
+   "nom": "Filets de canard au vinaigre de cidre",
+   "acc": "Riz blanc",
+   "t": 20,
+   "b": "plaisir",
+   "p": "volaille",
+   "f": "riz",
+   "c": "francaise",
+   "astuce": "Le vinaigre de cidre fait ressortir le goût du canard sans sucre ajouté.",
+   "ing": [
+    [
+     "Filets de canard",
+     3,
+     "",
+     "bou"
+    ],
+    [
+     "Beurre",
+     15,
+     "g",
+     "cre"
+    ],
+    [
+     "Oignons",
+     1,
+     "",
+     "fl"
+    ],
+    [
+     "Vinaigre",
+     4,
+     "cl",
+     "epi"
+    ],
+    [
+     "Riz",
+     250,
+     "g",
+     "epi"
+    ]
+   ],
+   "etapes": [
+    "Retirez la peau des filets de canard et coupez la chair en cubes.",
+    "Faites fondre le beurre dans une poêle et faites revenir l'oignon émincé.",
+    "Ajoutez les cubes de canard et laissez-les dorer 5 à 6 minutes en remuant.",
+    "Versez le vinaigre de cidre, salez, poivrez et laissez mijoter doucement quelques minutes.",
+    "Servez avec le riz cuit en même temps."
+   ],
+   "source": {
+    "titre": "Marmiton",
+    "url": "https://www.marmiton.org/recettes/recette_saute-de-canard-au-vinaigre-de-cidre_231694.aspx"
+   },
+   "ajoute": "2026-11-22"
+  },
+  {
+   "id": "pateslegumessaumon",
+   "nom": "Pâtes au saumon, carottes et courgettes",
+   "acc": "Salade verte",
+   "t": 25,
+   "b": "plaisir",
+   "p": "poisson",
+   "f": "pates",
+   "c": "francaise",
+   "astuce": "Coupez les légumes en rondelles fines pour qu'ils cuisent en même temps que le saumon.",
+   "ing": [
+    [
+     "Pavés de saumon",
+     5,
+     "",
+     "sur"
+    ],
+    [
+     "Tagliatelles",
+     500,
+     "g",
+     "epi"
+    ],
+    [
+     "Carottes",
+     250,
+     "g",
+     "fl"
+    ],
+    [
+     "Courgettes",
+     3,
+     "",
+     "fl"
+    ],
+    [
+     "Crème fraîche",
+     20,
+     "cl",
+     "cre"
+    ],
+    [
+     "Persil",
+     1,
+     "",
+     "fl"
+    ]
+   ],
+   "etapes": [
+    "Faites cuire les tagliatelles dans une grande casserole d'eau salée.",
+    "Coupez les carottes et les courgettes en rondelles fines et faites-les revenir à la poêle pendant 8 minutes.",
+    "Déposez les pavés de saumon dans la poêle, salez, poivrez et cuisez-les 3 à 4 minutes de chaque côté.",
+    "Ajoutez la crème fraîche et le persil ciselé, puis laissez chauffer une minute.",
+    "Mélangez les pâtes égouttées avec la sauce aux légumes et servez."
+   ],
+   "propose_par": "Anne",
+   "ajoute": "2026-11-22"
   }
  ],
  "prix": {
