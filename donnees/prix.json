@@ -1,5 +1,5 @@
 {
- "maj": "2026-11-19",
+ "maj": "2026-11-22",
  "releves": [
   {
    "ing": "Biscuits",
@@ -551,6 +551,116 @@
    "date": "2026-11-19",
    "source": "https://www.lidl.be/h/fr-BE/viande-volaille/h10095752",
    "note": "prix vérifié sur la page le 2026-11-19"
+  },
+  {
+   "ing": "Beurre",
+   "produit": "BONI beurre de laiterie doux 250 g",
+   "mag": "okay",
+   "prix": 2.07,
+   "quantite": 0.25,
+   "unite": "kg",
+   "prixUnitaire": 8.28,
+   "date": "2026-11-21"
+  },
+  {
+   "ing": "Fromage en tranches",
+   "produit": "BONI Gouda Belge jeune tranches 350 g",
+   "mag": "okay",
+   "prix": 4.6,
+   "quantite": 0.35,
+   "unite": "kg",
+   "prixUnitaire": 13.14,
+   "date": "2026-11-21"
+  },
+  {
+   "ing": "Chicons",
+   "produit": "BONI chicons 500 g",
+   "mag": "okay",
+   "prix": 2.83,
+   "quantite": 0.5,
+   "unite": "kg",
+   "prixUnitaire": 5.66,
+   "date": "2026-11-21"
+  },
+  {
+   "ing": "Laitue",
+   "produit": "Laitue feuille chêne rouge 1 pc",
+   "mag": "okay",
+   "prix": 1.52,
+   "quantite": 1,
+   "unite": "u",
+   "prixUnitaire": 1.52,
+   "date": "2026-11-21"
+  },
+  {
+   "ing": "Concombre",
+   "produit": "Concombre",
+   "mag": "okay",
+   "prix": 0.98,
+   "quantite": 1,
+   "unite": "u",
+   "prixUnitaire": 0.98,
+   "date": "2026-11-21"
+  },
+  {
+   "ing": "Avocats",
+   "produit": "Avocat XXL 2 pc",
+   "mag": "okay",
+   "prix": 3.99,
+   "quantite": 2,
+   "unite": "u",
+   "prixUnitaire": 2.0,
+   "date": "2026-11-21"
+  },
+  {
+   "ing": "Saumon frais",
+   "produit": "BONI filet saumon Atl. dés. 2x125 g",
+   "mag": "okay",
+   "prix": 5.99,
+   "quantite": 0.25,
+   "unite": "kg",
+   "prixUnitaire": 23.96,
+   "date": "2026-11-21"
+  },
+  {
+   "ing": "Frites au four",
+   "produit": "BONI pommes allumettes 2 kg",
+   "mag": "okay",
+   "prix": 2.78,
+   "quantite": 2,
+   "unite": "kg",
+   "prixUnitaire": 1.39,
+   "date": "2026-11-21"
+  },
+  {
+   "ing": "Sauce soja",
+   "produit": "BONI sauce soja 145 ml",
+   "mag": "okay",
+   "prix": 0.87,
+   "quantite": 1,
+   "unite": "u",
+   "prixUnitaire": 0.87,
+   "date": "2026-11-21"
+  },
+  {
+   "ing": "Mayonnaise",
+   "produit": "DEVOS LEMMENS mayonnaise au citron 550 ml",
+   "mag": "okay",
+   "prix": 2.19,
+   "quantite": 1,
+   "unite": "u",
+   "prixUnitaire": 2.19,
+   "date": "2026-11-21"
+  },
+  {
+   "ing": "Carottes",
+   "produit": "Carottes 2 kg",
+   "mag": "inter",
+   "prix": 2.99,
+   "quantite": 2,
+   "unite": "kg",
+   "prixUnitaire": 1.5,
+   "date": "2026-11-22"
   }
  ]
 }
