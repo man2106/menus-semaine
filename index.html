@@ -413,7 +413,7 @@ section.view-in{animation:viewIn .22s ease-out}
 .jwho{font-weight:700}
 .jtxt{color:var(--ink);min-width:0}
 .jwhen{color:var(--muted);font-size:11.5px;white-space:nowrap}
-body.readonly .edit-only, body.readonly [data-swap], body.readonly [data-pick], body.readonly select[data-cook],
+body.readonly .edit-only, body.readonly .tk-edit, body.readonly [data-swap], body.readonly [data-pick], body.readonly select[data-cook],
 body.readonly #addform, body.readonly [data-del], body.readonly #autoassign, body.readonly #clearassign, body.readonly select[data-add]{display:none!important}
 /* ---- Calendrier de présence ---- */
 .prwrap{overflow-x:auto;margin:0 -4px}
@@ -903,7 +903,7 @@ body.verrou .dgrip,body.readonly .dgrip{display:none}
       <div>
         <h1>Menus de la semaine</h1>
         <p class="sub">Repas du soir · moins de 30 minutes · petit budget</p>
-        <p class="appver" data-appver="72" data-appdate="21/11/2026 à 12:43">Version 72 · mise à jour le 21/11/2026 à 12:43</p>
+        <p class="appver" data-appver="73" data-appdate="22/11/2026 à 12:20">Version 73 · mise à jour le 22/11/2026 à 12:20</p>
       </div>
       <div class="comptehaut" id="comptehaut" hidden></div>
     </div>
@@ -1159,10 +1159,10 @@ body.verrou .dgrip,body.readonly .dgrip{display:none}
   <div class="sfoot" id="sfoot"></div>
 </div>
 
-<script src="vendor/supabase-js-2.45.4.js?v=72"></script>
-<script src="js/partage.js?v=72"></script>
+<script src="vendor/supabase-js-2.45.4.js?v=73"></script>
+<script src="js/partage.js?v=73"></script>
 <!-- Les scripts de data-scripts sont chargés dans cet ordre par js/demarrage.js, une fois donnees/recettes-base.json arrivé (jsPDF n'est chargé qu'à l'export PDF) -->
-<script src="js/demarrage.js?v=72" defer data-scripts="js/donnees.js js/menus.js js/courses.js js/promos.js js/vues.js js/fenetres.js js/pdf.js js/famille.js js/photoplat.js js/app.js"></script>
+<script src="js/demarrage.js?v=73" defer data-scripts="js/donnees.js js/menus.js js/courses.js js/promos.js js/vues.js js/fenetres.js js/pdf.js js/famille.js js/photoplat.js js/app.js"></script>
 
 </body>
 </html>
