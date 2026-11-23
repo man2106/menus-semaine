@@ -1,988 +1,1242 @@
 {
- "maj": "2026-11-22",
- "recettes": [
-  {
-   "id": "pechesthon",
-   "nom": "Pêches au thon et frites",
-   "acc": "Salade et tomates",
-   "t": 25,
-   "b": "eco",
-   "p": "poisson",
-   "f": "pdt",
-   "c": "belge",
-   "astuce": "Un classique belge : préparez la farce pendant que les frites cuisent au four.",
-   "ing": [
-    [
-     "Pêches au sirop",
-     3,
-     "boîte",
-     "epi"
+  "maj": "2026-11-23",
+  "recettes": [
+    {
+      "id": "pechesthon",
+      "nom": "Pêches au thon et frites",
+      "acc": "Salade et tomates",
+      "t": 25,
+      "b": "eco",
+      "p": "poisson",
+      "f": "pdt",
+      "c": "belge",
+      "astuce": "Un classique belge : préparez la farce pendant que les frites cuisent au four.",
+      "ing": [
+        [
+          "Pêches au sirop",
+          3,
+          "boîte",
+          "epi"
+        ],
+        [
+          "Thon au naturel",
+          4,
+          "boîte",
+          "epi"
+        ],
+        [
+          "Mayonnaise",
+          1,
+          "pot",
+          "epi"
+        ],
+        [
+          "Ketchup",
+          1,
+          "flacon",
+          "epi"
+        ],
+        [
+          "Frites au four",
+          1500,
+          "g",
+          "sur"
+        ],
+        [
+          "Laitue",
+          1,
+          "",
+          "fl"
+        ],
+        [
+          "Tomates",
+          5,
+          "",
+          "fl"
+        ],
+        [
+          "Œufs",
+          5,
+          "",
+          "cre"
+        ]
+      ],
+      "etapes": [
+        "Enfournez les frites selon le paquet et cuisez les œufs durs 10 minutes.",
+        "Égouttez le thon et mélangez-le avec 4 cuillères de mayonnaise, un peu de ketchup, sel et poivre.",
+        "Égouttez les demi-pêches et garnissez-les de thon.",
+        "Servez avec la salade, les tomates, les œufs coupés en deux et les frites."
+      ],
+      "propose_par": "Romane",
+      "ajoute": "2026-11-14"
+    },
+    {
+      "id": "lasagnebutternut",
+      "nom": "Lasagnes butternut, pleurotes et épinards à la poêle",
+      "acc": "Salade verte",
+      "t": 30,
+      "b": "moyen",
+      "p": "vege",
+      "f": "pates",
+      "c": "italienne",
+      "astuce": "Version rapide de la recette proposée : les feuilles de lasagne cassées cuisent dans la sauce, sans passer au four.",
+      "ing": [
+        [
+          "Butternut",
+          1000,
+          "g",
+          "fl"
+        ],
+        [
+          "Pleurotes",
+          250,
+          "g",
+          "fl"
+        ],
+        [
+          "Épinards",
+          450,
+          "g",
+          "sur"
+        ],
+        [
+          "Feuilles de lasagne",
+          400,
+          "g",
+          "epi"
+        ],
+        [
+          "Ricotta",
+          250,
+          "g",
+          "cre"
+        ],
+        [
+          "Mozzarella",
+          2,
+          "boule",
+          "cre"
+        ],
+        [
+          "Bouillon de légumes",
+          2,
+          "cube",
+          "epi"
+        ],
+        [
+          "Oignons",
+          1,
+          "",
+          "fl"
+        ]
+      ],
+      "etapes": [
+        "Épluchez la butternut et coupez-la en petits dés ; émincez l'oignon et les pleurotes.",
+        "Faites revenir l'oignon et la butternut 5 minutes dans une grande sauteuse, ajoutez les pleurotes 3 minutes.",
+        "Versez 1 L de bouillon, ajoutez les feuilles de lasagne cassées et les épinards ; couvrez et cuisez 15 minutes en remuant de temps en temps.",
+        "Ajoutez la ricotta par cuillerées et la mozzarella déchirée, couvrez 3 minutes pour la faire fondre."
+      ],
+      "source": {
+        "titre": "Colruyt (lien proposé par Servane)",
+        "url": "https://www.colruyt.be/fr/recettes/lasagne-de-butternut-aux-pleurotes-et-aux-epinards"
+      },
+      "propose_par": "Servane",
+      "ajoute": "2026-11-14"
+    },
+    {
+      "id": "painviandegrec",
+      "nom": "Pains de viande à la grecque, pommes rissolées",
+      "acc": "Salade tomate, concombre et feta",
+      "t": 30,
+      "b": "moyen",
+      "p": "boeuf",
+      "f": "pdt",
+      "c": "grecque",
+      "astuce": "Cuits en petits pains (ou dans des moules à muffins), ils sont prêts en 20 minutes au lieu d'une heure.",
+      "ing": [
+        [
+          "Haché porc-bœuf",
+          700,
+          "g",
+          "bou"
+        ],
+        [
+          "Feta",
+          200,
+          "g",
+          "cre"
+        ],
+        [
+          "Œufs",
+          1,
+          "",
+          "cre"
+        ],
+        [
+          "Chapelure",
+          1,
+          "paquet",
+          "epi"
+        ],
+        [
+          "Origan",
+          1,
+          "pot",
+          "epi"
+        ],
+        [
+          "Pommes de terre",
+          1200,
+          "g",
+          "fl"
+        ],
+        [
+          "Tomates",
+          4,
+          "",
+          "fl"
+        ],
+        [
+          "Concombre",
+          1,
+          "",
+          "fl"
+        ]
+      ],
+      "etapes": [
+        "Préchauffez le four à 210 °C. Coupez les pommes de terre en petits dés et faites-les rissoler 20 minutes à la poêle, à couvert au début.",
+        "Mélangez le haché, l'œuf, 4 cuillères de chapelure, 1 cuillère d'origan et la moitié de la feta émiettée.",
+        "Formez 10 petits pains et enfournez-les 18 minutes.",
+        "Préparez la salade : tomates, concombre, le reste de la feta, origan et huile d'olive."
+      ],
+      "source": {
+        "titre": "Colruyt (lien proposé par Servane)",
+        "url": "https://www.colruyt.be/fr/recettes/pain-de-viande-a-la-grecque-pommes-de-terre-rissolees-et-salade-rafraichissante"
+      },
+      "propose_par": "Servane",
+      "ajoute": "2026-11-14"
+    },
+    {
+      "id": "pinsa",
+      "nom": "Pinsas à l'aubergine, au jambon et à la burrata",
+      "acc": "Roquette",
+      "t": 25,
+      "b": "plaisir",
+      "p": "porc",
+      "f": "pain",
+      "c": "italienne",
+      "astuce": "Les bases de pinsa toutes prêtes se trouvent au rayon frais ; la burrata se pose à la sortie du four.",
+      "ing": [
+        [
+          "Pinsa",
+          5,
+          "",
+          "cre"
+        ],
+        [
+          "Aubergines",
+          2,
+          "",
+          "fl"
+        ],
+        [
+          "Coulis de tomate",
+          40,
+          "cl",
+          "epi"
+        ],
+        [
+          "Jambon cru",
+          150,
+          "g",
+          "bou"
+        ],
+        [
+          "Burrata",
+          3,
+          "",
+          "cre"
+        ],
+        [
+          "Roquette",
+          125,
+          "g",
+          "fl"
+        ]
+      ],
+      "etapes": [
+        "Préchauffez le four à 230 °C. Coupez les aubergines en fines rondelles et faites-les dorer à la poêle avec un peu d'huile.",
+        "Étalez le coulis de tomate sur les pinsas et répartissez les aubergines.",
+        "Enfournez 8 à 10 minutes.",
+        "À la sortie du four, ajoutez le jambon, la burrata déchirée et la roquette."
+      ],
+      "source": {
+        "titre": "Colruyt (lien proposé par Servane)",
+        "url": "https://www.colruyt.be/fr/recettes/pinsa-a-laubergine-au-jambon-et-a-la-burrata"
+      },
+      "propose_par": "Servane",
+      "ajoute": "2026-11-14"
+    },
+    {
+      "id": "lasagnesaumon",
+      "nom": "Lasagnes saumon et épinards à la poêle",
+      "acc": "Salade verte",
+      "t": 30,
+      "b": "plaisir",
+      "p": "poisson",
+      "f": "pates",
+      "c": "italienne",
+      "astuce": "Version rapide de la recette proposée : tout cuit dans la même sauteuse en une demi-heure.",
+      "ing": [
+        [
+          "Saumon frais",
+          600,
+          "g",
+          "sur"
+        ],
+        [
+          "Épinards",
+          600,
+          "g",
+          "sur"
+        ],
+        [
+          "Feuilles de lasagne",
+          400,
+          "g",
+          "epi"
+        ],
+        [
+          "Crème fraîche",
+          25,
+          "cl",
+          "cre"
+        ],
+        [
+          "Lait",
+          40,
+          "cl",
+          "cre"
+        ],
+        [
+          "Fromage râpé",
+          150,
+          "g",
+          "cre"
+        ],
+        [
+          "Oignons",
+          1,
+          "",
+          "fl"
+        ]
+      ],
+      "etapes": [
+        "Faites revenir l'oignon émincé, ajoutez les épinards et laissez-les décongeler 5 minutes.",
+        "Versez le lait, la crème et 30 cl d'eau, salez, poivrez, ajoutez les feuilles de lasagne cassées ; couvrez et cuisez 12 minutes en remuant.",
+        "Ajoutez le saumon en cubes et laissez cuire 5 minutes à couvert.",
+        "Parsemez de fromage râpé et couvrez 2 minutes avant de servir."
+      ],
+      "source": {
+        "titre": "Marmiton (lien proposé par Manu)",
+        "url": "https://www.marmiton.org/recettes/recette_lasagnes-au-saumon-et-aux-epinards_14665.aspx"
+      },
+      "propose_par": "Manu",
+      "ajoute": "2026-11-14"
+    },
+    {
+      "id": "tomatescrevettes",
+      "nom": "Tomates-crevettes à la belge et frites",
+      "acc": "Frites et salade",
+      "t": 25,
+      "b": "plaisir",
+      "p": "poisson",
+      "f": "pdt",
+      "c": "belge",
+      "astuce": "Choisissez des tomates bien fermes et égouttez-les tête en bas pendant que les frites cuisent : la farce reste ferme.",
+      "ing": [
+        [
+          "Tomates",
+          10,
+          "",
+          "fl"
+        ],
+        [
+          "Crevettes grises",
+          500,
+          "g",
+          "bou"
+        ],
+        [
+          "Mayonnaise",
+          1,
+          "pot",
+          "epi"
+        ],
+        [
+          "Citrons",
+          1,
+          "",
+          "fl"
+        ],
+        [
+          "Persil",
+          1,
+          "botte",
+          "fl"
+        ],
+        [
+          "Frites au four",
+          1500,
+          "g",
+          "sur"
+        ],
+        [
+          "Laitue",
+          1,
+          "",
+          "fl"
+        ]
+      ],
+      "etapes": [
+        "Enfournez les frites selon le paquet.",
+        "Coupez un chapeau sur chaque tomate et videz-les à la petite cuillère ; salez l'intérieur et retournez-les pour qu'elles s'égouttent.",
+        "Hachez finement une partie de la chair retirée.",
+        "Mélangez les crevettes avec la mayonnaise, un filet de citron, la chair hachée et un peu de persil.",
+        "Garnissez les tomates, reposez les chapeaux et servez avec les frites et la salade."
+      ],
+      "source": {
+        "titre": "Marmiton",
+        "url": "https://www.marmiton.org/recettes/recette_tomates-crevettes-a-la-belge_39217.aspx"
+      },
+      "ajoute": "2026-11-16"
+    },
+    {
+      "id": "burritosvege",
+      "nom": "Burritos végétariens haricots rouges et maïs",
+      "acc": "Guacamole",
+      "t": 30,
+      "b": "eco",
+      "p": "vege",
+      "f": "riz",
+      "c": "mexicaine",
+      "astuce": "La recette d'origine utilise du quinoa ; le riz marche aussi bien et coûte moins cher.",
+      "ing": [
+        [
+          "Riz",
+          250,
+          "g",
+          "epi"
+        ],
+        [
+          "Bouillon de légumes",
+          1,
+          "cube",
+          "epi"
+        ],
+        [
+          "Oignons",
+          1,
+          "",
+          "fl"
+        ],
+        [
+          "Poivrons",
+          2,
+          "",
+          "fl"
+        ],
+        [
+          "Haricots rouges",
+          2,
+          "boîte",
+          "epi"
+        ],
+        [
+          "Maïs",
+          2,
+          "boîte",
+          "epi"
+        ],
+        [
+          "Coulis de tomate",
+          20,
+          "cl",
+          "epi"
+        ],
+        [
+          "Avocats",
+          2,
+          "",
+          "fl"
+        ],
+        [
+          "Citrons verts",
+          1,
+          "",
+          "fl"
+        ],
+        [
+          "Tortillas",
+          10,
+          "",
+          "epi"
+        ]
+      ],
+      "etapes": [
+        "Cuisez le riz dans de l'eau avec le cube de bouillon.",
+        "Faites revenir l'oignon et les poivrons en lanières 10 minutes.",
+        "Ajoutez haricots rouges et maïs égouttés, le coulis, du paprika et du cumin ; laissez mijoter 5 minutes.",
+        "Écrasez les avocats avec le jus du citron vert et une pincée de sel.",
+        "Garnissez chaque tortilla de riz, de garniture et de guacamole, puis roulez-la.",
+        "Dorez les burritos 2 à 3 minutes de chaque côté dans une poêle sèche."
+      ],
+      "source": {
+        "titre": "Marmiton",
+        "url": "https://www.marmiton.org/recettes/recette_burritos-vegan_528300.aspx"
+      },
+      "ajoute": "2026-11-16"
+    },
+    {
+      "id": "pdtmarocaine",
+      "nom": "Pommes de terre en sauce à la marocaine",
+      "acc": "Pain",
+      "t": 30,
+      "b": "eco",
+      "p": "vege",
+      "f": "pdt",
+      "c": "orientale",
+      "astuce": "Ajoutez les pois chiches pour en faire un plat complet ; un œuf poché dans la sauce est aussi délicieux.",
+      "ing": [
+        [
+          "Pommes de terre",
+          1500,
+          "g",
+          "fl"
+        ],
+        [
+          "Oignons",
+          2,
+          "",
+          "fl"
+        ],
+        [
+          "Tomates",
+          3,
+          "",
+          "fl"
+        ],
+        [
+          "Pois chiches",
+          2,
+          "boîte",
+          "epi"
+        ],
+        [
+          "Persil",
+          1,
+          "botte",
+          "fl"
+        ],
+        [
+          "Pain de campagne",
+          1,
+          "",
+          "bl"
+        ]
+      ],
+      "etapes": [
+        "Faites dorer les oignons émincés dans un peu d'huile.",
+        "Ajoutez les tomates en dés et l'ail, laissez fondre 2 minutes.",
+        "Ajoutez les pommes de terre en cubes, du curcuma, du gingembre, du paprika et la moitié du persil.",
+        "Couvrez presque d'eau, salez et laissez cuire 15 à 18 minutes jusqu'à ce que les pommes de terre soient tendres.",
+        "Ajoutez les pois chiches égouttés 5 minutes avant la fin et parsemez du reste de persil."
+      ],
+      "source": {
+        "titre": "Marmiton",
+        "url": "https://www.marmiton.org/recettes/recette_pommes-de-terre-en-sauce-a-la-marocaine_312958.aspx"
+      },
+      "ajoute": "2026-11-16"
+    },
+    {
+      "id": "poeleechampi",
+      "nom": "Poêlée champignons, carottes, oignons et œufs au plat",
+      "acc": "Baguette",
+      "t": 25,
+      "b": "eco",
+      "p": "oeufs",
+      "f": "pain",
+      "c": "francaise",
+      "astuce": "Coupez les carottes en fines rondelles pour qu'elles cuisent en même temps que les champignons.",
+      "ing": [
+        [
+          "Champignons",
+          1000,
+          "g",
+          "fl"
+        ],
+        [
+          "Carottes",
+          500,
+          "g",
+          "fl"
+        ],
+        [
+          "Oignons",
+          3,
+          "",
+          "fl"
+        ],
+        [
+          "Beurre",
+          40,
+          "g",
+          "cre"
+        ],
+        [
+          "Persil",
+          1,
+          "botte",
+          "fl"
+        ],
+        [
+          "Œufs",
+          10,
+          "",
+          "cre"
+        ],
+        [
+          "Baguettes",
+          2,
+          "",
+          "bl"
+        ]
+      ],
+      "etapes": [
+        "Émincez les oignons, coupez les carottes en fines rondelles et les champignons en lamelles.",
+        "Faites fondre le beurre dans une grande poêle et ajoutez tous les légumes.",
+        "Laissez cuire 15 minutes à feu moyen en remuant, puis salez, poivrez et ajoutez le persil.",
+        "Pendant ce temps, faites cuire les œufs au plat.",
+        "Servez la poêlée avec deux œufs par personne et la baguette."
+      ],
+      "source": {
+        "titre": "Marmiton",
+        "url": "https://www.marmiton.org/recettes/recette_poelee-de-champignons-carottes-et-oignons_25500.aspx"
+      },
+      "ajoute": "2026-11-16"
+    },
+    {
+      "id": "pouletcurryoignons",
+      "nom": "Poulet curry et oignons, riz",
+      "acc": "Riz",
+      "t": 25,
+      "b": "moyen",
+      "p": "volaille",
+      "f": "riz",
+      "c": "indienne",
+      "astuce": "Laissez bien colorer les oignons à feu vif avant d'ajouter le poulet : c'est ce qui donne le goût.",
+      "ing": [
+        [
+          "Blancs de poulet",
+          800,
+          "g",
+          "bou"
+        ],
+        [
+          "Oignons",
+          3,
+          "",
+          "fl"
+        ],
+        [
+          "Crème fraîche",
+          25,
+          "cl",
+          "cre"
+        ],
+        [
+          "Riz",
+          400,
+          "g",
+          "epi"
+        ]
+      ],
+      "etapes": [
+        "Lancez la cuisson du riz.",
+        "Faites revenir les oignons émincés à feu vif dans un peu d'huile.",
+        "Ajoutez le curry et un peu de cumin, puis le poulet en morceaux ; laissez dorer 5 minutes.",
+        "Baissez le feu, ajoutez deux cuillères de crème, puis le reste 5 minutes plus tard.",
+        "Salez, poivrez et servez avec le riz."
+      ],
+      "source": {
+        "titre": "Marmiton",
+        "url": "https://www.marmiton.org/recettes/recette_poulet-curry-et-oignons-facile_13026.aspx"
+      },
+      "ajoute": "2026-11-16"
+    },
+    {
+      "id": "dindecampagnarde",
+      "nom": "Émincés de dinde campagnarde",
+      "acc": "Riz blanc",
+      "t": 30,
+      "b": "moyen",
+      "p": "volaille",
+      "f": "riz",
+      "c": "francaise",
+      "astuce": "Le poulet peut remplacer la dinde sans rien changer.",
+      "ing": [
+        [
+          "Escalopes de dinde",
+          700,
+          "g",
+          "bou"
+        ],
+        [
+          "Carottes",
+          250,
+          "g",
+          "fl"
+        ],
+        [
+          "Petits pois",
+          300,
+          "g",
+          "sur"
+        ],
+        [
+          "Crème fraîche",
+          25,
+          "cl",
+          "cre"
+        ],
+        [
+          "Riz",
+          250,
+          "g",
+          "epi"
+        ]
+      ],
+      "etapes": [
+        "Coupez les escalopes en lanières et faites-les dorer à feu vif dans un peu de beurre ou d'huile, puis salez et poivrez.",
+        "Ajoutez la crème fraîche et laissez frémir deux minutes.",
+        "Pendant ce temps, cuisez les carottes en rondelles et les petits pois à la vapeur, environ 10 minutes.",
+        "Mélangez les légumes à la viande et laissez réchauffer ensemble quelques minutes.",
+        "Servez chaud avec le riz cuit en même temps."
+      ],
+      "source": {
+        "titre": "Marmiton",
+        "url": "https://www.marmiton.org/recettes/recette_eminces-de-dinde-campagnarde_72162.aspx"
+      },
+      "ajoute": "2026-11-22"
+    },
+    {
+      "id": "coliscitron",
+      "nom": "Filets de colin au beurre, citron et persil",
+      "acc": "Pommes de terre vapeur",
+      "t": 25,
+      "b": "moyen",
+      "p": "poisson",
+      "f": "pdt",
+      "c": "francaise",
+      "astuce": "Un filet de citron au dernier moment réveille tout le plat.",
+      "ing": [
+        [
+          "Filets de colin",
+          750,
+          "g",
+          "sur"
+        ],
+        [
+          "Pommes de terre",
+          1000,
+          "g",
+          "fl"
+        ],
+        [
+          "Beurre",
+          40,
+          "g",
+          "cre"
+        ],
+        [
+          "Citrons",
+          1,
+          "",
+          "fl"
+        ],
+        [
+          "Persil",
+          1,
+          "",
+          "fl"
+        ]
+      ],
+      "etapes": [
+        "Épluchez les pommes de terre, coupez-les en morceaux et cuisez-les à la vapeur ou à l'eau salée, environ 15 minutes.",
+        "Faites fondre le beurre dans une grande poêle et déposez les filets de colin.",
+        "Laissez-les cuire environ 4 à 5 minutes de chaque côté, selon leur épaisseur.",
+        "Ajoutez le jus du citron et le persil ciselé, puis retournez les filets une dernière fois.",
+        "Servez aussitôt avec les pommes de terre."
+      ],
+      "source": {
+        "titre": "Marmiton",
+        "url": "https://www.marmiton.org/recettes/recette_filets-de-julienne-aux-amandes_26814.aspx"
+      },
+      "ajoute": "2026-11-22"
+    },
+    {
+      "id": "lentillescorail",
+      "nom": "Lentilles corail façon risotto aux champignons",
+      "acc": "Salade verte",
+      "t": 25,
+      "b": "eco",
+      "p": "vege",
+      "f": "lentilles",
+      "c": "orientale",
+      "astuce": "Ajoutez un peu d'eau en cours de cuisson pour garder une texture crémeuse.",
+      "ing": [
+        [
+          "Lentilles corail",
+          500,
+          "g",
+          "epi"
+        ],
+        [
+          "Oignons",
+          2,
+          "",
+          "fl"
+        ],
+        [
+          "Tomates",
+          2,
+          "",
+          "fl"
+        ],
+        [
+          "Champignons",
+          250,
+          "g",
+          "fl"
+        ]
+      ],
+      "etapes": [
+        "Rincez les lentilles corail plusieurs fois à l'eau froide, jusqu'à ce que l'eau de rinçage soit claire.",
+        "Faites fondre l'oignon émincé dans un peu d'huile d'olive, dans un grand faitout.",
+        "Ajoutez les champignons émincés et les tomates coupées, puis faites revenir quelques minutes.",
+        "Versez les lentilles égouttées et deux verres d'eau, puis laissez mijoter à feu doux en remuant.",
+        "Après une dizaine de minutes, les lentilles sont tendres : assaisonnez et servez."
+      ],
+      "source": {
+        "titre": "Marmiton",
+        "url": "https://www.marmiton.org/recettes/recette_lentilles-corail-vegetariennes_308245.aspx"
+      },
+      "ajoute": "2026-11-22"
+    },
+    {
+      "id": "canardcidre",
+      "nom": "Filets de canard au vinaigre de cidre",
+      "acc": "Riz blanc",
+      "t": 20,
+      "b": "plaisir",
+      "p": "volaille",
+      "f": "riz",
+      "c": "francaise",
+      "astuce": "Le vinaigre de cidre fait ressortir le goût du canard sans sucre ajouté.",
+      "ing": [
+        [
+          "Filets de canard",
+          3,
+          "",
+          "bou"
+        ],
+        [
+          "Beurre",
+          15,
+          "g",
+          "cre"
+        ],
+        [
+          "Oignons",
+          1,
+          "",
+          "fl"
+        ],
+        [
+          "Vinaigre",
+          4,
+          "cl",
+          "epi"
+        ],
+        [
+          "Riz",
+          250,
+          "g",
+          "epi"
+        ]
+      ],
+      "etapes": [
+        "Retirez la peau des filets de canard et coupez la chair en cubes.",
+        "Faites fondre le beurre dans une poêle et faites revenir l'oignon émincé.",
+        "Ajoutez les cubes de canard et laissez-les dorer 5 à 6 minutes en remuant.",
+        "Versez le vinaigre de cidre, salez, poivrez et laissez mijoter doucement quelques minutes.",
+        "Servez avec le riz cuit en même temps."
+      ],
+      "source": {
+        "titre": "Marmiton",
+        "url": "https://www.marmiton.org/recettes/recette_saute-de-canard-au-vinaigre-de-cidre_231694.aspx"
+      },
+      "ajoute": "2026-11-22"
+    },
+    {
+      "id": "pateslegumessaumon",
+      "nom": "Pâtes au saumon, carottes et courgettes",
+      "acc": "Salade verte",
+      "t": 25,
+      "b": "plaisir",
+      "p": "poisson",
+      "f": "pates",
+      "c": "francaise",
+      "astuce": "Coupez les légumes en rondelles fines pour qu'ils cuisent en même temps que le saumon.",
+      "ing": [
+        [
+          "Pavés de saumon",
+          5,
+          "",
+          "sur"
+        ],
+        [
+          "Tagliatelles",
+          500,
+          "g",
+          "epi"
+        ],
+        [
+          "Carottes",
+          250,
+          "g",
+          "fl"
+        ],
+        [
+          "Courgettes",
+          3,
+          "",
+          "fl"
+        ],
+        [
+          "Crème fraîche",
+          20,
+          "cl",
+          "cre"
+        ],
+        [
+          "Persil",
+          1,
+          "",
+          "fl"
+        ]
+      ],
+      "etapes": [
+        "Faites cuire les tagliatelles dans une grande casserole d'eau salée.",
+        "Coupez les carottes et les courgettes en rondelles fines et faites-les revenir à la poêle pendant 8 minutes.",
+        "Déposez les pavés de saumon dans la poêle, salez, poivrez et cuisez-les 3 à 4 minutes de chaque côté.",
+        "Ajoutez la crème fraîche et le persil ciselé, puis laissez chauffer une minute.",
+        "Mélangez les pâtes égouttées avec la sauce aux légumes et servez."
+      ],
+      "propose_par": "Anne",
+      "ajoute": "2026-11-22"
+    },
+    {
+      "id": "choufleurexpress",
+      "nom": "Gratin express de chou-fleur au reblochon",
+      "acc": "Salade verte",
+      "t": 30,
+      "b": "eco",
+      "p": "vege",
+      "f": "legumes",
+      "c": "francaise",
+      "astuce": "Le reblochon donne du goût sans trop de fromage ; la cocotte-minute accélère la cuisson du chou-fleur.",
+      "ing": [
+        [
+          "Chou-fleur",
+          1,
+          "",
+          "fl"
+        ],
+        [
+          "Mascarpone",
+          300,
+          "g",
+          "cre"
+        ],
+        [
+          "Reblochon",
+          1,
+          "",
+          "cre"
+        ],
+        [
+          "Fromage râpé",
+          100,
+          "g",
+          "cre"
+        ]
+      ],
+      "etapes": [
+        "Nettoyer le chou-fleur et le détailler en petits bouquets.",
+        "Le cuire 10 minutes à la vapeur (ou à la cocotte-minute).",
+        "Le mélanger au mascarpone dans un plat à gratin et saler légèrement.",
+        "Ajouter les morceaux de reblochon, puis couvrir de fromage râpé.",
+        "Enfourner à 180 °C pendant environ 10 minutes, jusqu'à ce que le dessus dore."
+      ],
+      "source": {
+        "titre": "Marmiton",
+        "url": "https://www.marmiton.org/recettes/recette_gratin-express-de-chou-fleur_337657.aspx"
+      },
+      "ajoute": "2026-11-23"
+    },
+    {
+      "id": "saucisseslentilles",
+      "nom": "Saucisses et lentilles vertes à la cocotte",
+      "acc": "Moutarde et pain",
+      "t": 30,
+      "b": "eco",
+      "p": "porc",
+      "f": "lentilles",
+      "c": "belge",
+      "astuce": "Les lardons salent déjà : salez les lentilles avec retenue.",
+      "ing": [
+        [
+          "Saucisses fumées",
+          5,
+          "",
+          "bou"
+        ],
+        [
+          "Lardons",
+          150,
+          "g",
+          "bou"
+        ],
+        [
+          "Oignons",
+          2,
+          "",
+          "fl"
+        ],
+        [
+          "Carottes",
+          250,
+          "g",
+          "fl"
+        ],
+        [
+          "Lentilles vertes",
+          300,
+          "g",
+          "epi"
+        ],
+        [
+          "Moutarde",
+          1,
+          "",
+          "epi"
+        ]
+      ],
+      "etapes": [
+        "Piquer les saucisses au couteau.",
+        "Les faire revenir dans la cocotte avec un peu d'huile, puis ajouter les oignons émincés, les carottes en rondelles et les lardons.",
+        "Faire colorer environ 5 minutes.",
+        "Ajouter les lentilles rincées, 1,5 L d'eau, un bouquet garni, du poivre et très peu de sel.",
+        "Fermer la cocotte et cuire 20 minutes à partir de la mise en rotation de la soupape.",
+        "Relever d'un peu de moutarde au moment de servir."
+      ],
+      "source": {
+        "titre": "Marmiton",
+        "url": "https://www.marmiton.org/recettes/recette_saucisses-lentilles-a-la-cocotte-minute_51841.aspx"
+      },
+      "ajoute": "2026-11-23"
+    },
+    {
+      "id": "escalopeveau",
+      "nom": "Escalopes de veau panées et spaghetti",
+      "acc": "Citron et salade",
+      "t": 25,
+      "b": "plaisir",
+      "p": "veau",
+      "f": "pates",
+      "c": "italienne",
+      "astuce": "Des escalopes bien fines dorent plus vite et restent tendres.",
+      "ing": [
+        [
+          "Escalopes de veau",
+          750,
+          "g",
+          "bou"
+        ],
+        [
+          "Œufs",
+          1,
+          "",
+          "cre"
+        ],
+        [
+          "Lait",
+          10,
+          "cl",
+          "cre"
+        ],
+        [
+          "Chapelure",
+          1,
+          "",
+          "epi"
+        ],
+        [
+          "Beurre",
+          30,
+          "g",
+          "cre"
+        ],
+        [
+          "Spaghetti",
+          500,
+          "g",
+          "epi"
+        ],
+        [
+          "Citrons",
+          1,
+          "",
+          "fl"
+        ]
+      ],
+      "etapes": [
+        "Battre l'œuf avec le lait, du sel, du poivre et une pincée de muscade dans une assiette creuse.",
+        "Étaler la chapelure dans une seconde assiette.",
+        "Passer chaque escalope dans l'œuf puis dans la chapelure, en la recouvrant bien.",
+        "Faire dorer les escalopes au beurre dans une poêle, deux à trois minutes de chaque côté.",
+        "Baisser le feu et finir la cuisson quelques minutes selon l'épaisseur.",
+        "Cuire les spaghetti et servir avec les escalopes et une rondelle de citron."
+      ],
+      "source": {
+        "titre": "Marmiton",
+        "url": "https://www.marmiton.org/recettes/recette_escalopes-de-veau-panees_48719.aspx"
+      },
+      "ajoute": "2026-11-23"
+    },
+    {
+      "id": "pennesojacourgette",
+      "nom": "Penne aux lardons, courgettes et sauce soja",
+      "acc": "Salade verte",
+      "t": 25,
+      "b": "eco",
+      "p": "porc",
+      "f": "pates",
+      "c": "italienne",
+      "astuce": "Une pointe de citron et de soja donne une sauce légère et surprenante.",
+      "ing": [
+        [
+          "Penne",
+          500,
+          "g",
+          "epi"
+        ],
+        [
+          "Lardons",
+          500,
+          "g",
+          "bou"
+        ],
+        [
+          "Courgettes",
+          2,
+          "",
+          "fl"
+        ],
+        [
+          "Oignons",
+          1,
+          "",
+          "fl"
+        ],
+        [
+          "Sauce soja",
+          1,
+          "",
+          "epi"
+        ],
+        [
+          "Citrons",
+          1,
+          "",
+          "fl"
+        ],
+        [
+          "Crème fraîche",
+          25,
+          "cl",
+          "cre"
+        ]
+      ],
+      "etapes": [
+        "Faire cuire les penne dans l'eau salée selon le temps indiqué sur le paquet.",
+        "Faire revenir les lardons à sec dans une poêle, puis ajouter l'oignon émincé.",
+        "Ajouter les courgettes coupées en petits dés et cuire à feu moyen jusqu'à ce qu'elles soient à peine croquantes.",
+        "Mélanger la sauce soja, le jus du citron, une pincée de sucre et un peu d'eau ; verser dans la poêle et laisser réduire en sirop.",
+        "Hors du feu, ajouter la crème, mélanger et servir avec les penne."
+      ],
+      "source": {
+        "titre": "Marmiton",
+        "url": "https://www.marmiton.org/recettes/recette_sauce-lardons-et-courgettes_228579.aspx"
+      },
+      "ajoute": "2026-11-23"
+    }
+  ],
+  "prix": {
+    "Pêches au sirop": [
+      1.6,
+      "u"
     ],
-    [
-     "Thon au naturel",
-     4,
-     "boîte",
-     "epi"
+    "Butternut": [
+      2,
+      "kg"
     ],
-    [
-     "Mayonnaise",
-     1,
-     "pot",
-     "epi"
+    "Pleurotes": [
+      12,
+      "kg"
     ],
-    [
-     "Ketchup",
-     1,
-     "flacon",
-     "epi"
+    "Ricotta": [
+      8,
+      "kg"
     ],
-    [
-     "Frites au four",
-     1500,
-     "g",
-     "sur"
+    "Pinsa": [
+      2.2,
+      "u"
     ],
-    [
-     "Laitue",
-     1,
-     "",
-     "fl"
+    "Aubergines": [
+      1.2,
+      "u"
     ],
-    [
-     "Tomates",
-     5,
-     "",
-     "fl"
+    "Burrata": [
+      2.6,
+      "u"
     ],
-    [
-     "Œufs",
-     5,
-     "",
-     "cre"
+    "Origan": [
+      1.5,
+      "u"
+    ],
+    "Crevettes grises": [
+      60,
+      "kg"
+    ],
+    "Chou-fleur": [
+      1.8,
+      "u"
+    ],
+    "Mascarpone": [
+      8,
+      "kg"
     ]
-   ],
-   "etapes": [
-    "Enfournez les frites selon le paquet et cuisez les œufs durs 10 minutes.",
-    "Égouttez le thon et mélangez-le avec 4 cuillères de mayonnaise, un peu de ketchup, sel et poivre.",
-    "Égouttez les demi-pêches et garnissez-les de thon.",
-    "Servez avec la salade, les tomates, les œufs coupés en deux et les frites."
-   ],
-   "propose_par": "Romane",
-   "ajoute": "2026-11-14"
-  },
-  {
-   "id": "lasagnebutternut",
-   "nom": "Lasagnes butternut, pleurotes et épinards à la poêle",
-   "acc": "Salade verte",
-   "t": 30,
-   "b": "moyen",
-   "p": "vege",
-   "f": "pates",
-   "c": "italienne",
-   "astuce": "Version rapide de la recette proposée : les feuilles de lasagne cassées cuisent dans la sauce, sans passer au four.",
-   "ing": [
-    [
-     "Butternut",
-     1000,
-     "g",
-     "fl"
-    ],
-    [
-     "Pleurotes",
-     250,
-     "g",
-     "fl"
-    ],
-    [
-     "Épinards",
-     450,
-     "g",
-     "sur"
-    ],
-    [
-     "Feuilles de lasagne",
-     400,
-     "g",
-     "epi"
-    ],
-    [
-     "Ricotta",
-     250,
-     "g",
-     "cre"
-    ],
-    [
-     "Mozzarella",
-     2,
-     "boule",
-     "cre"
-    ],
-    [
-     "Bouillon de légumes",
-     2,
-     "cube",
-     "epi"
-    ],
-    [
-     "Oignons",
-     1,
-     "",
-     "fl"
-    ]
-   ],
-   "etapes": [
-    "Épluchez la butternut et coupez-la en petits dés ; émincez l'oignon et les pleurotes.",
-    "Faites revenir l'oignon et la butternut 5 minutes dans une grande sauteuse, ajoutez les pleurotes 3 minutes.",
-    "Versez 1 L de bouillon, ajoutez les feuilles de lasagne cassées et les épinards ; couvrez et cuisez 15 minutes en remuant de temps en temps.",
-    "Ajoutez la ricotta par cuillerées et la mozzarella déchirée, couvrez 3 minutes pour la faire fondre."
-   ],
-   "source": {
-    "titre": "Colruyt (lien proposé par Servane)",
-    "url": "https://www.colruyt.be/fr/recettes/lasagne-de-butternut-aux-pleurotes-et-aux-epinards"
-   },
-   "propose_par": "Servane",
-   "ajoute": "2026-11-14"
-  },
-  {
-   "id": "painviandegrec",
-   "nom": "Pains de viande à la grecque, pommes rissolées",
-   "acc": "Salade tomate, concombre et feta",
-   "t": 30,
-   "b": "moyen",
-   "p": "boeuf",
-   "f": "pdt",
-   "c": "grecque",
-   "astuce": "Cuits en petits pains (ou dans des moules à muffins), ils sont prêts en 20 minutes au lieu d'une heure.",
-   "ing": [
-    [
-     "Haché porc-bœuf",
-     700,
-     "g",
-     "bou"
-    ],
-    [
-     "Feta",
-     200,
-     "g",
-     "cre"
-    ],
-    [
-     "Œufs",
-     1,
-     "",
-     "cre"
-    ],
-    [
-     "Chapelure",
-     1,
-     "paquet",
-     "epi"
-    ],
-    [
-     "Origan",
-     1,
-     "pot",
-     "epi"
-    ],
-    [
-     "Pommes de terre",
-     1200,
-     "g",
-     "fl"
-    ],
-    [
-     "Tomates",
-     4,
-     "",
-     "fl"
-    ],
-    [
-     "Concombre",
-     1,
-     "",
-     "fl"
-    ]
-   ],
-   "etapes": [
-    "Préchauffez le four à 210 °C. Coupez les pommes de terre en petits dés et faites-les rissoler 20 minutes à la poêle, à couvert au début.",
-    "Mélangez le haché, l'œuf, 4 cuillères de chapelure, 1 cuillère d'origan et la moitié de la feta émiettée.",
-    "Formez 10 petits pains et enfournez-les 18 minutes.",
-    "Préparez la salade : tomates, concombre, le reste de la feta, origan et huile d'olive."
-   ],
-   "source": {
-    "titre": "Colruyt (lien proposé par Servane)",
-    "url": "https://www.colruyt.be/fr/recettes/pain-de-viande-a-la-grecque-pommes-de-terre-rissolees-et-salade-rafraichissante"
-   },
-   "propose_par": "Servane",
-   "ajoute": "2026-11-14"
-  },
-  {
-   "id": "pinsa",
-   "nom": "Pinsas à l'aubergine, au jambon et à la burrata",
-   "acc": "Roquette",
-   "t": 25,
-   "b": "plaisir",
-   "p": "porc",
-   "f": "pain",
-   "c": "italienne",
-   "astuce": "Les bases de pinsa toutes prêtes se trouvent au rayon frais ; la burrata se pose à la sortie du four.",
-   "ing": [
-    [
-     "Pinsa",
-     5,
-     "",
-     "cre"
-    ],
-    [
-     "Aubergines",
-     2,
-     "",
-     "fl"
-    ],
-    [
-     "Coulis de tomate",
-     40,
-     "cl",
-     "epi"
-    ],
-    [
-     "Jambon cru",
-     150,
-     "g",
-     "bou"
-    ],
-    [
-     "Burrata",
-     3,
-     "",
-     "cre"
-    ],
-    [
-     "Roquette",
-     125,
-     "g",
-     "fl"
-    ]
-   ],
-   "etapes": [
-    "Préchauffez le four à 230 °C. Coupez les aubergines en fines rondelles et faites-les dorer à la poêle avec un peu d'huile.",
-    "Étalez le coulis de tomate sur les pinsas et répartissez les aubergines.",
-    "Enfournez 8 à 10 minutes.",
-    "À la sortie du four, ajoutez le jambon, la burrata déchirée et la roquette."
-   ],
-   "source": {
-    "titre": "Colruyt (lien proposé par Servane)",
-    "url": "https://www.colruyt.be/fr/recettes/pinsa-a-laubergine-au-jambon-et-a-la-burrata"
-   },
-   "propose_par": "Servane",
-   "ajoute": "2026-11-14"
-  },
-  {
-   "id": "lasagnesaumon",
-   "nom": "Lasagnes saumon et épinards à la poêle",
-   "acc": "Salade verte",
-   "t": 30,
-   "b": "plaisir",
-   "p": "poisson",
-   "f": "pates",
-   "c": "italienne",
-   "astuce": "Version rapide de la recette proposée : tout cuit dans la même sauteuse en une demi-heure.",
-   "ing": [
-    [
-     "Saumon frais",
-     600,
-     "g",
-     "sur"
-    ],
-    [
-     "Épinards",
-     600,
-     "g",
-     "sur"
-    ],
-    [
-     "Feuilles de lasagne",
-     400,
-     "g",
-     "epi"
-    ],
-    [
-     "Crème fraîche",
-     25,
-     "cl",
-     "cre"
-    ],
-    [
-     "Lait",
-     40,
-     "cl",
-     "cre"
-    ],
-    [
-     "Fromage râpé",
-     150,
-     "g",
-     "cre"
-    ],
-    [
-     "Oignons",
-     1,
-     "",
-     "fl"
-    ]
-   ],
-   "etapes": [
-    "Faites revenir l'oignon émincé, ajoutez les épinards et laissez-les décongeler 5 minutes.",
-    "Versez le lait, la crème et 30 cl d'eau, salez, poivrez, ajoutez les feuilles de lasagne cassées ; couvrez et cuisez 12 minutes en remuant.",
-    "Ajoutez le saumon en cubes et laissez cuire 5 minutes à couvert.",
-    "Parsemez de fromage râpé et couvrez 2 minutes avant de servir."
-   ],
-   "source": {
-    "titre": "Marmiton (lien proposé par Manu)",
-    "url": "https://www.marmiton.org/recettes/recette_lasagnes-au-saumon-et-aux-epinards_14665.aspx"
-   },
-   "propose_par": "Manu",
-   "ajoute": "2026-11-14"
-  },
-  {
-   "id": "tomatescrevettes",
-   "nom": "Tomates-crevettes à la belge et frites",
-   "acc": "Frites et salade",
-   "t": 25,
-   "b": "plaisir",
-   "p": "poisson",
-   "f": "pdt",
-   "c": "belge",
-   "astuce": "Choisissez des tomates bien fermes et égouttez-les tête en bas pendant que les frites cuisent : la farce reste ferme.",
-   "ing": [
-    [
-     "Tomates",
-     10,
-     "",
-     "fl"
-    ],
-    [
-     "Crevettes grises",
-     500,
-     "g",
-     "bou"
-    ],
-    [
-     "Mayonnaise",
-     1,
-     "pot",
-     "epi"
-    ],
-    [
-     "Citrons",
-     1,
-     "",
-     "fl"
-    ],
-    [
-     "Persil",
-     1,
-     "botte",
-     "fl"
-    ],
-    [
-     "Frites au four",
-     1500,
-     "g",
-     "sur"
-    ],
-    [
-     "Laitue",
-     1,
-     "",
-     "fl"
-    ]
-   ],
-   "etapes": [
-    "Enfournez les frites selon le paquet.",
-    "Coupez un chapeau sur chaque tomate et videz-les à la petite cuillère ; salez l'intérieur et retournez-les pour qu'elles s'égouttent.",
-    "Hachez finement une partie de la chair retirée.",
-    "Mélangez les crevettes avec la mayonnaise, un filet de citron, la chair hachée et un peu de persil.",
-    "Garnissez les tomates, reposez les chapeaux et servez avec les frites et la salade."
-   ],
-   "source": {
-    "titre": "Marmiton",
-    "url": "https://www.marmiton.org/recettes/recette_tomates-crevettes-a-la-belge_39217.aspx"
-   },
-   "ajoute": "2026-11-16"
-  },
-  {
-   "id": "burritosvege",
-   "nom": "Burritos végétariens haricots rouges et maïs",
-   "acc": "Guacamole",
-   "t": 30,
-   "b": "eco",
-   "p": "vege",
-   "f": "riz",
-   "c": "mexicaine",
-   "astuce": "La recette d'origine utilise du quinoa ; le riz marche aussi bien et coûte moins cher.",
-   "ing": [
-    [
-     "Riz",
-     250,
-     "g",
-     "epi"
-    ],
-    [
-     "Bouillon de légumes",
-     1,
-     "cube",
-     "epi"
-    ],
-    [
-     "Oignons",
-     1,
-     "",
-     "fl"
-    ],
-    [
-     "Poivrons",
-     2,
-     "",
-     "fl"
-    ],
-    [
-     "Haricots rouges",
-     2,
-     "boîte",
-     "epi"
-    ],
-    [
-     "Maïs",
-     2,
-     "boîte",
-     "epi"
-    ],
-    [
-     "Coulis de tomate",
-     20,
-     "cl",
-     "epi"
-    ],
-    [
-     "Avocats",
-     2,
-     "",
-     "fl"
-    ],
-    [
-     "Citrons verts",
-     1,
-     "",
-     "fl"
-    ],
-    [
-     "Tortillas",
-     10,
-     "",
-     "epi"
-    ]
-   ],
-   "etapes": [
-    "Cuisez le riz dans de l'eau avec le cube de bouillon.",
-    "Faites revenir l'oignon et les poivrons en lanières 10 minutes.",
-    "Ajoutez haricots rouges et maïs égouttés, le coulis, du paprika et du cumin ; laissez mijoter 5 minutes.",
-    "Écrasez les avocats avec le jus du citron vert et une pincée de sel.",
-    "Garnissez chaque tortilla de riz, de garniture et de guacamole, puis roulez-la.",
-    "Dorez les burritos 2 à 3 minutes de chaque côté dans une poêle sèche."
-   ],
-   "source": {
-    "titre": "Marmiton",
-    "url": "https://www.marmiton.org/recettes/recette_burritos-vegan_528300.aspx"
-   },
-   "ajoute": "2026-11-16"
-  },
-  {
-   "id": "pdtmarocaine",
-   "nom": "Pommes de terre en sauce à la marocaine",
-   "acc": "Pain",
-   "t": 30,
-   "b": "eco",
-   "p": "vege",
-   "f": "pdt",
-   "c": "orientale",
-   "astuce": "Ajoutez les pois chiches pour en faire un plat complet ; un œuf poché dans la sauce est aussi délicieux.",
-   "ing": [
-    [
-     "Pommes de terre",
-     1500,
-     "g",
-     "fl"
-    ],
-    [
-     "Oignons",
-     2,
-     "",
-     "fl"
-    ],
-    [
-     "Tomates",
-     3,
-     "",
-     "fl"
-    ],
-    [
-     "Pois chiches",
-     2,
-     "boîte",
-     "epi"
-    ],
-    [
-     "Persil",
-     1,
-     "botte",
-     "fl"
-    ],
-    [
-     "Pain de campagne",
-     1,
-     "",
-     "bl"
-    ]
-   ],
-   "etapes": [
-    "Faites dorer les oignons émincés dans un peu d'huile.",
-    "Ajoutez les tomates en dés et l'ail, laissez fondre 2 minutes.",
-    "Ajoutez les pommes de terre en cubes, du curcuma, du gingembre, du paprika et la moitié du persil.",
-    "Couvrez presque d'eau, salez et laissez cuire 15 à 18 minutes jusqu'à ce que les pommes de terre soient tendres.",
-    "Ajoutez les pois chiches égouttés 5 minutes avant la fin et parsemez du reste de persil."
-   ],
-   "source": {
-    "titre": "Marmiton",
-    "url": "https://www.marmiton.org/recettes/recette_pommes-de-terre-en-sauce-a-la-marocaine_312958.aspx"
-   },
-   "ajoute": "2026-11-16"
-  },
-  {
-   "id": "poeleechampi",
-   "nom": "Poêlée champignons, carottes, oignons et œufs au plat",
-   "acc": "Baguette",
-   "t": 25,
-   "b": "eco",
-   "p": "oeufs",
-   "f": "pain",
-   "c": "francaise",
-   "astuce": "Coupez les carottes en fines rondelles pour qu'elles cuisent en même temps que les champignons.",
-   "ing": [
-    [
-     "Champignons",
-     1000,
-     "g",
-     "fl"
-    ],
-    [
-     "Carottes",
-     500,
-     "g",
-     "fl"
-    ],
-    [
-     "Oignons",
-     3,
-     "",
-     "fl"
-    ],
-    [
-     "Beurre",
-     40,
-     "g",
-     "cre"
-    ],
-    [
-     "Persil",
-     1,
-     "botte",
-     "fl"
-    ],
-    [
-     "Œufs",
-     10,
-     "",
-     "cre"
-    ],
-    [
-     "Baguettes",
-     2,
-     "",
-     "bl"
-    ]
-   ],
-   "etapes": [
-    "Émincez les oignons, coupez les carottes en fines rondelles et les champignons en lamelles.",
-    "Faites fondre le beurre dans une grande poêle et ajoutez tous les légumes.",
-    "Laissez cuire 15 minutes à feu moyen en remuant, puis salez, poivrez et ajoutez le persil.",
-    "Pendant ce temps, faites cuire les œufs au plat.",
-    "Servez la poêlée avec deux œufs par personne et la baguette."
-   ],
-   "source": {
-    "titre": "Marmiton",
-    "url": "https://www.marmiton.org/recettes/recette_poelee-de-champignons-carottes-et-oignons_25500.aspx"
-   },
-   "ajoute": "2026-11-16"
-  },
-  {
-   "id": "pouletcurryoignons",
-   "nom": "Poulet curry et oignons, riz",
-   "acc": "Riz",
-   "t": 25,
-   "b": "moyen",
-   "p": "volaille",
-   "f": "riz",
-   "c": "indienne",
-   "astuce": "Laissez bien colorer les oignons à feu vif avant d'ajouter le poulet : c'est ce qui donne le goût.",
-   "ing": [
-    [
-     "Blancs de poulet",
-     800,
-     "g",
-     "bou"
-    ],
-    [
-     "Oignons",
-     3,
-     "",
-     "fl"
-    ],
-    [
-     "Crème fraîche",
-     25,
-     "cl",
-     "cre"
-    ],
-    [
-     "Riz",
-     400,
-     "g",
-     "epi"
-    ]
-   ],
-   "etapes": [
-    "Lancez la cuisson du riz.",
-    "Faites revenir les oignons émincés à feu vif dans un peu d'huile.",
-    "Ajoutez le curry et un peu de cumin, puis le poulet en morceaux ; laissez dorer 5 minutes.",
-    "Baissez le feu, ajoutez deux cuillères de crème, puis le reste 5 minutes plus tard.",
-    "Salez, poivrez et servez avec le riz."
-   ],
-   "source": {
-    "titre": "Marmiton",
-    "url": "https://www.marmiton.org/recettes/recette_poulet-curry-et-oignons-facile_13026.aspx"
-   },
-   "ajoute": "2026-11-16"
-  },
-  {
-   "id": "dindecampagnarde",
-   "nom": "Émincés de dinde campagnarde",
-   "acc": "Riz blanc",
-   "t": 30,
-   "b": "moyen",
-   "p": "volaille",
-   "f": "riz",
-   "c": "francaise",
-   "astuce": "Le poulet peut remplacer la dinde sans rien changer.",
-   "ing": [
-    [
-     "Escalopes de dinde",
-     700,
-     "g",
-     "bou"
-    ],
-    [
-     "Carottes",
-     250,
-     "g",
-     "fl"
-    ],
-    [
-     "Petits pois",
-     300,
-     "g",
-     "sur"
-    ],
-    [
-     "Crème fraîche",
-     25,
-     "cl",
-     "cre"
-    ],
-    [
-     "Riz",
-     250,
-     "g",
-     "epi"
-    ]
-   ],
-   "etapes": [
-    "Coupez les escalopes en lanières et faites-les dorer à feu vif dans un peu de beurre ou d'huile, puis salez et poivrez.",
-    "Ajoutez la crème fraîche et laissez frémir deux minutes.",
-    "Pendant ce temps, cuisez les carottes en rondelles et les petits pois à la vapeur, environ 10 minutes.",
-    "Mélangez les légumes à la viande et laissez réchauffer ensemble quelques minutes.",
-    "Servez chaud avec le riz cuit en même temps."
-   ],
-   "source": {
-    "titre": "Marmiton",
-    "url": "https://www.marmiton.org/recettes/recette_eminces-de-dinde-campagnarde_72162.aspx"
-   },
-   "ajoute": "2026-11-22"
-  },
-  {
-   "id": "coliscitron",
-   "nom": "Filets de colin au beurre, citron et persil",
-   "acc": "Pommes de terre vapeur",
-   "t": 25,
-   "b": "moyen",
-   "p": "poisson",
-   "f": "pdt",
-   "c": "francaise",
-   "astuce": "Un filet de citron au dernier moment réveille tout le plat.",
-   "ing": [
-    [
-     "Filets de colin",
-     750,
-     "g",
-     "sur"
-    ],
-    [
-     "Pommes de terre",
-     1000,
-     "g",
-     "fl"
-    ],
-    [
-     "Beurre",
-     40,
-     "g",
-     "cre"
-    ],
-    [
-     "Citrons",
-     1,
-     "",
-     "fl"
-    ],
-    [
-     "Persil",
-     1,
-     "",
-     "fl"
-    ]
-   ],
-   "etapes": [
-    "Épluchez les pommes de terre, coupez-les en morceaux et cuisez-les à la vapeur ou à l'eau salée, environ 15 minutes.",
-    "Faites fondre le beurre dans une grande poêle et déposez les filets de colin.",
-    "Laissez-les cuire environ 4 à 5 minutes de chaque côté, selon leur épaisseur.",
-    "Ajoutez le jus du citron et le persil ciselé, puis retournez les filets une dernière fois.",
-    "Servez aussitôt avec les pommes de terre."
-   ],
-   "source": {
-    "titre": "Marmiton",
-    "url": "https://www.marmiton.org/recettes/recette_filets-de-julienne-aux-amandes_26814.aspx"
-   },
-   "ajoute": "2026-11-22"
-  },
-  {
-   "id": "lentillescorail",
-   "nom": "Lentilles corail façon risotto aux champignons",
-   "acc": "Salade verte",
-   "t": 25,
-   "b": "eco",
-   "p": "vege",
-   "f": "lentilles",
-   "c": "orientale",
-   "astuce": "Ajoutez un peu d'eau en cours de cuisson pour garder une texture crémeuse.",
-   "ing": [
-    [
-     "Lentilles corail",
-     500,
-     "g",
-     "epi"
-    ],
-    [
-     "Oignons",
-     2,
-     "",
-     "fl"
-    ],
-    [
-     "Tomates",
-     2,
-     "",
-     "fl"
-    ],
-    [
-     "Champignons",
-     250,
-     "g",
-     "fl"
-    ]
-   ],
-   "etapes": [
-    "Rincez les lentilles corail plusieurs fois à l'eau froide, jusqu'à ce que l'eau de rinçage soit claire.",
-    "Faites fondre l'oignon émincé dans un peu d'huile d'olive, dans un grand faitout.",
-    "Ajoutez les champignons émincés et les tomates coupées, puis faites revenir quelques minutes.",
-    "Versez les lentilles égouttées et deux verres d'eau, puis laissez mijoter à feu doux en remuant.",
-    "Après une dizaine de minutes, les lentilles sont tendres : assaisonnez et servez."
-   ],
-   "source": {
-    "titre": "Marmiton",
-    "url": "https://www.marmiton.org/recettes/recette_lentilles-corail-vegetariennes_308245.aspx"
-   },
-   "ajoute": "2026-11-22"
-  },
-  {
-   "id": "canardcidre",
-   "nom": "Filets de canard au vinaigre de cidre",
-   "acc": "Riz blanc",
-   "t": 20,
-   "b": "plaisir",
-   "p": "volaille",
-   "f": "riz",
-   "c": "francaise",
-   "astuce": "Le vinaigre de cidre fait ressortir le goût du canard sans sucre ajouté.",
-   "ing": [
-    [
-     "Filets de canard",
-     3,
-     "",
-     "bou"
-    ],
-    [
-     "Beurre",
-     15,
-     "g",
-     "cre"
-    ],
-    [
-     "Oignons",
-     1,
-     "",
-     "fl"
-    ],
-    [
-     "Vinaigre",
-     4,
-     "cl",
-     "epi"
-    ],
-    [
-     "Riz",
-     250,
-     "g",
-     "epi"
-    ]
-   ],
-   "etapes": [
-    "Retirez la peau des filets de canard et coupez la chair en cubes.",
-    "Faites fondre le beurre dans une poêle et faites revenir l'oignon émincé.",
-    "Ajoutez les cubes de canard et laissez-les dorer 5 à 6 minutes en remuant.",
-    "Versez le vinaigre de cidre, salez, poivrez et laissez mijoter doucement quelques minutes.",
-    "Servez avec le riz cuit en même temps."
-   ],
-   "source": {
-    "titre": "Marmiton",
-    "url": "https://www.marmiton.org/recettes/recette_saute-de-canard-au-vinaigre-de-cidre_231694.aspx"
-   },
-   "ajoute": "2026-11-22"
-  },
-  {
-   "id": "pateslegumessaumon",
-   "nom": "Pâtes au saumon, carottes et courgettes",
-   "acc": "Salade verte",
-   "t": 25,
-   "b": "plaisir",
-   "p": "poisson",
-   "f": "pates",
-   "c": "francaise",
-   "astuce": "Coupez les légumes en rondelles fines pour qu'ils cuisent en même temps que le saumon.",
-   "ing": [
-    [
-     "Pavés de saumon",
-     5,
-     "",
-     "sur"
-    ],
-    [
-     "Tagliatelles",
-     500,
-     "g",
-     "epi"
-    ],
-    [
-     "Carottes",
-     250,
-     "g",
-     "fl"
-    ],
-    [
-     "Courgettes",
-     3,
-     "",
-     "fl"
-    ],
-    [
-     "Crème fraîche",
-     20,
-     "cl",
-     "cre"
-    ],
-    [
-     "Persil",
-     1,
-     "",
-     "fl"
-    ]
-   ],
-   "etapes": [
-    "Faites cuire les tagliatelles dans une grande casserole d'eau salée.",
-    "Coupez les carottes et les courgettes en rondelles fines et faites-les revenir à la poêle pendant 8 minutes.",
-    "Déposez les pavés de saumon dans la poêle, salez, poivrez et cuisez-les 3 à 4 minutes de chaque côté.",
-    "Ajoutez la crème fraîche et le persil ciselé, puis laissez chauffer une minute.",
-    "Mélangez les pâtes égouttées avec la sauce aux légumes et servez."
-   ],
-   "propose_par": "Anne",
-   "ajoute": "2026-11-22"
   }
- ],
- "prix": {
-  "Pêches au sirop": [
-   1.6,
-   "u"
-  ],
-  "Butternut": [
-   2,
-   "kg"
-  ],
-  "Pleurotes": [
-   12,
-   "kg"
-  ],
-  "Ricotta": [
-   8,
-   "kg"
-  ],
-  "Pinsa": [
-   2.2,
-   "u"
-  ],
-  "Aubergines": [
-   1.2,
-   "u"
-  ],
-  "Burrata": [
-   2.6,
-   "u"
-  ],
-  "Origan": [
-   1.5,
-   "u"
-  ],
-  "Crevettes grises": [
-   60,
-   "kg"
-  ]
- }
 }
