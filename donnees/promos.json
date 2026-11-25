@@ -1,151 +1,151 @@
 {
- "releve": "19 novembre 2026",
- "date": "2026-11-19",
- "region": "Givry, Quévy, Binche, Mons (15 km)",
- "promos": [
-  {
-   "mag": "okay",
-   "produit": "Entremont raclette nature 250 g (-50 % dès 2, carte Xtra)",
-   "prix": 3.48,
-   "avant": 6.95,
-   "du": "2026-11-18",
-   "au": "2026-12-01",
-   "ing": "Fromage à raclette"
-  },
-  {
-   "mag": "okay",
-   "produit": "Via Italia base à pizza fraîche 4 × 125 g (-50 % dès 2, carte Xtra)",
-   "prix": 2.75,
-   "avant": 5.49,
-   "du": "2026-11-18",
-   "au": "2026-12-01",
-   "ing": "Pâte à pizza"
-  },
-  {
-   "mag": "okay",
-   "produit": "Pinsa Verde (-50 % dès 2, carte Xtra)",
-   "prix": 2.44,
-   "avant": 4.89,
-   "du": "2026-11-18",
-   "au": "2026-12-01",
-   "ing": "Pinsa"
-  },
-  {
-   "mag": "okay",
-   "produit": "OKay cordon bleu de dinde (-33,34 % dès 3, carte Xtra)",
-   "prix": 3.43,
-   "avant": 5.15,
-   "du": "2026-11-18",
-   "au": "2026-12-01",
-   "ing": "Cordons bleus"
-  },
-  {
-   "mag": "okay",
-   "produit": "Beretta assiette raclette (-25 % dès 2, carte Xtra)",
-   "prix": 4.27,
-   "avant": 5.69,
-   "du": "2026-11-18",
-   "au": "2026-12-01",
-   "ing": "Charcuterie assortie"
-  },
-  {
-   "mag": "okay",
-   "produit": "Brugse Delicatesse jambon fumé 4 mois (-25 % dès 2, carte Xtra)",
-   "prix": 2.24,
-   "avant": 2.99,
-   "du": "2026-11-18",
-   "au": "2026-12-01",
-   "ing": "Jambon cru"
-  },
-  {
-   "mag": "okay",
-   "produit": "Boecher steak irlandais (pièce) (-25 % dès 2, carte Xtra)",
-   "prix": 6.74,
-   "avant": 8.99,
-   "du": "2026-11-18",
-   "au": "2026-12-01",
-   "ing": "Steaks de bœuf"
-  },
-  {
-   "mag": "okay",
-   "produit": "Flandrien mi-vieux tranches 200 g (-20 % dès 2, carte Xtra)",
-   "prix": 4.15,
-   "avant": 5.19,
-   "du": "2026-11-18",
-   "au": "2026-12-01",
-   "ing": "Fromage en tranches"
-  },
-  {
-   "mag": "okay",
-   "produit": "Landana fromage à l'ortie tranches (-20 % dès 2, carte Xtra)",
-   "prix": 2.84,
-   "avant": 3.55,
-   "du": "2026-11-18",
-   "au": "2026-12-01",
-   "ing": "Fromage en tranches"
-  },
-  {
-   "mag": "okay",
-   "produit": "Boni Selection fromage d'abbaye tranches (-20 % dès 2, carte Xtra)",
-   "prix": 2.64,
-   "avant": 3.3,
-   "du": "2026-11-18",
-   "au": "2026-12-01",
-   "ing": "Fromage en tranches"
-  },
-  {
-   "mag": "inter",
-   "produit": "Hachis porc et bœuf, prix au kg (6 passata Cirio offertes pour ±2 kg)",
-   "prix": 8.49,
-   "avant": null,
-   "du": "2026-11-24",
-   "au": "2026-11-29",
-   "ing": "Haché porc-bœuf"
-  },
-  {
-   "mag": "inter",
-   "produit": "Magret de canard ±2 × 350 g, prix au kg",
-   "prix": 15.99,
-   "avant": 31.99,
-   "du": "2026-11-24",
-   "au": "2026-11-29",
-   "ing": "Filets de canard"
-  },
-  {
-   "mag": "inter",
-   "produit": "Saucisses italiennes de porc, prix au kg (3+3 gratis)",
-   "prix": 4.99,
-   "avant": 10.09,
-   "du": "2026-11-24",
-   "au": "2026-11-29",
-   "ing": "Saucisses"
-  },
-  {
-   "mag": "inter",
-   "produit": "Jambon à l'os 250 g + 250 g gratis (500 g)",
-   "prix": 5.5,
-   "avant": 11,
-   "du": "2026-11-24",
-   "au": "2026-11-29",
-   "ing": "Jambon cuit"
-  },
-  {
-   "mag": "inter",
-   "produit": "Maître Coq cordons bleus de poulet 800 g / 1 kg (-30 %)",
-   "prix": 7.69,
-   "avant": 10.99,
-   "du": "2026-11-25",
-   "au": "2026-11-29",
-   "ing": "Cordons bleus"
-  },
-  {
-   "mag": "inter",
-   "produit": "Aiguillettes de poulet, prix au kg (-40 %)",
-   "prix": 8.69,
-   "avant": 14.49,
-   "du": "2026-11-24",
-   "au": "2026-11-29",
-   "ing": "Aiguillettes de poulet"
-  }
- ]
+  "releve": "25 novembre 2026",
+  "date": "2026-11-25",
+  "region": "Givry, Quévy, Binche, Mons (15 km)",
+  "promos": [
+    {
+      "mag": "okay",
+      "produit": "Entremont raclette nature 250 g (-50 % dès 2, carte Xtra)",
+      "prix": 3.48,
+      "avant": 6.95,
+      "du": "2026-11-18",
+      "au": "2026-12-01",
+      "ing": "Fromage à raclette"
+    },
+    {
+      "mag": "okay",
+      "produit": "Via Italia base à pizza fraîche 4 × 125 g (-50 % dès 2, carte Xtra)",
+      "prix": 2.75,
+      "avant": 5.49,
+      "du": "2026-11-18",
+      "au": "2026-12-01",
+      "ing": "Pâte à pizza"
+    },
+    {
+      "mag": "okay",
+      "produit": "Pinsa Verde (-50 % dès 2, carte Xtra)",
+      "prix": 2.44,
+      "avant": 4.89,
+      "du": "2026-11-18",
+      "au": "2026-12-01",
+      "ing": "Pinsa"
+    },
+    {
+      "mag": "okay",
+      "produit": "OKay cordon bleu de dinde (-33,34 % dès 3, carte Xtra)",
+      "prix": 3.43,
+      "avant": 5.15,
+      "du": "2026-11-18",
+      "au": "2026-12-01",
+      "ing": "Cordons bleus"
+    },
+    {
+      "mag": "okay",
+      "produit": "Beretta assiette raclette (-25 % dès 2, carte Xtra)",
+      "prix": 4.27,
+      "avant": 5.69,
+      "du": "2026-11-18",
+      "au": "2026-12-01",
+      "ing": "Charcuterie assortie"
+    },
+    {
+      "mag": "okay",
+      "produit": "Brugse Delicatesse jambon fumé 4 mois (-25 % dès 2, carte Xtra)",
+      "prix": 2.24,
+      "avant": 2.99,
+      "du": "2026-11-18",
+      "au": "2026-12-01",
+      "ing": "Jambon cru"
+    },
+    {
+      "mag": "okay",
+      "produit": "Boecher steak irlandais (pièce) (-25 % dès 2, carte Xtra)",
+      "prix": 6.74,
+      "avant": 8.99,
+      "du": "2026-11-18",
+      "au": "2026-12-01",
+      "ing": "Steaks de bœuf"
+    },
+    {
+      "mag": "okay",
+      "produit": "Flandrien mi-vieux tranches 200 g (-20 % dès 2, carte Xtra)",
+      "prix": 4.15,
+      "avant": 5.19,
+      "du": "2026-11-18",
+      "au": "2026-12-01",
+      "ing": "Fromage en tranches"
+    },
+    {
+      "mag": "okay",
+      "produit": "Landana fromage à l'ortie tranches (-20 % dès 2, carte Xtra)",
+      "prix": 2.84,
+      "avant": 3.55,
+      "du": "2026-11-18",
+      "au": "2026-12-01",
+      "ing": "Fromage en tranches"
+    },
+    {
+      "mag": "okay",
+      "produit": "Boni Selection fromage d'abbaye tranches (-20 % dès 2, carte Xtra)",
+      "prix": 2.64,
+      "avant": 3.3,
+      "du": "2026-11-18",
+      "au": "2026-12-01",
+      "ing": "Fromage en tranches"
+    },
+    {
+      "mag": "inter",
+      "produit": "Hachis porc et bœuf, prix au kg (6 passata Cirio offertes pour ±2 kg)",
+      "prix": 8.49,
+      "avant": null,
+      "du": "2026-11-24",
+      "au": "2026-11-29",
+      "ing": "Haché porc-bœuf"
+    },
+    {
+      "mag": "inter",
+      "produit": "Magret de canard ±2 × 350 g, prix au kg",
+      "prix": 15.99,
+      "avant": 31.99,
+      "du": "2026-11-24",
+      "au": "2026-11-29",
+      "ing": "Filets de canard"
+    },
+    {
+      "mag": "inter",
+      "produit": "Saucisses italiennes de porc, prix au kg (3+3 gratis)",
+      "prix": 4.99,
+      "avant": 10.09,
+      "du": "2026-11-24",
+      "au": "2026-11-29",
+      "ing": "Saucisses"
+    },
+    {
+      "mag": "inter",
+      "produit": "Jambon à l'os 250 g + 250 g gratis (500 g)",
+      "prix": 5.5,
+      "avant": 11,
+      "du": "2026-11-24",
+      "au": "2026-11-29",
+      "ing": "Jambon cuit"
+    },
+    {
+      "mag": "inter",
+      "produit": "Maître Coq cordons bleus de poulet 800 g / 1 kg (-30 %)",
+      "prix": 7.69,
+      "avant": 10.99,
+      "du": "2026-11-25",
+      "au": "2026-11-29",
+      "ing": "Cordons bleus"
+    },
+    {
+      "mag": "inter",
+      "produit": "Aiguillettes de poulet, prix au kg (-40 %)",
+      "prix": 8.69,
+      "avant": 14.49,
+      "du": "2026-11-24",
+      "au": "2026-11-29",
+      "ing": "Aiguillettes de poulet"
+    }
+  ]
 }

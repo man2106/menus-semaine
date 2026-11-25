@@ -1,5 +1,5 @@
 {
-  "maj": "2026-11-23",
+  "maj": "2026-11-25",
   "recettes": [
     {
       "id": "pechesthon",
@@ -1191,6 +1191,279 @@
         "url": "https://www.marmiton.org/recettes/recette_sauce-lardons-et-courgettes_228579.aspx"
       },
       "ajoute": "2026-11-23"
+    },
+    {
+      "id": "gratinpoireauxraclette",
+      "nom": "Gratin de poireaux, pommes de terre et lardons à la raclette",
+      "acc": "Salade verte",
+      "t": 30,
+      "b": "eco",
+      "p": "porc",
+      "f": "pdt",
+      "c": "francaise",
+      "astuce": "Des rondelles fines cuisent en 10 minutes au micro-ondes, ce qui fait gagner un bon quart d’heure.",
+      "ing": [
+        [
+          "Pommes de terre",
+          1000,
+          "g",
+          "fl"
+        ],
+        [
+          "Poireaux",
+          3,
+          "",
+          "fl"
+        ],
+        [
+          "Lardons",
+          200,
+          "g",
+          "bou"
+        ],
+        [
+          "Fromage à raclette",
+          200,
+          "g",
+          "cre"
+        ],
+        [
+          "Crème fraîche",
+          20,
+          "cl",
+          "cre"
+        ]
+      ],
+      "etapes": [
+        "Épluchez les pommes de terre, coupez-les en rondelles fines et faites-les cuire 10 minutes au micro-ondes, couvertes, avec un peu d’eau.",
+        "Émincez les poireaux et faites-les fondre 6 minutes dans une poêle avec une noix de beurre.",
+        "Faites dorer les lardons à sec dans la même poêle.",
+        "Dans un plat à gratin, superposez la moitié des pommes de terre, les poireaux et les lardons, puis le reste des pommes de terre.",
+        "Nappez de crème fraîche, poivrez et couvrez de tranches de fromage à raclette.",
+        "Enfournez 15 minutes à 220 °C, jusqu’à ce que le fromage soit bien doré."
+      ],
+      "source": {
+        "titre": "Marmiton",
+        "url": "https://www.marmiton.org/recettes/recette_gratin-de-poireaux-pommes-de-terre-et-bacon-au-fromage-a-raclette_64299.aspx"
+      },
+      "ajoute": "2026-11-25"
+    },
+    {
+      "id": "choufleursaucisses",
+      "nom": "Gratin express de chou-fleur aux saucisses",
+      "acc": "Salade verte",
+      "t": 30,
+      "b": "eco",
+      "p": "porc",
+      "f": "legumes",
+      "c": "belge",
+      "astuce": "Cuire le chou-fleur au micro-ondes avant le four raccourcit beaucoup la cuisson.",
+      "ing": [
+        [
+          "Chou-fleur",
+          1,
+          "",
+          "fl"
+        ],
+        [
+          "Saucisses",
+          5,
+          "",
+          "bou"
+        ],
+        [
+          "Crème fraîche",
+          20,
+          "cl",
+          "cre"
+        ],
+        [
+          "Fromage râpé",
+          100,
+          "g",
+          "cre"
+        ]
+      ],
+      "etapes": [
+        "Séparez le chou-fleur en bouquets et faites-les cuire 8 minutes à la vapeur ou au micro-ondes.",
+        "Coupez les saucisses en tronçons et faites-les dorer 5 minutes dans une poêle.",
+        "Disposez le chou-fleur et les saucisses dans un plat à gratin beurré.",
+        "Mélangez la crème fraîche avec la moitié du fromage râpé, salez légèrement et poivrez.",
+        "Versez cette préparation sur le plat et parsemez du reste de fromage.",
+        "Enfournez 15 à 20 minutes à 210 °C, jusqu’à ce que le dessus soit doré."
+      ],
+      "source": {
+        "titre": "Marmiton",
+        "url": "https://www.marmiton.org/recettes/recette_gratin-de-chou-fleur-rapide-et-facile_51499.aspx"
+      },
+      "ajoute": "2026-11-25"
+    },
+    {
+      "id": "navetsgratinesexpress",
+      "nom": "Navets gratinés express",
+      "acc": "Salade verte",
+      "t": 30,
+      "b": "eco",
+      "p": "vege",
+      "f": "legumes",
+      "c": "francaise",
+      "astuce": "Blanchir les navets quelques minutes adoucit leur goût et raccourcit l’étuvée.",
+      "ing": [
+        [
+          "Navets",
+          5,
+          "",
+          "fl"
+        ],
+        [
+          "Crème fraîche",
+          25,
+          "cl",
+          "cre"
+        ],
+        [
+          "Fromage râpé",
+          120,
+          "g",
+          "cre"
+        ],
+        [
+          "Œufs",
+          2,
+          "",
+          "cre"
+        ]
+      ],
+      "etapes": [
+        "Épluchez les navets, coupez-les en rondelles et blanchissez-les 4 minutes dans de l’eau bouillante salée.",
+        "Égouttez-les et faites-les étuver 12 minutes à couvert dans une noix de beurre, à feu doux.",
+        "Dans un bol, mélangez les jaunes des deux œufs, la crème fraîche et la moitié du fromage râpé ; salez et poivrez.",
+        "Disposez les navets dans un plat beurré et nappez de la préparation.",
+        "Parsemez du reste de fromage.",
+        "Passez sous le gril 8 à 10 minutes, jusqu’à ce que le dessus soit bien doré."
+      ],
+      "source": {
+        "titre": "Marmiton",
+        "url": "https://www.marmiton.org/recettes/recette_navets-au-gratin_82888.aspx"
+      },
+      "ajoute": "2026-11-25"
+    },
+    {
+      "id": "cabillaudmozza",
+      "nom": "Pavés de cabillaud gratinés à la mozzarella",
+      "acc": "Riz ou pommes de terre",
+      "t": 30,
+      "b": "plaisir",
+      "p": "poisson",
+      "f": "legumes",
+      "c": "italienne",
+      "astuce": "Le citron suffit à relever le poisson : inutile d’ajouter du sel en plus de la mozzarella.",
+      "ing": [
+        [
+          "Filets de cabillaud",
+          750,
+          "g",
+          "bou"
+        ],
+        [
+          "Mozzarella",
+          2,
+          "",
+          "cre"
+        ],
+        [
+          "Crème fraîche",
+          10,
+          "cl",
+          "cre"
+        ],
+        [
+          "Parmesan",
+          40,
+          "g",
+          "cre"
+        ],
+        [
+          "Chapelure",
+          1,
+          "",
+          "epi"
+        ],
+        [
+          "Citrons",
+          1,
+          "",
+          "fl"
+        ]
+      ],
+      "etapes": [
+        "Préchauffez le four à 200 °C et huilez un plat à gratin.",
+        "Rincez les filets de cabillaud, essuyez-les et disposez-les dans le plat.",
+        "Arrosez de jus de citron, salez et poivrez.",
+        "Recouvrez de mozzarella en fines lamelles, puis nappez de crème fraîche.",
+        "Parsemez de chapelure mélangée au parmesan râpé.",
+        "Enfournez 20 à 25 minutes, jusqu’à ce que le poisson se défasse facilement à la fourchette."
+      ],
+      "source": {
+        "titre": "Marmiton",
+        "url": "https://www.marmiton.org/recettes/recette_paves-de-cabillaud-gratines-a-la-mozzarella_71916.aspx"
+      },
+      "ajoute": "2026-11-25"
+    },
+    {
+      "id": "chouxbxlsaucisses",
+      "nom": "Poêlée de choux de Bruxelles, carottes et saucisses",
+      "acc": "Purée ou pommes de terre",
+      "t": 30,
+      "b": "eco",
+      "p": "porc",
+      "f": "legumes",
+      "c": "belge",
+      "astuce": "Ajouter les choux coupés en deux plutôt qu’effeuillés raccourcit la préparation.",
+      "ing": [
+        [
+          "Choux de Bruxelles",
+          500,
+          "g",
+          "fl"
+        ],
+        [
+          "Carottes",
+          400,
+          "g",
+          "fl"
+        ],
+        [
+          "Saucisses",
+          5,
+          "",
+          "bou"
+        ],
+        [
+          "Oignons",
+          2,
+          "",
+          "fl"
+        ],
+        [
+          "Crème fraîche",
+          10,
+          "cl",
+          "cre"
+        ]
+      ],
+      "etapes": [
+        "Coupez les choux de Bruxelles en deux et les carottes en fines lamelles.",
+        "Émincez les oignons et faites-les revenir 5 minutes dans une grande poêle avec une noix de beurre.",
+        "Ajoutez les saucisses coupées en tronçons et faites-les dorer.",
+        "Ajoutez les choux, les carottes et 15 cl d’eau, couvrez et laissez cuire 12 minutes à feu moyen.",
+        "Terminez avec la crème fraîche, salez et poivrez avant de servir."
+      ],
+      "source": {
+        "titre": "Marmiton",
+        "url": "https://www.marmiton.org/recettes/recette_choux-de-bruxelles-et-carottes-poeles_67023.aspx"
+      },
+      "ajoute": "2026-11-25"
     }
   ],
   "prix": {
