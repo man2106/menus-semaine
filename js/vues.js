@@ -32,14 +32,15 @@ document.addEventListener("click",e=>{
 });
 // Bandeau « À suivre » : prochain repas et prochaine course
 function renderNext(){
-  let d=state.week.findIndex((_,i)=>dayOffset(i)>=TODAY&&!isOut(i)); if(d<0) d=homeDays()[0]??0;
-  const r=BYID[state.week[d]], isToday=dayOffset(d).getTime()===TODAY.getTime();
+  let d=state.week.findIndex((id,i)=>dayOffset(i)>=TODAY&&!isOut(i)&&BYID[id]); if(d<0) d=homeDays().find(i=>BYID[state.week[i]])??-1;
+  const r=d<0?null:BYID[state.week[d]], isToday=d>=0&&dayOffset(d).getTime()===TODAY.getTime();
   const trips=coursesTrips();
   let t=0;
   const items=trips[t], plan=planTrip(t,items), left=items.filter(i=>!state.checked[i.ck]).length;
   const days=Math.round((tripDate(t)-TODAY)/DAY);
   const when=days===0?"aujourd'hui":days===1?"demain":fmtD(tripDate(t));
-  $("next").innerHTML=`<button class="ncard" data-open="${d}"><img src="${photoSrc(r.id)}" alt="" data-cache-err="1" decoding="async"><div><small>${isToday?"Ce soir":"Prochain repas · "+fmtD(dayOffset(d))}</small><b>${esc(r.nom)}</b><span class="nsub">${r.t} min${state.cooks[d]?" · "+esc(state.cooks[d])+" cuisine":""} · voir la recette</span></div></button>
+  const dd=homeDays().find(i=>!BYID[state.week[i]])??0;
+  $("next").innerHTML=(r?`<button class="ncard" data-open="${d}"><img src="${photoSrc(r.id)}" alt="" data-cache-err="1" decoding="async"><div><small>${isToday?"Ce soir":"Prochain repas · "+fmtD(dayOffset(d))}</small><b>${esc(r.nom)}</b><span class="nsub">${r.t} min${state.cooks[d]?" · "+esc(state.cooks[d])+" cuisine":""} · voir la recette</span></div></button>`:`<button class="ncard edit-only" data-cpick="${dd}"><div><small>Prochain repas</small><b>À décider</b><span class="nsub">Aucun plat prévu · choisir un plat</span></div></button>`)+`
     <button class="ncard" data-gotrip="${t}"><span class="nicon"><svg viewBox="0 0 24 24"><path d="M3 4h2l2.4 11h10.2L20 8H6.2"/><circle cx="9" cy="19.5" r="1.4"/><circle cx="17" cy="19.5" r="1.4"/></svg></span><div><small>Prochaine course · ${when}</small><b>${MAGNOM[plan.primary]}${plan.secondary?" + "+MAGNOM[plan.secondary]:""}</b><span class="nsub">${left?`${left} article${left>1?"s":""} à acheter`:"Tout est dans le caddie"} · ≈ ${kmTxt(plan.route)}</span></div></button>`;
 }
 $("next").addEventListener("click",e=>{const o=e.target.closest("[data-open]"); if(o) openMeal(state.week[+o.dataset.open],+o.dataset.open);});
@@ -52,7 +53,7 @@ function mealItems(id,d){
   });
 }
 function renderModal(){
-  if(!modalCtx) return; const {id,d}=modalCtx, r=BYID[id], items=mealItems(id,d), total=items.reduce((s,i)=>s+i.cost,0);
+  if(!modalCtx) return; if(!BYID[modalCtx.id]){ closeMeal(); return; } const {id,d}=modalCtx, r=BYID[id], items=mealItems(id,d), total=items.reduce((s,i)=>s+i.cost,0);
   $("meyebrow").textContent = d===null ? "Recette" : `${JOURS[d]} ${fmtShort(dayOffset(d))}${state.cooks[d]?" · cuisiné par "+state.cooks[d]:""}`;
   $("mtitle").textContent = r.nom;
   $("mmeta").innerHTML = `<span class="pill">${r.t} min</span><span class="pill cost">≈ ${eur(total)} · ${eur(total/Math.max(1,headcount(d)))} / pers.</span><span>${headcount(d)} à table · avec ${r.acc.toLowerCase()}</span>`;
@@ -70,7 +71,7 @@ function renderModal(){
   const w=dislikesFor(r,d), pp=photoPage(id);
   const ctrl = d===null ? `<div class="mctrl"><button class="btn primary" data-cookmode="1">Cuisiner pas à pas</button>${r.perso?`<button class="btn edit-only" data-editrec="${id}">Modifier</button><button class="btn edit-only owner-only" data-delrec="${id}">${delArm===id?"Confirmer la suppression":"Supprimer"}</button>`:""}</div>`
     : isOut(d) ? `<div class="mout"><b>Ce soir, repas à l'extérieur.</b><span>Ce plat n'est ni compté dans les courses ni dans le budget. Il reste proposé si vos plans changent.</span><button class="btn primary edit-only" data-outtoggle="${d}">Finalement, on mange à la maison</button></div>`
-    : `<div class="mctrl"><button class="btn primary" data-cookmode="1">Cuisiner pas à pas</button><button class="btn edit-only" data-gallery="${d}">Changer de plat</button><button class="btn edit-only" data-swap="${d}">Autre idée</button><button class="btn edit-only" data-outtoggle="${d}">Manger à l'extérieur ce soir</button></div>
+    : `<div class="mctrl"><button class="btn primary" data-cookmode="1">Cuisiner pas à pas</button><button class="btn edit-only" data-gallery="${d}">Changer de plat</button><button class="btn edit-only" data-swap="${d}">Autre idée</button><button class="btn edit-only" data-outtoggle="${d}">Manger à l'extérieur ce soir</button><button class="btn edit-only" data-unset="${d}">Retirer le plat (à décider)</button></div>
        <div class="mcook edit-only"><span>Aux fourneaux</span>${cookSelect(d)}</div>`;
   const avis = state.family.length ? `<section id="avis"><h3><span>L'avis de la famille</span><span class="mtotal">${avisSummary(r)}</span></h3>
       <div class="avislist">${state.family.map((n,i)=>{const v=(state.avis[id]||{})[n]||0;
@@ -89,12 +90,12 @@ function renderModal(){
     ${avis}
     <p class="note">Sel, poivre, huile et ail sont à prendre au placard. Coût estimé selon la gamme ${GAMMES[state.gamme].nom.toLowerCase()}.</p>
     ${d===null?"":`<div class="links"><button class="chip" data-gotrip="${items.find(i=>i.t!==null)?.t??0}">Voir la liste de la course</button><button class="chip" data-goto="courses" data-el="economies">Voir les promos</button></div>
-    <div class="mnav"><button data-mday="${d-1}"${d===0?" disabled":""}><small>← Veille</small>${d>0?esc(BYID[state.week[d-1]].nom):"—"}</button><button data-mday="${d+1}"${d===6?" disabled":""}><small>Lendemain →</small>${d<6?esc(BYID[state.week[d+1]].nom):"—"}</button></div>`}`;
+    <div class="mnav"><button data-mday="${d-1}"${d===0?" disabled":""}><small>← Veille</small>${d>0?(BYID[state.week[d-1]]?esc(BYID[state.week[d-1]].nom):"À décider"):"—"}</button><button data-mday="${d+1}"${d===6?" disabled":""}><small>Lendemain →</small>${d<6?(BYID[state.week[d+1]]?esc(BYID[state.week[d+1]].nom):"À décider"):"—"}</button></div>`}`;
 }
-function openMeal(id,d){ lastFocus=document.activeElement; modalCtx={id,d}; renderModal(); $("overlay").hidden=false; document.body.style.overflow="hidden"; $("mclose").focus(); }
+function openMeal(id,d){ if(!BYID[id]){ if(d!==null&&d!==undefined&&!document.body.classList.contains("readonly")) openSheet({type:"gallery",d}); return; } lastFocus=document.activeElement; modalCtx={id,d}; renderModal(); $("overlay").hidden=false; document.body.style.overflow="hidden"; $("mclose").focus(); }
 function closeMeal(){ modalCtx=null; $("overlay").hidden=true; document.body.style.overflow=""; if(lastFocus&&lastFocus.focus) try{lastFocus.focus()}catch(e){} }
 $("mclose").onclick=closeMeal;
-function modalDay(nd){ if(!modalCtx||modalCtx.d===null||nd<0||nd>6) return; modalCtx={id:state.week[nd],d:nd}; renderModal(); $("modal").scrollTop=0; }
+function modalDay(nd){ if(!modalCtx||modalCtx.d===null||nd<0||nd>6) return; if(!BYID[state.week[nd]]){ closeMeal(); openMeal(null,nd); return; } modalCtx={id:state.week[nd],d:nd}; renderModal(); $("modal").scrollTop=0; }
 $("mbody").addEventListener("click",e=>{const b=e.target.closest("[data-mday]"); if(b&&!b.disabled) modalDay(+b.dataset.mday);});
 document.addEventListener("keydown",e=>{ if(!modalCtx||modalCtx.d===null) return; if(e.key==="ArrowLeft") modalDay(modalCtx.d-1); if(e.key==="ArrowRight") modalDay(modalCtx.d+1); });
 // glisser à gauche/droite pour changer de jour
@@ -247,7 +248,7 @@ function relWeek(){ return ["Cette semaine","Semaine suivante","Dans 2 semaines"
 function goWeek(off){ if(off<0||off>3||off===state.weekOffset) return;
   stashWeek(); state.weekOffset=off; setMonday(off);
   const w=state.weeks[curIso()];
-  if(w&&Array.isArray(w.menu)&&w.menu.length===7&&w.menu.every(id=>BYID[id])) applyWeekData(w);
+  if(w&&menuOk(w.menu)) applyWeekData(w);
   else { state.week=proposeMenu(); state.cooks=Array(7).fill(null); state.checked={}; state.statut="proposition"; state.journal=[]; state.absents={}; state.invites=[0,0,0,0,0,0,0]; state.approbations={}; state.limite=null; state.exterieur=null; state.extras=[]; state.qtEdit={}; state.lieux={}; state.tickets=[]; }
   state.picking=null; applyValidation(); saveLocal(); subscribeWeek(); render();
   urlSemaine(); }
@@ -260,7 +261,7 @@ const sharedPayload=()=>({menu:state.week,cuisiniers:state.cooks,coches:state.ch
 function describeChange(prev,next){
   if(!prev) return "a proposé le menu de la semaine";
   const out=[];
-  next.menu.forEach((id,d)=>{ if(prev.menu&&prev.menu[d]!==id) out.push(`${JOURS[d]} : ${BYID[id].nom}`); });
+  next.menu.forEach((id,d)=>{ if(prev.menu&&prev.menu[d]!==id) out.push(`${JOURS[d]} : ${BYID[id]?BYID[id].nom:"à décider"}`); });
   next.cuisiniers.forEach((c,d)=>{ if((prev.cuisiniers||[])[d]!==c) out.push(`${JOURS[d]} : ${c?c+" aux fourneaux":"personne aux fourneaux"}`); });
   state.family.forEach(n=>{ const a=(prev.absents||{})[n]||[], b=(next.absents||{})[n]||[];
     JOURS.forEach((j,d)=>{ if(a.includes(d)!==b.includes(d)) out.push(`${n} ${b.includes(d)?"absent(e)":"présent(e)"} ${j.toLowerCase()}`); }); });
@@ -295,8 +296,8 @@ function subscribeWeek(){
     if(iso!==curIso()) return;
     if(snap.exists){
       const d=snap.data();
-      if(Array.isArray(d.menu)&&d.menu.length===7&&!d.menu.every(id=>BYID[id])) pendingWeek={iso,d};
-      if(!snap.metadata.hasPendingWrites && Array.isArray(d.menu) && d.menu.length===7 && d.menu.every(id=>BYID[id])){
+      if(Array.isArray(d.menu)&&d.menu.length===7&&d.menu.some(id=>id!==null&&!BYID[id])) pendingWeek={iso,d};
+      if(!snap.metadata.hasPendingWrites && menuOk(d.menu)){
         applyWeekData({menu:d.menu,cooks:d.cuisiniers,checked:d.coches,statut:d.statut,journal:d.journal,absents:d.absents,invites:d.invites,approbations:d.approbations,exterieur:d.exterieur,extras:d.ajouts,quantites:d.quantites,lieux:d.lieux,tickets:d.tickets});
         lastShared=JSON.stringify(sharedPayload()); saveLocal(); render(); if(modalCtx) renderModal();
       }
@@ -411,7 +412,7 @@ function renderApprovals(){
 }
 function shareMessage(){
   return `Bonjour la famille ! Voici les menus du soir proposés pour la semaine du ${weekLabel()} :\n`+
-    state.week.map((id,d)=>isOut(d)?`- ${JOURS[d]} : repas à l'extérieur`:`- ${JOURS[d]} : ${BYID[id].nom}${state.cooks[d]?" (cuisine : "+state.cooks[d]+")":""}`).join("\n")+
+    state.week.map((id,d)=>isOut(d)?`- ${JOURS[d]} : repas à l'extérieur`:`- ${JOURS[d]} : ${BYID[id]?BYID[id].nom:"à décider"}${state.cooks[d]?" (cuisine : "+state.cooks[d]+")":""}`).join("\n")+
     `${limiteTxt()?`\n\nMerci de valider le menu (ou de proposer des changements) avant ${limiteTxt()}.`:""}\n\nVous pouvez changer un plat, choisir qui cuisine et cocher les courses directement dans l'application :\n${window.INVITE_URL||APP_URL}`;
 }
 const APP_URL="https://man2106.github.io/menus-semaine/";
@@ -445,7 +446,7 @@ $("weekbar").addEventListener("click",e=>{
 });
 // ---- Calendrier de présence ----
 function gcalLink(d){
-  const day=dayOffset(d), r=BYID[state.week[d]], ymd=isoOf(day).replace(/-/g,"");
+  const day=dayOffset(d), r=BYID[state.week[d]]||{nom:"plat à décider"}, ymd=isoOf(day).replace(/-/g,"");
   const pres=state.family.filter(n=>!(state.absents[n]||[]).includes(d));
   const det=[`${headcount(d)} à table`, state.cooks[d]?`Cuisine : ${state.cooks[d]}`:"", pres.length?`Présents : ${pres.join(", ")}`:"", state.invites[d]?`Invités : ${state.invites[d]}`:"", "Recette et courses : "+APP_URL].filter(Boolean).join("\n");
   const q=new URLSearchParams({action:"TEMPLATE",text:`Dîner : ${r.nom}`,dates:`${ymd}T190000/${ymd}T200000`,ctz:"Europe/Brussels",details:det});
@@ -454,7 +455,7 @@ function gcalLink(d){
 function planningText(){
   return `Présences aux repas du soir, semaine du ${weekLabel()} :\n`+JOURS.map((j,d)=>{
     const abs=state.family.filter(n=>(state.absents[n]||[]).includes(d));
-    return `- ${j} ${fmtShort(dayOffset(d))} : ${headcount(d)} à table (${BYID[state.week[d]].nom})${abs.length?" · absents : "+abs.join(", "):""}${state.invites[d]?" · invités : "+state.invites[d]:""}${state.cooks[d]?" · cuisine : "+state.cooks[d]:""}`;}).join("\n")+
+    return `- ${j} ${fmtShort(dayOffset(d))} : ${headcount(d)} à table (${BYID[state.week[d]]?BYID[state.week[d]].nom:"plat à décider"})${abs.length?" · absents : "+abs.join(", "):""}${state.invites[d]?" · invités : "+state.invites[d]:""}${state.cooks[d]?" · cuisine : "+state.cooks[d]:""}`;}).join("\n")+
     `\n\nIndiquez vos absences dans l'application :\n${APP_URL}`;
 }
 function renderPresences(){

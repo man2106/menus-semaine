@@ -34,7 +34,7 @@ function subscribeRecettes(){ if(!DB) return; if(unsubRec) unsubRec();
         if(!state.week.includes(x.id)){ const i=RECETTES.findIndex(r=>r.id===x.id); if(i>=0) RECETTES.splice(i,1); delete BYID[x.id]; } changed=true; }
       else { const r=registerRecipe(x); if(r){ state.perso=[...state.perso.filter(p=>p.id!==r.id),r]; changed=true; } } });
     if(changed){ saveLocal();
-      if(pendingWeek&&pendingWeek.iso===curIso()&&pendingWeek.d.menu.every(id=>BYID[id])){ const d=pendingWeek.d; pendingWeek=null;
+      if(pendingWeek&&pendingWeek.iso===curIso()&&menuOk(pendingWeek.d.menu)){ const d=pendingWeek.d; pendingWeek=null;
         applyWeekData({menu:d.menu,cooks:d.cuisiniers,checked:d.coches,statut:d.statut,journal:d.journal,absents:d.absents,invites:d.invites,approbations:d.approbations,exterieur:d.exterieur,extras:d.ajouts,quantites:d.quantites,lieux:d.lieux,tickets:d.tickets}); lastShared=JSON.stringify(sharedPayload()); }
       render(); if(modalCtx&&BYID[modalCtx.id]) renderModal(); }
   },()=>{}); }
@@ -274,6 +274,8 @@ $("mbody").addEventListener("click",e=>{ const b=e.target.closest("button"); if(
   if(D.avis){ const [i,v]=D.avis.split("|").map(Number); setAvis(modalCtx.id,state.family[i],v); return; }
   if(D.outtoggle){ toggleOut(+D.outtoggle); return; }
   if(D.gallery){ openSheet({type:"gallery",d:+D.gallery}); return; }
+  if(D.unset){ const d=+D.unset; if(verrouille()){ toast("Menu figé : validé par toute la famille ou semaine commencée"); return; } const prev=state.week[d]; state.week[d]=null; closeMeal(); save(); render();
+    toast(JOURS[d]+" : à décider",()=>{ state.week[d]=prev; save(); render(); toast("Plat rétabli"); }); return; }
   if(D.swap){ const d=+D.swap, prev=state.week[d];
     const pool=RECETTES.filter(r=>!state.week.includes(r.id)&&!dislikesFor(r,d).length); const alt=(pool.length?pool:RECETTES.filter(r=>r.id!==prev));
     const pick=alt[Math.floor(Math.random()*alt.length)].id; replaceDay(d,pick); modalCtx.id=state.week[d]; renderModal(); return; }

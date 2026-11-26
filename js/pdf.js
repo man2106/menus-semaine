@@ -30,7 +30,7 @@ function buildPdf(){
   // menus de la semaine
   doc.setDrawColor(220,227,214); doc.setFillColor(245,247,241); const mh=7*5.2+6; doc.roundedRect(M,y,W-2*M,mh,2,2,"FD"); let yy=y+6;
   doc.setFontSize(9.5); state.week.forEach((id,d)=>{ doc.setFont("helvetica","bold"); doc.setTextColor(...ACC); doc.text(T(`${JOURS[d]} ${fmtShort(dayOffset(d))}`),M+4,yy);
-    doc.setFont("helvetica","normal"); doc.setTextColor(...INK); doc.text(T(`${BYID[id].nom} · ${headcount(d)} à table${state.cooks[d]?" · "+state.cooks[d]+" cuisine":""}`),M+34,yy); yy+=5.2; });
+    doc.setFont("helvetica","normal"); doc.setTextColor(...INK); doc.text(T(`${id&&BYID[id]?BYID[id].nom:"à décider"} · ${headcount(d)} à table${state.cooks[d]?" · "+state.cooks[d]+" cuisine":""}`),M+34,yy); yy+=5.2; });
   y+=mh+8;
   const trips=coursesTrips();
   exportTrips().forEach(t=>{ const all=trips[t], plan=planTrip(t,all), items=exportItems(t,all); if(!items.length) return;
@@ -93,14 +93,14 @@ async function exportPdf(btn){
 function exportKindChips(){ const k=sheetCtx.kind; return `<div class="gfilters">${[["courses","Liste de courses"],["menu","Menu de la semaine"]].map(([v,l])=>`<button class="chip${k===v?" on":""}" data-xkind="${v}">${l}</button>`).join("")}</div>`; }
 // ---- Export du menu de la semaine ----
 function menuRows(){ return state.week.map((id,d)=>{ const r=BYID[id], abs=state.family.filter(n=>(state.absents[n]||[]).includes(d));
-  return {d,r,date:dayOffset(d),hc:headcount(d),cook:state.cooks[d],abs,inv:state.invites[d]||0,cost:recipeCost(r,undefined,d),out:isOut(d)}; }); }
+  return {d,r,date:dayOffset(d),hc:headcount(d),cook:state.cooks[d],abs,inv:state.invites[d]||0,cost:r?recipeCost(r,undefined,d):0,out:isOut(d)}; }); }
 function menuText(){
   const {ok,wait}=approvalStats();
   let t=`Menus du soir · semaine du ${weekLabel()}\nStatut : ${state.statut==="valide"?"menu validé":"proposition à discuter"}${limiteTxt()?` · réponse attendue avant ${limiteTxt()}`:""}\n\n`;
-  menuRows().forEach(x=>{ if(x.out){ t+=`${JOURS[x.d]} ${fmtShort(x.date)} : repas à l'extérieur\n`; return; } t+=`${JOURS[x.d]} ${fmtShort(x.date)} : ${x.r.nom}${x.r.acc?" (avec "+x.r.acc.toLowerCase()+")":""}\n   ${x.r.t} min · ${x.hc} couvert${x.hc>1?"s":""}${x.abs.length?" · absents : "+x.abs.join(", "):""}${x.inv?" · invités : "+x.inv:""} · cuisine : ${x.cook||"à définir"}\n`; });
+  menuRows().forEach(x=>{ if(x.out){ t+=`${JOURS[x.d]} ${fmtShort(x.date)} : repas à l'extérieur\n`; return; } if(!x.r){ t+=`${JOURS[x.d]} ${fmtShort(x.date)} : à décider\n`; return; } t+=`${JOURS[x.d]} ${fmtShort(x.date)} : ${x.r.nom}${x.r.acc?" (avec "+x.r.acc.toLowerCase()+")":""}\n   ${x.r.t} min · ${x.hc} couvert${x.hc>1?"s":""}${x.abs.length?" · absents : "+x.abs.join(", "):""}${x.inv?" · invités : "+x.inv:""} · cuisine : ${x.cook||"à définir"}\n`; });
   t+=`\n${totalCouverts()} couverts dans la semaine · budget estimé ${eur(weekCost(state.gamme))}\n`;
   if(state.family.length) t+=`\nOnt validé : ${ok.length?ok.join(", "):"personne pour l'instant"}\nEn attente : ${wait.length?wait.join(", "):"personne"}\n`;
-  if(sheetCtx&&sheetCtx.withRecipes) menuRows().filter(x=>!x.out).forEach(x=>{ t+=`\n--- ${x.r.nom} (${JOURS[x.d]}, ${x.hc} pers.) ---\nIngrédients : ${x.r.ing.map(([n,q,u])=>n+" "+fmt(scale(q,x.d),u)).join(", ")}\n${getSteps(x.r.id).map((s,i)=>(i+1)+". "+s).join("\n")}\n`; });
+  if(sheetCtx&&sheetCtx.withRecipes) menuRows().filter(x=>!x.out&&x.r).forEach(x=>{ t+=`\n--- ${x.r.nom} (${JOURS[x.d]}, ${x.hc} pers.) ---\nIngrédients : ${x.r.ing.map(([n,q,u])=>n+" "+fmt(scale(q,x.d),u)).join(", ")}\n${getSteps(x.r.id).map((s,i)=>(i+1)+". "+s).join("\n")}\n`; });
   return t+`\n${APP_URL}`;
 }
 // Photo d'un plat en data URL pour le PDF (photos publiées avec la page ou recette de famille)
@@ -120,7 +120,7 @@ async function buildMenuPdf(){
   const sw=doc.getTextWidth(stT)+8; doc.setFillColor(...(state.statut==="valide"?ACCS:WARMS)); doc.roundedRect(PW-M-sw,M,sw,7,3.5,3.5,"F");
   doc.setTextColor(...(state.statut==="valide"?ACC:WARM)); doc.text(stT,PW-M-sw+4,M+4.9);
   if(limiteTxt()){ doc.setFont("helvetica","normal"); doc.setFontSize(9); doc.setTextColor(...MUT); doc.text(T(`Réponse attendue avant ${limiteTxt()}`),PW-M,M+12,{align:"right"}); }
-  const rows=menuRows(), photos=await Promise.all(rows.map(x=>x.out?null:photoData(x.r.id)));
+  const rows=menuRows(), photos=await Promise.all(rows.map(x=>x.out||!x.r?null:photoData(x.r.id)));
   rows.forEach((x,i)=>{ const col=i%COLS, row=Math.floor(i/COLS), X=M+col*(bw+GAP), Y=top+row*(bh+GAP);
     const today=x.date.getTime()===TODAY.getTime();
     doc.setDrawColor(...(today?ACC:LINE)); doc.setLineWidth(today?0.8:0.3); doc.setFillColor(...(x.out?BG:[255,255,255])); doc.roundedRect(X,Y,bw,bh,3,3,"FD");
@@ -131,6 +131,8 @@ async function buildMenuPdf(){
     let y=Y+9;
     if(x.out){ doc.setFont("helvetica","bold"); doc.setFontSize(14); doc.setTextColor(...MUT); doc.text(T("Repas à l'extérieur"),X+bw/2,Y+bh/2,{align:"center"});
       doc.setFont("helvetica","normal"); doc.setFontSize(9); doc.text(T("Pas de cuisine ni de courses"),X+bw/2,Y+bh/2+6,{align:"center"}); return; }
+    if(!x.r){ doc.setFont("helvetica","bold"); doc.setFontSize(14); doc.setTextColor(...WARM); doc.text(T("À décider"),X+bw/2,Y+bh/2,{align:"center"});
+      doc.setFont("helvetica","normal"); doc.setFontSize(9); doc.setTextColor(...MUT); doc.text(T("Aucun plat prévu"),X+bw/2,Y+bh/2+6,{align:"center"}); return; }
     const ph=photos[i], ih=26;
     if(ph){ try{ doc.addImage(ph,"JPEG",X+0.3,y,bw-0.6,ih,undefined,"FAST"); y+=ih; }catch(e){} }
     y+=5;
@@ -160,7 +162,7 @@ async function buildMenuPdf(){
   // pages de recettes (portrait)
   if(sheetCtx&&sheetCtx.withRecipes){ const W=210, M2=16, BOT=282; let y;
     const need=h=>{ if(y+h>BOT){ doc.addPage("a4","portrait"); y=M2; } };
-    rows.filter(x=>!x.out).forEach(x=>{ doc.addPage("a4","portrait"); y=M2;
+    rows.filter(x=>!x.out&&x.r).forEach(x=>{ doc.addPage("a4","portrait"); y=M2;
       doc.setFont("helvetica","bold"); doc.setFontSize(9); doc.setTextColor(...ACC); doc.text(T(`${JOURS[x.d].toUpperCase()} ${fmtShort(x.date)} · ${x.hc} COUVERTS${x.cook?" · CUISINE : "+x.cook.toUpperCase():""}`),M2,y); y+=8;
       doc.setFontSize(18); doc.setTextColor(...INK); doc.text(T(x.r.nom),M2,y); y+=6;
       doc.setFont("helvetica","normal"); doc.setFontSize(10); doc.setTextColor(...MUT); doc.text(T(`${x.r.t} min${x.r.acc?" · avec "+x.r.acc.toLowerCase():""} · coût estimé ${eur(x.cost)}`),M2,y); y+=9;

@@ -123,7 +123,7 @@ function promoFactor(n){ const ps=promosFor(n).filter(p=>p.avant); return ps.len
 function itemCost(n,u,q,ray,g){ const p=PRIX[n]; if(!p) return 0; const gm=GAMMES[g||state.gamme].m[ray]||1;
   const qty = u==="g"? q/1000 : u==="cl"? q/100 : q; return p[0]*qty*gm*promoFactor(n); }
 function recipeCost(r,g,d){ return r.ing.reduce((s,[n,q,u,ray])=>s+itemCost(n,u,scale(q,d),ray,g),0) + (r.prix? r.prix*headcount(d)/5*GAMMES[g||state.gamme].m.epi : 0); }
-function weekCost(g){ return state.week.reduce((s,id,d)=>s+recipeCost(BYID[id],g,d),0); }
+function weekCost(g){ return state.week.reduce((s,id,d)=>s+(BYID[id]?recipeCost(BYID[id],g,d):0),0); }
 function renderMix(){ const home=[0,1,2,3,4,5,6].filter(d=>!isOut(d)), q=mixFor(home.length), now={eco:0,moyen:0,plaisir:0}, P={}, F={};
   home.forEach(d=>{ const r=BYID[state.week[d]]; if(!r) return; now[budgetOf(r)]++; if(r.p) P[r.p]=(P[r.p]||0)+1; if(r.f) F[r.f]=(F[r.f]||0)+1; });
   const step=(k,v,max)=>`<span class="mixstep"><button class="sbtn edit-only" data-mix="${k}" data-dv="-1" ${v<=0?"disabled":""} aria-label="Un de moins">−</button><b>${v}</b><button class="sbtn edit-only" data-mix="${k}" data-dv="1" ${max<=0?"disabled":""} aria-label="Un de plus">+</button></span>`;
@@ -141,13 +141,13 @@ function renderMix(){ const home=[0,1,2,3,4,5,6].filter(d=>!isOut(d)), q=mixFor(
 function renderBudget(){
   const couverts=totalCouverts()||1, per=v=>eur(v/couverts);
   const g=GAMMES[state.gamme], w=weekCost(state.gamme);
-  const sorted=state.week.map((id,d)=>({d,r:BYID[id],c:recipeCost(BYID[id],state.gamme)/state.persons})).sort((a,b)=>a.c-b.c);
+  const sorted=state.week.map((id,d)=>BYID[id]?({d,r:BYID[id],c:recipeCost(BYID[id],state.gamme)/state.persons}):null).filter(Boolean).sort((a,b)=>a.c-b.c);
   $("budget").innerHTML=`<h2>Prix de revient de la semaine</h2>
     <div class="bigcost"><span>${eur(w)}</span><small>soit ${per(w)} par personne et par repas · ${totalCouverts()} couverts dans la semaine · gamme ${g.nom.toLowerCase()}</small></div>
     <div class="gammes" role="radiogroup" aria-label="Gamme de produits">${Object.entries(GAMMES).map(([k,x])=>{const c=weekCost(k);
       return `<button class="gamme" role="radio" aria-checked="${k===state.gamme}" data-gamme="${k}"><b>${x.nom}</b><span class="gc">${eur(c)}</span><small>${per(c)} / pers. / repas</small><small class="gd">${x.desc}</small><small class="gd">Où : ${x.ou}</small></button>`}).join("")}</div>
     ${renderMix()}
-    <p class="note">Le plus économique cette semaine : ${sorted[0].r.nom.toLowerCase()} (${eur(sorted[0].c)} par personne). Le plus cher : ${sorted[6].r.nom.toLowerCase()} (${eur(sorted[6].c)} par personne).</p>
+    ${sorted.length?`<p class="note">Le plus économique cette semaine : ${sorted[0].r.nom.toLowerCase()} (${eur(sorted[0].c)} par personne). Le plus cher : ${sorted[sorted.length-1].r.nom.toLowerCase()} (${eur(sorted[sorted.length-1].c)} par personne).</p>`:""}
     <p class="note">Estimation à partir de prix indicatifs, promos de la semaine déduites. Les ingrédients sont comptés à la quantité utilisée, pas au paquet entier.</p>`;
   const absN=Object.values(state.absents).reduce((s,a)=>s+a.length,0);
   $("budgetsum").innerHTML=`<span class="sumtitle">Budget</span><span class="sumval">≈ ${eur(w)} · ${per(w)} par repas · ${totalCouverts()} couverts${absN?` · ${absN} absence${absN>1?"s":""}`:""}</span>`;

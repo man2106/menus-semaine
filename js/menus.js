@@ -1,4 +1,6 @@
 // ---- Dates : semaine planifiée et validité des promos ----
+// Menu de la semaine : 7 entrées, chacune un id de recette valide ou null (« pas encore décidé »)
+const menuOk = m => Array.isArray(m)&&m.length===7&&m.every(id=>id===null||!!BYID[id]);
 const isoDate = s => { const [y,m,d]=s.split("-").map(Number); return new Date(y,m-1,d); };
 const TODAY = (()=>{const t=new Date(); t.setHours(0,0,0,0); return t;})();
 let MONDAY = (()=>{const dow=(TODAY.getDay()+6)%7; const m=new Date(TODAY); m.setDate(TODAY.getDate()-dow+(dow>=4?7:0)); return m;})();
@@ -33,7 +35,7 @@ const DEFAUT = ["carbo","omelette","wraps","cantonais","croque","chili","quiche"
 const KEY = "menus-semaine-v1";
 
 let state = {week:[...DEFAUT], persons:5, checked:{}, tab:"menu", picking:null, family:[], cooks:Array(7).fill(null), prices:{}, trip1:"sam", trip2:3, tripStore:[null,null], gamme:"eco", maxStores:1, seuil:2, weekOffset:0, weeks:{}, statut:"proposition", journal:[], approbations:{}, limite:null, exterieur:null, outDefault:[5], absents:{}, invites:[0,0,0,0,0,0,0], extras:[], emails:{}, perso:[], avis:{}, exclus:{}, storePref:null, onboarded:false};
-try{const s=JSON.parse(localStorage.getItem(KEY)||"null"); if(s&&Array.isArray(s.perso)) s.perso.forEach(registerRecipe); if(s&&Array.isArray(s.week)&&s.week.every(id=>BYID[id])) state={...state,...s,picking:null};}catch(e){}
+try{const s=JSON.parse(localStorage.getItem(KEY)||"null"); if(s&&Array.isArray(s.perso)) s.perso.forEach(registerRecipe); if(s&&menuOk(s.week)) state={...state,...s,picking:null};}catch(e){}
 if(!Array.isArray(state.family)) state.family=[];
 if(!state.prices||typeof state.prices!=="object") state.prices={};
 if(!["sam","lun"].includes(state.trip1)) state.trip1="sam";
@@ -95,7 +97,7 @@ function cleanLieux(o){ const r={}; if(o&&typeof o==="object") Object.entries(o)
 function cleanQt(o){ const r={}; if(o&&typeof o==="object") Object.entries(o).slice(0,300).forEach(([k,v])=>{ if(typeof k==="string"&&k.length<=90&&typeof v==="string"&&v.trim()) r[k]=propre(v,20); }); return r; }
 function cleanTickets(a){ return Array.isArray(a)?a.filter(x=>x&&+x.montant>0&&+x.montant<5000).slice(0,10).map(x=>({montant:Math.round(+x.montant*100)/100,mag:typeof x.mag==="string"?x.mag.replace(/[<>"'`]/g,"").slice(0,40):"",quand:typeof x.quand==="string"?x.quand.slice(0,30):"",estime:+x.estime>0?Math.round(+x.estime*100)/100:null,par:propre(x.par,30)})):[]; }
 function cleanExtras(a){ return Array.isArray(a)? a.filter(x=>x&&typeof x.n==="string"&&x.n.trim()&&x.id).slice(0,200).map(x=>({id:String(x.id).slice(0,40),n:String(x.n).trim().slice(0,60),qt:String(x.qt||"").slice(0,20),ray:RAYONS[x.ray]?x.ray:"epi",t:x.t===1?1:0,par:String(x.par||"").replace(/[^0-9a-f-]/g,"").slice(0,36)})) : []; }
-{ const w=state.weeks[curIso()]; if(w&&Array.isArray(w.menu)&&w.menu.length===7&&w.menu.every(id=>BYID[id])) applyWeekData(w); }
+{ const w=state.weeks[curIso()]; if(w&&menuOk(w.menu)) applyWeekData(w); }
 if(!Array.isArray(state.cooks)||state.cooks.length!==7) state.cooks=Array(7).fill(null);
 function save(){ saveLocal(); if(typeof shareSync==="function"){ shareSync(); familySync(); goutsSync(); } }
 function saveLocal(){ stashWeek(); try{localStorage.setItem(KEY,JSON.stringify({outDefault:state.outDefault,mix:state.mix,rayon:state.rayon,vueMenu:state.vueMenu,customStores:state.customStores,osmStores:state.osmStores,osmAt:state.osmAt,storeFix:state.storeFix,home:state.home,perso:state.perso,avis:state.avis,exclus:state.exclus,storeOrder:state.storeOrder,storeOff:state.storeOff,storeMode:state.storeMode,onboarded:state.onboarded,emails:state.emails,weekOffset:state.weekOffset,weeks:state.weeks,statut:state.statut,journal:state.journal,week:state.week,persons:state.persons,checked:state.checked,tab:state.tab,family:state.family,cooks:state.cooks,prices:state.prices,trip1:state.trip1,trip2:state.trip2,tripStore:state.tripStore,gamme:state.gamme,maxStores:state.maxStores,seuil:state.seuil}))}catch(e){}}
@@ -187,12 +189,14 @@ function renderNouveautes(){ const box=$("nouveautes"); if(!box) return;
     ${proms.length?`<h3 class="nvh">Nouvelles promos</h3><ul class="nvlist">${proms.map(p=>`<li><b>${esc(p.produit)}</b> <small>${esc(ENS[p.mag]||p.mag)} · ${p.prix.toFixed(2).replace(".",",")} € · jusqu'au ${esc(p.au.slice(8,10))}/${esc(p.au.slice(5,7))}</small></li>`).join("")}</ul>`:""}`;
 }
 function renderACompleter(){ const box=$("acompleter"); if(!box) return;
-  const sansCuisinier=homeDays().filter(d=>headcount(d)>0&&!state.cooks[d]);
+  const sansPlat=homeDays().filter(d=>headcount(d)>0&&!BYID[state.week[d]]);
+  const sansCuisinier=homeDays().filter(d=>headcount(d)>0&&BYID[state.week[d]]&&!state.cooks[d]);
   const dehors=JOURS.map((_,d)=>d).filter(d=>isOut(d)), personne=homeDays().filter(d=>headcount(d)===0);
   const jour=d=>`${JOURS[d].slice(0,3)}<br>${fmtShort(dayOffset(d))}`;
-  if(!sansCuisinier.length&&!personne.length&&!dehors.length){ box.className="panel acomp ok"; box.innerHTML=`<p>✓ Chaque soir a un repas et un cuisinier.</p>`; return; }
+  if(!sansPlat.length&&!sansCuisinier.length&&!personne.length&&!dehors.length){ box.className="panel acomp ok"; box.innerHTML=`<p>✓ Chaque soir a un repas et un cuisinier.</p>`; return; }
   box.className="panel acomp";
-  const lignes=[...sansCuisinier.map(d=>({d,html:`<span class="acday">${jour(d)}</span><span class="acinfo"><b>${esc(BYID[state.week[d]].nom)}</b><small>Pas encore de cuisinier · ${headcount(d)} à table</small></span><span class="edit-only">${state.family.length?cookSelect(d):""}</span>`})),
+  const lignes=[...sansPlat.map(d=>({d,html:`<span class="acday">${jour(d)}</span><span class="acinfo"><b>À décider</b><small>Aucun plat prévu · ${headcount(d)} à table</small></span><button class="chip on edit-only" data-cpick="${d}" type="button">Choisir un plat</button>`})),
+    ...sansCuisinier.map(d=>({d,html:`<span class="acday">${jour(d)}</span><span class="acinfo"><b>${esc(BYID[state.week[d]].nom)}</b><small>Pas encore de cuisinier · ${headcount(d)} à table</small></span><span class="edit-only">${state.family.length?cookSelect(d):""}</span>`})),
     ...personne.map(d=>({d,html:`<span class="acday">${jour(d)}</span><span class="acinfo"><b>Personne à table</b><small>Tout le monde est absent : pas de repas prévu</small></span><span></span>`})),
     ...dehors.map(d=>({d,html:`<span class="acday">${jour(d)}</span><span class="acinfo"><b>Pas de repas prévu à la maison</b><small>Soir marqué « à l'extérieur »</small></span><button class="chip edit-only" data-acout="${d}" type="button">Prévoir un repas</button>`}))].sort((x,y)=>x.d-y.d);
   box.innerHTML=`<div class="phead"><h2>À compléter cette semaine</h2>${sansCuisinier.length>1&&state.family.length?`<button class="btn edit-only" id="acrepartir" type="button" data-tip="Attribue ces soirs aux personnes présentes, en commençant par celles qui cuisinent le moins">Répartir ces soirs</button>`:""}</div>
@@ -215,7 +219,7 @@ const totalCouverts = () => JOURS.reduce((s,_,d)=>s+headcount(d),0);
 
 function courses(){
   const map=new Map();
-  state.week.forEach((id,d)=>{ if(!headcount(d)) return; const r=BYID[id]; r.ing.forEach(([n,q,u,ray])=>{
+  state.week.forEach((id,d)=>{ if(!headcount(d)) return; const r=BYID[id]; if(!r) return; r.ing.forEach(([n,q,u,ray])=>{
     const k=n+"|"+u; if(!map.has(k)) map.set(k,{k,n,u,ray,q:0,pour:new Set()});
     const it=map.get(k); it.q+=scale(q,d); it.pour.add(JOURS[d]); }); });
   return [...map.values()].sort((a,b)=>ORDRE.indexOf(a.ray)-ORDRE.indexOf(b.ray)||a.n.localeCompare(b.n,"fr"));
@@ -225,7 +229,7 @@ const $=id=>document.getElementById(id);
 const todayIdx=(new Date().getDay()+6)%7;
 
 function renderStats(){
-  const hd=homeDays(), mins=hd.reduce((s,d)=>s+BYID[state.week[d]].t,0);
+  const hd=homeDays(), mins=hd.reduce((s,d)=>s+(BYID[state.week[d]]?BYID[state.week[d]].t:0),0);
   const n=courses().length;
   $("stats").innerHTML=`<span><b>${hd.length}</b> soirs à la maison</span><span><b>${Math.floor(mins/60)} h ${String(mins%60).padStart(2,"0")}</b> en cuisine</span><span><b>${n}</b> articles</span>`;
   $("persons").textContent=state.persons+(state.persons>1?" personnes":" personne");
@@ -234,6 +238,10 @@ function renderStats(){
 
 function renderDays(){
   $("days").innerHTML=state.week.map((id,d)=>{const r=BYID[id];
+    if(!r&&!isOut(d)) return `<article class="day manque${dayOffset(d).getTime()===TODAY.getTime()?" today":""}" id="day-${d}">
+      <button class="dgrip" type="button" aria-label="Glisser pour échanger ce soir avec un autre" data-tip="Glisser pour échanger ce soir avec un autre">⠿</button>
+      <div class="dcard"><span class="dinfo"><span class="dday">${JOURS[d]} ${fmtShort(dayOffset(d))}</span><b class="dish">À décider</b><span class="dmeta">Aucun plat prévu${headcount(d)?` · ${headcount(d)} à table`:""}</span></span>
+      <button class="chip on edit-only" data-cpick="${d}" type="button">Choisir un plat</button></div></article>`;
     if(isOut(d)) return `<article class="day out${dayOffset(d).getTime()===TODAY.getTime()?" today":""}" id="day-${d}">
       <button class="dcard" data-open="${d}" aria-label="${JOURS[d]} : repas à l'extérieur, ouvrir la fiche">
         <span class="dthumbbox outbox" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 3v8a2 2 0 0 0 4 0V3M9 11v10M17 3c-2 0-3 3-3 7h3v11"/></svg></span>
