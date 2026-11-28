@@ -74,9 +74,8 @@ function renderModal(){
     : `<div class="mctrl"><button class="btn primary" data-cookmode="1">Cuisiner pas à pas</button><button class="btn edit-only" data-gallery="${d}">Changer de plat</button><button class="btn edit-only" data-swap="${d}">Autre idée</button><button class="btn edit-only" data-outtoggle="${d}">Manger à l'extérieur ce soir</button><button class="btn edit-only" data-unset="${d}">Retirer le plat (à décider)</button></div>
        <div class="mcook edit-only"><span>Aux fourneaux</span>${cookSelect(d)}</div>`;
   const avis = state.family.length ? `<section id="avis"><h3><span>L'avis de la famille</span><span class="mtotal">${avisSummary(r)}</span></h3>
-      <div class="avislist">${state.family.map((n,i)=>{const v=(state.avis[id]||{})[n]||0;
-        return `<div class="avisrow"><span>${esc(n)}</span><button class="avb up edit-ctl" data-avis="${i}|1" aria-pressed="${v===1}">J'aime</button><button class="avb down edit-ctl" data-avis="${i}|-1" aria-pressed="${v===-1}">Pas pour moi</button></div>`}).join("")}</div>
-      <p class="note">Les plats aimés reviennent plus souvent dans les propositions, les autres sont évités les soirs où la personne est là.</p></section>` : "";
+      <div class="avislist">${state.family.map((n,i)=>`<div class="avisrow">${htmlAvisBoutons(id,n,"data-avis",i)}</div>`).join("")}</div>
+      <p class="note">Chacun donne son avis pour lui-même, une seule fois : le choix enregistré ne se change plus. Les plats aimés reviennent plus souvent dans les propositions, les autres sont évités les soirs où la personne est là.</p></section>` : "";
   $("mbody").innerHTML = `<figure class="mphoto"><img src="${photoSrc(id)}" alt="${esc(r.nom)}" data-cache-parent="1" decoding="async">${PHOTOS_PERSO[id]?`<figcaption>Photo de la famille</figcaption>`:pp?`<figcaption>Photo d'illustration : <a href="${pp}" target="_blank" rel="noopener">Wikimedia Commons</a> (auteur et licence libre sur la page du fichier)</figcaption>`:(r.perso?`<figcaption>Recette de la famille</figcaption>`:"")}</figure>${typeof ppSousFigure==="function"?ppSousFigure(id):""}
     ${w.length?`<div class="mwarn">${esc(w.join(", "))} n'aime${w.length>1?"nt":""} pas ce plat${d!==null?" et sera là ce soir":""}.</div>`:""}
     ${ctrl}
