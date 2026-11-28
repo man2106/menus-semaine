@@ -91,21 +91,20 @@ document.addEventListener("click", e=>{
 if($("nouveautes")) $("nouveautes").addEventListener("click",e=>{const b=e.target.closest("[data-openrec]"); if(b) openMeal(b.dataset.openrec,null);});
 const _renderPlis = render; render = function(){ _renderPlis(); appliquerPlis(); };
 // Le rappel se met à jour tout seul : le repas du soir apparaît à 19 h sans recharger la page
-setInterval(()=>{ if(state.tab==='menu') renderRetours(); }, 60000);
+setInterval(()=>{ if(state.tab==='famille') renderRetours(); }, 60000);
 chargerDonnees();
 
 // ===================== Visite guidée (première ouverture sur un appareil) =====================
 const VISITE=[
- {sel:null,t:"Bienvenue !",p:"Voici une visite rapide de l'application des menus de la famille. Elle dure une minute. Vous pourrez la revoir dans Réglages, rubrique Aide."},
- {sel:"#acompleter",t:"Ce qu'il reste à faire",p:"Les soirs sans cuisinier ou sans repas prévu s'affichent ici. Choisissez qui cuisine directement dans la liste. Tant qu'il manque quelque chose, le menu ne peut pas être validé."},
- {sel:"#weekbar .wtop",t:"La semaine",p:"Les flèches passent d'une semaine à l'autre. Vous pouvez préparer jusqu'à trois semaines à l'avance."},
- {sel:"#share",t:"Prévenir la famille",p:"Prépare un message avec le menu et le lien de l'application, à envoyer par WhatsApp ou SMS."},
- {sel:"#weekbar .appr",t:"Chacun valide",p:"Chaque membre indique qu'il est d'accord avec le menu. Le propriétaire peut fixer une date limite de réponse, puis valider le menu final."},
+ {sel:null,t:"Bienvenue !",p:"Voici une visite rapide de l'application des menus de la famille. Elle dure une minute. Vous pourrez la revoir dans Plus, Réglages, rubrique Aide."},
+ {sel:"#mshead",t:"Cette semaine",p:"L'onglet Menu ne montre que deux choses : les repas de la semaine en cours, avec le soir même en évidence, puis la proposition de la semaine prochaine. Les jours passés sont repliés."},
  {sel:"#days .day",t:"Les repas",p:"Touchez un jour pour voir la recette, les courses du plat, changer de plat, choisir qui cuisine ou noter une absence. Les étiquettes Éco, Moyen et Plaisir indiquent le budget."},
+ {sel:"#weekfold summary",t:"Valider et prévenir la famille",p:"Ouvrez cette ligne pour envoyer le menu par WhatsApp ou SMS, voir qui a validé, fixer la date limite et relire les dernières modifications."},
+ {sel:"#msec-suivante .mshead",t:"La semaine prochaine",p:"Les 7 soirs proposés en liste, et combien de personnes ont validé. « Valider » donne votre accord ; « Voir et modifier » ouvre la semaine pour changer les plats, avec une flèche pour revenir à cette semaine."},
  {sel:"#tab-courses",t:"Les courses",p:"La liste se fait toute seule, groupée par magasin et par rayon, en deux passages par semaine. Le mode magasin permet de cocher en avançant dans les rayons."},
- {sel:"#tab-famille",t:"La famille",p:"Qui est là chaque soir, qui cuisine, les goûts de chacun, et les avis donnés après les repas."},
- {sel:"#tab-plus",t:"Vos envies",p:"Répondez au sondage : dites quels plats vous font envie. Les menus proposés en tiennent compte, et des plannings sont suggérés pour les semaines suivantes."},
- {sel:"#tab-plus",t:"Les réglages",p:"Votre adresse et vos magasins, les jours de courses, les recettes de la famille et l'accès des membres."},
+ {sel:"#tab-recettes",t:"Les recettes",p:"Toutes les recettes, avec une recherche. C'est ici, et seulement ici, qu'on ajoute une nouvelle recette de la famille : nom, ingrédients, étapes et photo, ou en collant une liste ou un lien."},
+ {sel:"#tab-famille",t:"La famille",p:"Le rappel pour noter les repas, ce qu'il reste à compléter (plats et cuisiniers), qui est là chaque soir, qui cuisine et les goûts de chacun."},
+ {sel:"#tab-plus",t:"Plus : envies et réglages",p:"Répondez au sondage des envies. Vous y trouvez aussi les nouveautés, le budget, l'affichage du menu en liste ou en calendrier, le PDF, ainsi que les réglages : adresse, magasins, jours de courses et accès des membres."},
  {sel:null,t:"C'est parti !",p:"Passez la souris sur un bouton (ou gardez le doigt appuyé sur mobile) pour savoir à quoi il sert. Bon appétit !"}];
 let visite=null;
 function visiteFin(){ if(!visite) return; visite.els.forEach(e=>e.remove()); visite=null; try{ localStorage.setItem(KEY+"-visite","1"); }catch(e){} document.removeEventListener("keydown",visiteClavier,true); window.removeEventListener("resize",visitePlacer); }

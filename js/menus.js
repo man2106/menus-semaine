@@ -151,7 +151,7 @@ function manquesTexte(m){ const liste=l=>l.length>1?l.slice(0,-1).join(", ")+" e
   return [pp.length?"il manque un plat "+liste(pp):"",pc.length?"il manque un cuisinier "+liste(pc):""].filter(Boolean).join(" ; "); }
 // ---- Vue calendrier : la semaine comme dans l'export PDF, cases à compléter en orange ----
 function renderCalendrier(){ const box=$("calendrier"), liste=$("days"); if(!box||!liste) return;
-  const cal=(state.vueMenu||(innerWidth>=700?"cal":"liste"))==="cal"; box.hidden=!cal; liste.hidden=cal;
+  const cal=(state.vueMenu||"liste")==="cal"; box.hidden=!cal; liste.hidden=cal;
   document.querySelectorAll("[data-vue]").forEach(b=>b.classList.toggle("on",(b.dataset.vue==="cal")===cal));
   if(!cal) return;
   const cases=menuRows().map(x=>{ const today=x.date.getTime()===TODAY.getTime(), head=`<span class="chead"><span>${JOURS[x.d]}</span><small>${fmtShort(x.date)}</small></span>`;
@@ -236,20 +236,24 @@ function renderStats(){
   document.querySelector(".stepper").hidden=!!state.family.length;
 }
 
+let passesOuverts=false; // « Jours passés (n) » : replié par défaut
 function renderDays(){
-  $("days").innerHTML=state.week.map((id,d)=>{const r=BYID[id];
-    if(!r&&!isOut(d)) return `<article class="day manque${dayOffset(d).getTime()===TODAY.getTime()?" today":""}" id="day-${d}">
+  const nbPasses=state.week.filter((_,d)=>etatJour(d)==="passe").length, repli=nbPasses>0&&!passesOuverts;
+  const cachee=d=>repli&&etatJour(d)==="passe"?" hidden":"";
+  const pliPasses=nbPasses?`<button type="button" class="pastbtn" data-passes="1" aria-expanded="${!repli}">${repli?"Afficher":"Masquer"} les jours passés (${nbPasses})<span class="dchev" aria-hidden="true">${repli?"›":"⌄"}</span></button>`:"";
+  $("days").innerHTML=pliPasses+state.week.map((id,d)=>{const r=BYID[id];
+    if(!r&&!isOut(d)) return `<article class="day manque${dayOffset(d).getTime()===TODAY.getTime()?" today":""}" id="day-${d}"${cachee(d)}>
       <button class="dgrip" type="button" aria-label="Glisser pour échanger ce soir avec un autre" data-tip="Glisser pour échanger ce soir avec un autre">⠿</button>
       <div class="dcard"><span class="dinfo"><span class="dday">${JOURS[d]} ${fmtShort(dayOffset(d))}</span><b class="dish">À décider</b><span class="dmeta">Aucun plat prévu${headcount(d)?` · ${headcount(d)} à table`:""}</span></span>
       <button class="chip on edit-only" data-cpick="${d}" type="button">Choisir un plat</button></div></article>`;
-    if(isOut(d)) return `<article class="day out${dayOffset(d).getTime()===TODAY.getTime()?" today":""}" id="day-${d}">
+    if(isOut(d)) return `<article class="day out${dayOffset(d).getTime()===TODAY.getTime()?" today":""}" id="day-${d}"${cachee(d)}>
       <button class="dcard" data-open="${d}" aria-label="${JOURS[d]} : repas à l'extérieur, ouvrir la fiche">
         <span class="dthumbbox outbox" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 3v8a2 2 0 0 0 4 0V3M9 11v10M17 3c-2 0-3 3-3 7h3v11"/></svg></span>
         <span class="dinfo"><span class="dday">${JOURS[d]} ${fmtShort(dayOffset(d))}</span><b class="dish">Repas à l'extérieur</b><span class="dmeta">Pas de cuisine ni de courses ce soir</span></span>
         <span class="dchev" aria-hidden="true">›</span></button></article>`;
     const isToday=dayOffset(d).getTime()===TODAY.getTime(), pc=promoCount(r), hc=headcount(d), w=dislikesFor(r,d);
     const et=etatJour(d), vtag=verrouille()?(et==="passe"?`<span class="jstat passe">Passé</span>`:et==="avenir"?`<span class="jstat prevu">Prévu</span>`:""):"";
-    return `<article class="day${isToday?" today":""}${et==="passe"?" passe":""}" id="day-${d}">
+    return `<article class="day${isToday?" today":""}${et==="passe"?" passe":""}" id="day-${d}"${cachee(d)}>
       <button class="dgrip" type="button" aria-label="Glisser pour échanger ce repas avec un autre soir" data-tip="Glisser pour échanger ce repas avec un autre soir">⠿</button>
       <button class="dcard" data-open="${d}" aria-label="${JOURS[d]} : ${esc(r.nom)}, ouvrir la fiche">
         <span class="dthumbbox"><img class="dthumb" src="${photoSrc(id)}" alt="" loading="lazy" data-cache-err="1" decoding="async"></span>

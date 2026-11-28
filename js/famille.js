@@ -37,7 +37,7 @@ function subscribeRetours(){ if(!DB) return; if(unsubRetours) unsubRetours();
       if(sheetCtx&&(sheetCtx.type==="bilan"||sheetCtx.type==="retour")&&!saisie) renderSheet(); } },()=>{});
   // toutes les semaines partagées, pour retrouver les repas déjà mangés
   if(unsubSemaines) unsubSemaines();
-  unsubSemaines=DB.collection("semaines").onSnapshot(q=>{ q.docChanges().forEach(c=>{ if(c.type==="removed") delete SEMAINES[c.doc.id]; else SEMAINES[c.doc.id]=c.doc.data(); }); renderRetours(); },()=>{});
+  unsubSemaines=DB.collection("semaines").onSnapshot(q=>{ q.docChanges().forEach(c=>{ if(c.type==="removed") delete SEMAINES[c.doc.id]; else SEMAINES[c.doc.id]=c.doc.data(); }); renderRetours(); if(typeof renderMenuPage==="function") renderMenuPage(); },()=>{});
 }
 // Repas déjà servis ces 14 derniers jours (le soir même à partir de 19 h)
 function repasPasses(jours=14){
@@ -133,7 +133,7 @@ function bonusRetours(r){ const l=Object.values(RETOURS).filter(x=>x.plat===r.id
   const G=3.5, K=2, s=(l.length*moy(l.map(x=>x.note))+K*G)/(l.length+K);
   const dernier=l.map(x=>x.quand).sort().pop(), recent=dernier&&(Date.now()-new Date(dernier))<28*864e5;
   if(s<=2.6&&l.length>=2&&recent) return -4; return (s-3.5)*0.9; }
-// ---- Affichage : invitation à noter (onglet Menu) et résumé (onglet Famille) ----
+// ---- Affichage : invitation à noter et résumé (onglet Famille) ----
 function renderRetours(){
   const box=$("retoursbox"), fam=$("retoursfam"); if(!box||!fam) return;
   const passes=repasPasses(4).filter(p=>p.pres.length), aNoter=passes.filter(p=>retoursDu(p.iso,p.d).filter(r=>r.note).length<p.pres.length).slice(0,3);
@@ -197,7 +197,7 @@ const CATS=[["sur","Les valeurs sûres","Bien notés par presque tout le monde :
 function renderBilan(){ const A=analyse();
   $("seyebrow").textContent="Retours sur les repas"; $("stitle").textContent="Bilan des repas"; $("sextra").innerHTML="";
   $("sfoot").innerHTML=`<button class="btn" data-retourslist="1">Noter un repas</button>`;
-  if(!A.all.length){ $("sbody").innerHTML=`<p>Pas encore d'avis. Après le souper, touchez « C'était comment ? » dans l'onglet Menu : chacun choisit un visage, c'est tout.</p>
+  if(!A.all.length){ $("sbody").innerHTML=`<p>Pas encore d'avis. Après le souper, touchez « C'était comment ? » dans l'onglet Famille : chacun choisit un visage, c'est tout.</p>
     <p class="note">Le bilan apparaît dès les premiers avis. Il devient vraiment parlant après 2 ou 3 semaines.</p>`; return; }
   const maxM=5, reco=[];
   const surs=A.plats.filter(p=>p.cat==="sur").sort((a,b)=>b.score-a.score), adj=A.plats.filter(p=>p.cat==="ameliorer"&&p.topMots.length), ret=A.plats.filter(p=>p.cat==="retester");
@@ -543,7 +543,7 @@ function htmlSuggestions(){ const qui=envQui||(window.__acces&&window.__acces()&
   return `<div class="panel" id="suggbox"><h2>Suggérer un plat</h2>
     <p><b>Une suggestion</b> est une idée, un lien ou une photo. Elle n'entre pas tout de suite dans la bibliothèque : le propriétaire la reprend le lundi ou le mercredi.</p>
     <p class="note">Une <b>recette complète</b> (ingrédients, étapes, photo) s'ajoute directement à la bibliothèque.</p>
-    <button class="btn edit-only" type="button" data-newlib="1">Ajouter une recette complète à la bibliothèque</button>
+    <button class="btn edit-only" type="button" data-newlib="1">Ajouter une recette complète (onglet Recettes)</button>
     <div class="gfilters wrapchips">${T.map(([k,l])=>`<button class="chip${f.type===k?" on":""}" data-sgtype="${k}" type="button">${l}</button>`).join("")}</div>
     <form class="addrform" id="suggform" autocomplete="off">
       ${f.type==="lien"?`<label class="wfield">Lien de la recette<input id="sg-url" type="url" inputmode="url" maxlength="400" placeholder="https://www.exemple.be/recette-de-…" required></label>`:""}
@@ -561,7 +561,7 @@ function htmlSuggestions(){ const qui=envQui||(window.__acces&&window.__acces()&
   </div>`; }
 document.addEventListener("click",async e=>{ const o=e.target.closest("#suggbox [data-openrec]"); if(o){ openMeal(o.dataset.openrec,null); return; }
   const o2=e.target.closest("[data-openrec2]"); if(o2){ openMeal(o2.dataset.openrec2,null); return; }
-  const nl=e.target.closest("[data-newlib]"); if(nl){ if(typeof openSheet==="function"&&typeof newDraft==="function") openSheet({type:"recipe",draft:newDraft()}); return; }
+  const nl=e.target.closest("[data-newlib]"); if(nl){ if(typeof nouvelleRecette==="function") nouvelleRecette(); return; }
   const b=e.target.closest("[data-sgtype],[data-sgdel]"); if(!b) return;
   if(b.dataset.sgtype){ suggForm={type:b.dataset.sgtype,photo:null}; renderEnvies(); return; }
   if(b.dataset.sgdel){ const id=b.dataset.sgdel; if(!DB) { delete SUGG[id]; renderEnvies(); return; } try{ await DB.collection("suggestions").doc(id).delete(); toast("Suggestion supprimée"); }catch(err){ toast("Seul le propriétaire peut supprimer une proposition"); } } });
