@@ -13,7 +13,7 @@ function renderReglages(){
   $("outdef").innerHTML=JOURS.map((j,d)=>`<button class="chip${state.outDefault.includes(d)?" on":""}" data-outdef="${d}" aria-pressed="${state.outDefault.includes(d)}">${j.slice(0,3)}</button>`).join("");
   $("fcount").textContent=state.family.length?"":"!";
 }
-const VUES=["menu","courses","famille","plus","envies","reglages"];
+const VUES=["menu","courses","recettes","famille","plus","envies","reglages"];
 const ONGLET_DE={envies:"plus",reglages:"plus"};
 function setTab(t,opts={}){ if(!VUES.includes(t)) t="menu"; const changed=state.tab!==t; state.tab=t; save(); if(t==="envies"&&typeof renderEnvies==="function") renderEnvies();
   const onglet=ONGLET_DE[t]||t;
@@ -115,7 +115,7 @@ $("mbody").addEventListener("click",e=>{ if(e.target.id!=="mcopy") return;
 $("recipes").addEventListener("click",e=>{const b=e.target.closest("[data-openrec]"); if(b) openMeal(b.dataset.openrec,null);});
 $("trip1").onchange=e=>{state.trip1=e.target.value;state.checked={};save();render();toast("Jour des courses : "+tripName(0));};
 
-function render(){if(!$("view-menu")) return; document.body.classList.toggle("verrou",verrouille()); renderNouveautes(); $("trip1").value=state.trip1;renderWeekbar();renderCompteHaut();renderACompleter();renderCalendrier();renderPresences();renderBudget();renderStats();renderDays();renderCourses();renderPromos();renderRecettes();renderReglages();if(typeof renderRetours==="function")renderRetours();if(state.tab==="envies"&&typeof renderEnvies==="function")renderEnvies();}
+function render(){if(!$("view-menu")) return; document.body.classList.toggle("verrou",verrouille()); renderNouveautes(); $("trip1").value=state.trip1;renderWeekbar();if(typeof renderMenuPage==="function")renderMenuPage();renderCompteHaut();renderACompleter();renderCalendrier();renderPresences();renderBudget();renderStats();renderDays();renderCourses();renderPromos();renderRecettes();renderReglages();if(typeof renderRetours==="function")renderRetours();if(state.tab==="envies"&&typeof renderEnvies==="function")renderEnvies();}
 $("sugg").addEventListener("change",e=>{const s=e.target.closest("select[data-add]"); if(!s||s.value==="") return;
   replaceDay(+s.value,s.dataset.add);});
 $("cmp").addEventListener("change",e=>{const inp=e.target.closest("input[data-pk]"); if(!inp) return;
@@ -246,8 +246,9 @@ function weekLabel(){ const a=dayOffset(0), b=dayOffset(6);
 function relWeek(){ return ["Cette semaine","Semaine suivante","Dans 2 semaines","Dans 3 semaines"][state.weekOffset]; }
 function goWeek(off){ if(off<0||off>3||off===state.weekOffset) return;
   stashWeek(); state.weekOffset=off; setMonday(off);
-  const w=state.weeks[curIso()];
+  const w=state.weeks[curIso()], sv=(typeof SEMAINES==="object"&&DB)?SEMAINES[curIso()]:null;
   if(w&&menuOk(w.menu)) applyWeekData(w);
+  else if(sv&&menuOk(sv.menu)) applyWeekData(weekFromDoc(sv));   // semaine déjà préparée par un autre membre : on part de sa fiche, pas d'une nouvelle proposition
   else { state.week=proposeMenu(); state.cooks=Array(7).fill(null); state.checked={}; state.statut="proposition"; state.journal=[]; state.absents={}; state.invites=[0,0,0,0,0,0,0]; state.approbations={}; state.limite=null; state.exterieur=null; state.extras=[]; state.qtEdit={}; state.lieux={}; state.tickets=[]; }
   state.picking=null; applyValidation(); saveLocal(); subscribeWeek(); render();
   urlSemaine(); }
@@ -344,19 +345,11 @@ function kindTitre(valide){
 }
 function renderWeekbar(){
   const valide=state.statut==="valide";
-  $("weekbar").innerHTML=`<div class="wtop">
-      <button class="wnav" data-week="${state.weekOffset-1}" ${state.weekOffset===0?"disabled":""} aria-label="Semaine précédente">‹</button>
-      <div class="wtitle"><small>${relWeek()}</small><b>Semaine du ${weekLabel()}</b></div>
-      <button class="wnav" data-week="${state.weekOffset+1}" ${state.weekOffset===3?"disabled":""} aria-label="Semaine suivante">›</button>
-    </div>
-    <div class="kind ${valide?"official":"proposal"}"><b>${kindTitre(valide)}</b><small>${valide?(verrouille()?"Verrouillé : la semaine a commencé. Les jours passés sont figés.":"Figé. Rouvrir pour modifier."):"À discuter en famille avant validation."}</small></div>
-    <div class="wstate"><span class="st ${valide?"on":"soon"}">${valide?"Menu validé":"Proposition à discuter"}</span><span class="sync ${syncState}" id="sync"></span></div>
-    <div class="actions wact">
+  $("weekbar").innerHTML=`    <div class="actions wact">
       <button class="btn primary" id="share" data-tip="Prépare un message avec le menu et le lien de l'application, à envoyer par WhatsApp ou SMS">Envoyer à la famille</button>
       <button class="btn edit-only owner-only${!valide&&manques().length?" incomplet":""}" id="valider" data-tip="${valide?"Permet à nouveau de changer les plats et les cuisiniers":manques().length?"Impossible pour l'instant : "+esc(manquesTexte(manques()))+". Complétez d'abord ces soirs.":"Fige le menu de la semaine : il devient le menu officiel"}">${valide?"Rouvrir aux modifications":"Valider le menu"}</button>
       <button class="btn" id="exportmenu" data-tip="Calendrier de la semaine en PDF (ou en texte), avec les plats, les cuisiniers et les couverts">📄 Menu en PDF</button>
       <button class="btn edit-only" id="propose" data-tip="Tire un nouveau menu selon la répartition des budgets, la variété et les goûts de chacun">Nouvelle proposition</button>
-      ${state.weekOffset===0?`<button class="btn" data-week="1" data-tip="Passe à la semaine prochaine pour préparer son menu à l'avance">Préparer la semaine suivante →</button>`:""}
     </div>
     ${renderApprovals()}
     <div class="sharebox" id="sharebox"${shareOpen?"":" hidden"}>
@@ -368,7 +361,7 @@ function renderWeekbar(){
       <div class="actions"><button class="btn primary" id="copymsg">Copier le message</button></div>
     </div>
     <div class="journal"><h3>Dernières modifications</h3><div id="journal"></div></div>`;
-  setSync(syncState); renderJournal();
+  renderJournal();
 }
 // ---- Validation par chaque membre et date limite ----
 const menuKey = () => state.week.join(",")+"|"+outList(state.exterieur).join("");
@@ -421,12 +414,9 @@ function setLimite(v){ if(DB&&!IS_OWNER){ toast("Seul le propriétaire fixe la d
   saveLocal(); render(); toast(v?"Réponse attendue avant "+limiteTxt():"Date limite : le samedi à 10 h, avant la première course"); }
 $("weekbar").addEventListener("change",e=>{ if(e.target.id==="limite"){ const v=e.target.value; if(v) setLimite(v); } });
 $("weekbar").addEventListener("click",e=>{
-  const w=e.target.closest("[data-week]"); if(w&&!w.disabled){ goWeek(+w.dataset.week); toast(relWeek()+" : semaine du "+weekLabel()); return; }
   if(e.target.id==="share"){ shareOpen=!shareOpen; const b=$("sharebox"); b.hidden=!shareOpen; if(shareOpen){ $("sharemsg").value=shareMessage(); } return; }
   const ap=e.target.closest("[data-appr]");
-  if(ap){ const n=state.family[+ap.dataset.appr]; if(!n) return; const a=approvalOf(n), all={...state.approbations};
-    if(a&&!a.ancienne) delete all[n]; else all[n]={quand:new Date().toISOString(),menu:menuKey(),par:ME};
-    state.approbations=all; save(); render(); toast(all[n]?`${n} a validé le menu`:`Validation de ${n} retirée`); return; }
+  if(ap){ const n=state.family[+ap.dataset.appr]; if(!n) return; basculerApprobation(n); return; }
   if(e.target.id==="nolimite"){ setLimite(null); return; }
   if(e.target.id==="exportmenu"){ openSheet({type:"export",kind:"menu",withRecipes:false}); return; }
   if(e.target.id==="copymails2"){ $("copymails").click(); return; }
@@ -435,7 +425,7 @@ $("weekbar").addEventListener("click",e=>{
     try{ navigator.clipboard.writeText(txt).then(()=>toast("Message copié"),()=>{box.focus();box.select();toast("Sélectionnez le texte puis copiez-le");}); }catch(err){box.focus();box.select();} return; }
   if(e.target.id==="valider"){ if(DB&&!IS_OWNER){ toast("Seul le propriétaire valide le menu"); return; }
     if(verrouille()){ toast("Menu figé : validé par toute la famille ou semaine commencée"); return; }
-    if(state.statut!=="valide"){ const m=manques(); if(m.length){ toast(`Validation impossible : ${manquesTexte(m)}.`); const b=$("acompleter"); if(b){ b.scrollIntoView({behavior:"smooth",block:"center"}); b.classList.remove("pulse"); void b.offsetWidth; b.classList.add("pulse"); } return; } }
+    if(state.statut!=="valide"){ const m=manques(); if(m.length){ toast(`Validation impossible : ${manquesTexte(m)}.`); if($("acompleter")) goTo("famille","acompleter"); return; } }
     state.statut=state.statut==="valide"?"proposition":"valide";
     if(DB){ VALID={...VALID,[curIso()]:state.statut}; DB.doc("validations/menus").set({semaines:VALID,limites:LIMITES}).catch(()=>toast("La validation n'a pas pu être enregistrée"));
       state.journal=[{par:ME,quand:new Date().toISOString(),texte:state.statut==="valide"?"a validé le menu":"a rouvert le menu aux modifications"},...state.journal].slice(0,15); if(shareReady) queueWrite(); }

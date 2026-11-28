@@ -75,7 +75,7 @@ function renderGallery(){ const c=sheetCtx, d=c.d;
   $("sbody").innerHTML=`<input class="gsearch" id="gq" type="search" placeholder="Rechercher un plat" value="${esc(c.q||"")}" aria-label="Rechercher un plat" autocomplete="off">
     <div class="gfilters">${F.map(([k,l])=>`<button class="chip${(c.filter||"tous")===k?" on":""}" data-gf="${k}">${l}</button>`).join("")}</div>
     <div class="gfilters"><button class="chip${!c.cuis?" on":""}" data-gc="tous">Toutes les cuisines</button>${Object.entries(CUISINES).map(([k,l])=>`<button class="chip${c.cuis===k?" on":""}" data-gc="${k}">${l}</button>`).join("")}</div><div class="ggrid" id="ggrid"></div>`;
-  $("sfoot").innerHTML=`<button class="btn edit-only" data-newrec="1">Ajouter une recette de famille</button>`;
+  $("sfoot").innerHTML=`<button class="btn edit-only" data-newrec="1">Nouvelle recette (onglet Recettes)</button>`;
   renderGalleryGrid(); }
 function renderGalleryGrid(){ const c=sheetCtx, d=c.d, q=(c.q||"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,""), f=c.filter||"tous";
   let list=RECETTES.filter(r=>!q||r.nom.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").includes(q));
@@ -163,6 +163,8 @@ function renderGouts(){ const c=sheetCtx, n=state.family[c.i]; if(!n){ closeShee
 const UNITS=[["g","g"],["cl","cl"],["","pièce"]];
 const LIGNES_VIDES=3;
 const RAYON_COURT={fl:"Fruits & légumes",bou:"Boucherie",cre:"Crèmerie",bl:"Boulangerie",epi:"Épicerie",boi:"Boissons",sur:"Surgelés"};
+// Les nouvelles recettes se créent seulement depuis l'onglet Recettes : tous les autres boutons « ajouter une recette » y mènent
+function nouvelleRecette(opts={}){ if(sheetCtx) closeSheet(); if(modalCtx) closeMeal(); setTab("recettes"); openSheet({type:"recipe",draft:newDraft(),forDay:(opts.forDay===undefined?null:opts.forDay)}); }
 function newDraft(){ return {nom:"",acc:"",t:"",pers:5,ing:Array.from({length:LIGNES_VIDES},()=>["","","g","fl"]),etapes:"",astuce:"",photo:null,prix:"",coller:""}; }
 // Rayon deviné d'après le nom : d'abord les ingrédients déjà connus de l'application, ensuite des mots-clés
 const MOTS_RAYON=[
@@ -210,40 +212,49 @@ function ligneIngHtml([n,q,u,ray],k){ return `<div class="ingrow" data-row="${k}
       <input list="inglist" type="text" data-rf="n" data-k="${k}" value="${esc(n)}" maxlength="40" placeholder="Ingrédient (ex. : spaghetti)" aria-label="Nom de l'ingrédient ${k+1}" autocomplete="off" autocapitalize="sentences">
       <button type="button" class="mdel" data-rfdel="${k}" aria-label="Retirer l'ingrédient ${k+1}">×</button>
       <div class="ingsub"><input type="number" inputmode="decimal" min="0" step="any" data-rf="q" data-k="${k}" value="${q===""||q==null||q===0?"":q}" placeholder="Quantité" aria-label="Quantité de l'ingrédient ${k+1}">
-        <select data-rf="u" data-k="${k}" aria-label="Unité de l'ingrédient ${k+1}">${UNITS.map(([v,l])=>`<option value="${v}"${u===v?" selected":""}>${l}</option>`).join("")}</select>
-        <select data-rf="ray" data-k="${k}" aria-label="Rayon de l'ingrédient ${k+1}">${RAYKEYS.map(v=>`<option value="${v}"${ray===v?" selected":""}>${RAYON_COURT[v]}</option>`).join("")}</select></div></div>`; }
-function renderRecipeForm(){ const c=sheetCtx, dr=c.draft;
-  $("seyebrow").textContent=c.editId?"Modifier la recette":"Nouvelle recette de famille"; $("stitle").textContent=dr.nom||"Recette"; $("sextra").innerHTML="";
+        <select data-rf="u" data-k="${k}" aria-label="Unité de l'ingrédient ${k+1}">${UNITS.map(([v,l])=>`<option value="${v}"${u===v?" selected":""}>${l}</option>`).join("")}</select></div>
+      <label class="rayhint"><span>Rayon (deviné)</span><select data-rf="ray" data-k="${k}" aria-label="Rayon de l'ingrédient ${k+1}">${RAYKEYS.map(v=>`<option value="${v}"${ray===v?" selected":""}>${RAYON_COURT[v]}</option>`).join("")}</select></label></div>`; }
+function ligneEtapeHtml(txt,i){ return `<li class="steprow"><span class="stepno" aria-hidden="true">${i+1}</span><textarea data-rfstep="${i}" rows="2" maxlength="400" aria-label="Étape ${i+1}" placeholder="${i===0?"Ex. : Faire revenir l'oignon 3 minutes.":""}">${esc(txt)}</textarea><button type="button" class="mdel" data-rfstepdel="${i}" aria-label="Retirer l'étape ${i+1}">×</button></li>`; }
+// Étapes du brouillon : une rangée par étape (le texte « une étape par ligne » reste le format enregistré)
+function etapesDuBrouillon(dr){ if(!Array.isArray(dr.etapesL)){ const l=String(dr.etapes||"").split(/\n+/).map(x=>x.trim()).filter(Boolean); dr.etapesL=l.length?l:[""]; } return dr.etapesL; }
+function renderRecipeForm(){ const c=sheetCtx, dr=c.draft, steps=etapesDuBrouillon(dr);
+  $("seyebrow").textContent=c.editId?"Modifier la recette":"Recettes"; $("stitle").textContent=dr.nom||(c.editId?"Recette":"Nouvelle recette"); $("sextra").innerHTML="";
   const e=c.erreurs||[];
   $("sbody").innerHTML=`<form id="rform" class="rform" novalidate>
-    ${e.length?`<div class="rferr" role="alert" id="rf-err"><b>${e.length>1?"À corriger avant d'enregistrer :":"À corriger avant d'enregistrer :"}</b><ul>${e.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>`:""}
-    <label class="wfield"><span>Nom du plat <em class="req">obligatoire</em></span><input id="rf-nom" type="text" maxlength="60" value="${esc(dr.nom)}" placeholder="Ex. : lasagnes de mamie" autocomplete="off" aria-required="true"${c.champ==="nom"?' aria-invalid="true"':""}></label>
-    <fieldset class="ringr"><legend>Ingrédients <em class="req">obligatoire</em></legend>
-      <div class="rpers"><span id="rf-pers-lab">Quantités notées pour</span>
+    ${e.length?`<div class="rferr" role="alert" id="rf-err"><b>À corriger avant d'enregistrer :</b><ul>${e.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>`:""}
+    <div class="rphotobox${dr.photo?" has":""}">${dr.photo?`<img src="${dr.photo}" alt="Photo du plat">`:`<span class="rphotoph" aria-hidden="true">📷</span>`}
+      <div class="rphotoact"><label class="btn">${dr.photo?"Changer la photo":"Ajouter une photo (facultatif)"}<input id="rf-photo" type="file" accept="image/*" hidden></label>${dr.photo?`<button type="button" class="btn" data-rfnophoto="1">Retirer</button>`:""}</div></div>
+    <label class="wfield"><span>Nom du plat <em class="req">*</em></span><input id="rf-nom" type="text" maxlength="60" value="${esc(dr.nom)}" placeholder="Ex. : lasagnes de mamie" autocomplete="off" aria-required="true"${c.champ==="nom"?' aria-invalid="true"':""}></label>
+    <div class="rmeta2">
+      <div class="wfield"><span id="rf-pers-lab">Pour (personnes)</span><div class="rpers">
         <button type="button" class="rstep" data-rfpers="-1" aria-label="Une personne de moins"${dr.pers<=1?" disabled":""}>−</button>
         <input id="rf-pers" type="number" inputmode="numeric" min="1" max="20" value="${esc(dr.pers)}" aria-labelledby="rf-pers-lab" aria-label="Nombre de personnes">
-        <button type="button" class="rstep" data-rfpers="1" aria-label="Une personne de plus"${dr.pers>=20?" disabled":""}>+</button><span>personne${dr.pers>1?"s":""}</span></div>
-      <p class="note">Notez les quantités de votre recette telle que vous la faites : elles seront ramenées à 5 personnes, puis adaptées au nombre de personnes à table.</p>
+        <button type="button" class="rstep" data-rfpers="1" aria-label="Une personne de plus"${dr.pers>=20?" disabled":""}>+</button></div></div>
+      <label class="wfield"><span>Temps (min)</span><input id="rf-t" type="number" inputmode="numeric" min="5" max="240" value="${esc(dr.t)}" placeholder="30"></label>
+    </div>
+    <fieldset class="ringr"><legend>Ingrédients <em class="req">*</em></legend>
+      <p class="note">Quantités de votre recette telle que vous la faites : elles seront adaptées au nombre de personnes à table.</p>
       ${dr.ing.map(ligneIngHtml).join("")}
       <datalist id="inglist">${ALL_ING().map(x=>`<option value="${esc(x)}">`).join("")}</datalist>
-      <button type="button" class="btn big rfadd" data-rfadd="1">+ Ajouter un ingrédient</button>
-      <details class="rcoller"${dr.collerOuvert?" open":""}><summary>Coller une liste d'ingrédients</summary>
+      <div class="rfbtns"><button type="button" class="btn big rfadd" data-rfadd="1">+ Ingrédient</button><button type="button" class="btn big" data-rfcollertoggle="1" aria-expanded="${!!dr.collerOuvert}">Coller une liste</button></div>
+      <div class="rcoller"${dr.collerOuvert?"":" hidden"} id="rf-collerbox">
         <p class="note">Collez la liste, un ingrédient par ligne (ex. : « 600 g spaghetti », « 4 œufs », « 20 cl crème »). Le rayon est deviné ; vous pourrez tout corriger.</p>
         <textarea id="rf-coller" rows="6" placeholder="600 g spaghetti&#10;4 œufs&#10;20 cl crème&#10;200 g lardons" aria-label="Liste d'ingrédients à coller">${esc(dr.coller||"")}</textarea>
-        <button type="button" class="btn big" data-rfcoller="1">Ajouter ces ingrédients</button></details>
+        <button type="button" class="btn big" data-rfcoller="1">Ajouter ces ingrédients</button></div>
     </fieldset>
-    <details class="ropt"${dr.optOuvert||dr.acc||dr.t||dr.etapes||dr.astuce||dr.photo||dr.prix||c.editId?" open":""}><summary>Détails facultatifs : temps, accompagnement, étapes, photo</summary>
+    <fieldset class="ringr"><legend>Étapes (facultatif)</legend>
+      <ol class="rsteps">${steps.map(ligneEtapeHtml).join("")}</ol>
+      <button type="button" class="btn big rfadd" data-rfstepadd="1"${steps.length>=20?" disabled":""}>+ Étape</button>
+    </fieldset>
+    <details class="ropt"${dr.optOuvert||dr.acc||dr.astuce||dr.prix||c.editId?" open":""}><summary>Détails facultatifs : accompagnement, astuce, prix, lien</summary>
       <div class="rform">
-        <div class="rgrid2"><label class="wfield">Temps (minutes)<input id="rf-t" type="number" inputmode="numeric" min="5" max="240" value="${esc(dr.t)}" placeholder="30"></label>
-          <label class="wfield">Accompagnement<input id="rf-acc" type="text" maxlength="60" value="${esc(dr.acc)}" placeholder="Ex. : salade verte"></label></div>
-        <label class="wfield">Étapes : une par ligne, sans numéro (la numérotation est automatique)<textarea id="rf-etapes" rows="6" placeholder="Faire revenir l'oignon 3 minutes.&#10;Ajouter la viande…">${esc(dr.etapes)}</textarea><small id="rf-etapes-cpt" class="note">${compteEtapes(dr.etapes)}</small></label>
-        <div class="wfield"><span>Photo</span><div class="rphoto">${dr.photo?`<img src="${dr.photo}" alt="">`:""}<label class="btn">${dr.photo?"Changer la photo":"Ajouter une photo"}<input id="rf-photo" type="file" accept="image/*" hidden></label>${dr.photo?`<button type="button" class="btn" data-rfnophoto="1">Retirer</button>`:""}</div></div>
+        <label class="wfield">Accompagnement<input id="rf-acc" type="text" maxlength="60" value="${esc(dr.acc)}" placeholder="Ex. : salade verte"></label>
         <label class="wfield">Astuce<input id="rf-astuce" type="text" maxlength="200" value="${esc(dr.astuce)}"></label>
-        <label class="wfield">Coût estimé du plat en euros (pour les ingrédients inconnus de l'application)<input id="rf-prix" type="number" inputmode="decimal" min="0" step="0.5" value="${esc(dr.prix)}"></label>
-        <div class="wfield"><span>Importer depuis un lien</span><div class="rlien"><input id="rf-lien" type="url" inputmode="url" placeholder="https://…"><button type="button" class="btn" data-rflien="1">Remplir</button></div><small class="note">Remplit le nom, les ingrédients et les étapes. Vérifiez avant d'enregistrer.</small></div>
+        <label class="wfield">Prix : coût estimé du plat en euros (pour les ingrédients inconnus de l'application)<input id="rf-prix" type="number" inputmode="decimal" min="0" step="0.5" value="${esc(dr.prix)}"></label>
+        <div class="wfield"><span>Lien : importer une recette depuis un site</span><div class="rlien"><input id="rf-lien" type="url" inputmode="url" placeholder="https://…"><button type="button" class="btn" data-rflien="1">Remplir</button></div><small class="note">Remplit le nom, les ingrédients et les étapes. Vérifiez avant d'enregistrer.</small></div>
       </div></details>
   </form>`;
-  $("sfoot").innerHTML=`<button class="btn big" data-sclose="1">Annuler</button><button class="btn primary big" data-rfsave="1" id="rf-save"${c.envoi?" disabled":""}>${c.envoi?"Enregistrement…":"Enregistrer la recette"}</button>`; }
+  $("sfoot").innerHTML=`<button class="btn big" data-sclose="1">Annuler</button><button class="btn primary big" data-rfsave="1" id="rf-save"${c.envoi?" disabled":""}>${c.envoi?"Enregistrement…":"Enregistrer"}</button>`; }
 const API_RECETTE="https://menus-semaine-man20671.vercel.app/api/recette";
 async function importerLien(url){
   const r=await fetch(API_RECETTE+"?url="+encodeURIComponent(url));
@@ -251,11 +262,11 @@ async function importerLien(url){
   if(!r.ok) throw new Error(j.erreur||"Lecture impossible");
   return j;
 }
-function compteEtapes(txt){ const n=String(txt||"").split(/\n+/).filter(x=>x.trim()).length; return n+(n>1?" étapes":n?" étape":"")+" (20 maximum)"; }
 function readRecipeForm(){ const dr=sheetCtx.draft, v=id=>{const e=$(id); return e?e.value:null;}, set=(k,x)=>{ if(x!==null) dr[k]=x; };
   set("nom",v("rf-nom")==null?null:v("rf-nom").trim()); set("acc",v("rf-acc")==null?null:v("rf-acc").trim()); set("t",v("rf-t")); if(v("rf-pers")!==null) dr.pers=Math.max(1,Math.min(20,Math.round(+v("rf-pers"))||5));
-  set("etapes",v("rf-etapes")); set("astuce",v("rf-astuce")==null?null:v("rf-astuce").trim()); set("prix",v("rf-prix")); set("coller",v("rf-coller"));
-  const o=document.querySelector("#rform details.ropt"), cl=document.querySelector("#rform details.rcoller"); if(o) dr.optOuvert=o.open; if(cl) dr.collerOuvert=cl.open;
+  const st=[...document.querySelectorAll("#rform [data-rfstep]")]; if(st.length){ dr.etapesL=st.map(x=>x.value); dr.etapes=dr.etapesL.map(x=>x.trim()).filter(Boolean).join("\n"); }
+  set("astuce",v("rf-astuce")==null?null:v("rf-astuce").trim()); set("prix",v("rf-prix")); set("coller",v("rf-coller"));
+  const o=document.querySelector("#rform details.ropt"); if(o) dr.optOuvert=o.open;
   document.querySelectorAll("#rform [data-rf]").forEach(el=>{ const k=+el.dataset.k, f=el.dataset.rf; if(!dr.ing[k]) return;
     if(f==="n") dr.ing[k][0]=el.value; if(f==="q") dr.ing[k][1]=el.value; if(f==="u") dr.ing[k][2]=el.value; if(f==="ray") dr.ing[k][3]=el.value; }); }
 function resizePhoto(file){ return new Promise((res,rej)=>{ const fr=new FileReader(); fr.onload=()=>{ const img=new Image(); img.onload=()=>{
@@ -296,7 +307,8 @@ async function saveRecipe(){ readRecipeForm(); const c=sheetCtx, dr=c.draft; if(
     try{ await DB.collection("recettes").doc(r.id).set({...r}); partage="ok"; } catch(e){ console.warn("[recette] partage impossible",e); partage="echec"; }
     c.envoi=false; }
   const d=c.forDay; if(sheetCtx===c){ sheetCtx.after=null; closeSheet(); }
-  if(d!==undefined&&d!==null) replaceDay(d,r.id); else { render(); if(modalCtx&&modalCtx.id===r.id) renderModal(); }
+  if(d!==undefined&&d!==null){ replaceDay(d,r.id); setTab("menu"); }   // recette créée pour un soir précis : on revient au menu
+  else { render(); if(modalCtx&&modalCtx.id===r.id) renderModal(); if(!c.editId){ setTab("recettes"); montrerRecette(r.id); } }   // sinon on reste dans Recettes, la nouvelle recette en évidence
   if(typeof renderCourses==="function") try{ renderCourses(); }catch(err){}
   const base=c.editId?"Recette mise à jour":"Recette ajoutée";
   toast(perdu.length?`${base}, mais ${perdu.join(" et ")} n'ont pas pu être gardées`:partage==="echec"?`${base} sur cet appareil. Le partage avec la famille a échoué : rouvrez la recette et touchez Enregistrer pour réessayer.`:partage==="ok"?`${base} et partagée avec la famille`:`${base}`); }
@@ -307,7 +319,7 @@ $("sheet").addEventListener("click",async e=>{ const c=sheetCtx; if(!c) return; 
   if(c.type==="export"){ handleExportClick(D,T); return; }
   if(c.type==="gallery"){ if(D.gf){ c.filter=D.gf; renderGallery(); return; } if(D.gc){ c.cuis=D.gc==="tous"?null:D.gc; renderGallery(); return; }
     if(D.pickrec){ const d=c.d; closeSheet(); if(d===null){ openMeal(D.pickrec,null); return; } if(state.week[d]!==D.pickrec) replaceDay(d,D.pickrec); if(modalCtx&&modalCtx.d===d){ modalCtx.id=state.week[d]; renderModal(); } return; }
-    if(D.newrec){ const d=c.d; closeSheet(); openSheet({type:"recipe",draft:newDraft(),forDay:d}); return; } }
+    if(D.newrec){ nouvelleRecette({forDay:c.d}); return; } }
   if(c.type==="shop"){ if(D.stop){ c.stop=+D.stop; renderShop(); return; }
     if(D.shopk){ const k=D.shopk; if(state.checked[k]) delete state.checked[k]; else state.checked[k]=true; save(); renderCourses(); renderShop(); try{navigator.vibrate&&navigator.vibrate(15);}catch(err){} return; }
     if(D.shopend){ closeSheet(); return; } }
@@ -339,11 +351,14 @@ $("sheet").addEventListener("click",async e=>{ const c=sheetCtx; if(!c) return; 
       try{ const j=await importerLien(lien); const dr=c.draft;
         dr.nom=j.titre||dr.nom; dr.t=j.tempsMinutes||dr.t; dr.pers=j.portions||dr.pers;
         const ing=(j.ingredients||[]).map(parseLigneIng).filter(x=>x&&x[0]).slice(0,30);
-        dr.ing=ing.length?ing:dr.ing; dr.etapes=(j.etapes||[]).join("\n");
+        dr.ing=ing.length?ing:dr.ing; dr.etapes=(j.etapes||[]).join("\n"); dr.etapesL=null;
         renderRecipeForm(); toast("Recette remplie : vérifiez avant d'enregistrer"); }
       catch(err){ toast(err.message||"Lecture impossible : saisissez la recette à la main"); }
       return; }
     if(D.rfadd){ readRecipeForm(); c.draft.ing.push(["","","g","fl"]); c.erreurs=null; renderRecipeForm(); const l=document.querySelectorAll("#rform .ingrow"); const n=l[l.length-1]&&l[l.length-1].querySelector("input"); if(n){ n.scrollIntoView({block:"center"}); n.focus(); } return; }
+    if(D.rfstepadd){ readRecipeForm(); etapesDuBrouillon(c.draft).push(""); renderRecipeForm(); const l=document.querySelectorAll("#rform [data-rfstep]"), t=l[l.length-1]; if(t){ t.scrollIntoView({block:"center"}); t.focus(); } return; }
+    if(D.rfstepdel){ readRecipeForm(); const l=etapesDuBrouillon(c.draft); l.splice(+D.rfstepdel,1); if(!l.length) l.push(""); c.draft.etapes=l.map(x=>x.trim()).filter(Boolean).join("\n"); renderRecipeForm(); return; }
+    if(D.rfcollertoggle){ readRecipeForm(); c.draft.collerOuvert=!c.draft.collerOuvert; renderRecipeForm(); if(c.draft.collerOuvert){ const t=$("rf-coller"); if(t){ t.scrollIntoView({block:"center"}); t.focus(); } } return; }
     if(D.rfdel){ readRecipeForm(); c.draft.ing.splice(+D.rfdel,1); if(!c.draft.ing.length) c.draft.ing.push(["","","g","fl"]); renderRecipeForm(); return; }
     if(D.rfpers){ readRecipeForm(); c.draft.pers=Math.max(1,Math.min(20,c.draft.pers+(+D.rfpers))); renderRecipeForm(); return; }
     if(D.rfcoller){ readRecipeForm(); const R=parseListeIng(c.draft.coller);
@@ -363,10 +378,11 @@ $("sheet").addEventListener("submit",e=>{ if(e.target.id==="wform"){ e.preventDe
 $("sheet").addEventListener("change",e=>{ const t=e.target, c=sheetCtx; if(!c||c.type!=="recipe"||!t.dataset||!t.dataset.rf) return; const k=+t.dataset.k, row=c.draft.ing[k]; if(!row) return;
   if(t.dataset.rf==="ray"){ row[3]=t.value; row[4]=1; return; }
   if(t.dataset.rf==="n"&&!row[4]&&t.value.trim()){ const r=rayonDe(t.value), sel=t.closest(".ingrow").querySelector('select[data-rf="ray"]'); row[0]=t.value; row[3]=r; if(sel) sel.value=r; } });
+$("sheet").addEventListener("input",e=>{ const t=e.target, c=sheetCtx; if(!c||c.type!=="recipe"||!t.dataset||t.dataset.rf!=="n") return; const row=c.draft.ing[+t.dataset.k]; if(!row) return;
+  row[0]=t.value; if(!row[4]&&t.value.trim()){ const r=rayonDe(t.value); row[3]=r; const sel=t.closest(".ingrow").querySelector('select[data-rf="ray"]'); if(sel) sel.value=r; } });
 $("sheet").addEventListener("change",async e=>{ if(e.target.id==="rf-photo"&&e.target.files&&e.target.files[0]){ readRecipeForm();
     try{ sheetCtx.draft.photo=await resizePhoto(e.target.files[0]); renderRecipeForm(); }catch(err){ toast("Impossible de lire cette photo"); } } });
-$("sheet").addEventListener("input",e=>{ if(e.target.id==="rf-nom") $("stitle").textContent=e.target.value||"Recette";
-  if(e.target.id==="rf-etapes") $("rf-etapes-cpt").textContent=compteEtapes(e.target.value); });
+$("sheet").addEventListener("input",e=>{ if(e.target.id==="rf-nom") $("stitle").textContent=e.target.value||(sheetCtx&&sheetCtx.editId?"Recette":"Nouvelle recette"); });
 
 // --- Avis « J'aime / Pas pour moi » : un seul choix par personne et par plat, définitif ---
 async function setAvis(rid,n,v){ if(!n||!BYID[rid]||(v!==1&&v!==-1)) return;
@@ -642,7 +658,7 @@ $("rayonchips").addEventListener("click",e=>{ const b=e.target.closest("[data-ra
 $("savail").addEventListener("click",e=>{ const b=e.target.closest("[data-sadd]"); if(!b) return; const id=b.dataset.sadd; if(state.storeOrder.includes(id)) return;
   state.storeOrder=[...state.storeOrder,id]; save(); render(); toast(MAGNOM[id]+" ajouté en dernière position : remontez-le si besoin"); });
 $("ensfilter").addEventListener("click",e=>{ const b=e.target.closest("[data-ensf]"); if(!b) return; ensFilter=b.dataset.ensf; renderStoreOrder(); });
-$("newrecipe").onclick=()=>openSheet({type:"recipe",draft:newDraft()});
+$("newrecipe").onclick=()=>nouvelleRecette();
 $("rewizard").onclick=()=>openSheet({type:"wizard",step:0});
 let wizardChecked=false;
 function maybeWizard(){ if(wizardChecked) return; wizardChecked=true; if(!state.onboarded&&!state.family.length&&!sheetCtx) openSheet({type:"wizard",step:0}); }

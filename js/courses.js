@@ -153,10 +153,22 @@ function renderBudget(){
   $("budgetsum").innerHTML=`<span class="sumtitle">Budget</span><span class="sumval">≈ ${eur(w)} · ${per(w)} par repas · ${totalCouverts()} couverts${absN?` · ${absN} absence${absN>1?"s":""}`:""}</span>`;
 }
 
-function renderRecettes(){
-  const list=[...RECETTES].sort((x,y)=>(y.perso?1:0)-(x.perso?1:0)||x.nom.localeCompare(y.nom,"fr"));
-  $("recipes").innerHTML=list.map(r=>{const days=state.week.map((id,d)=>id===r.id?JOURS[d].slice(0,3):null).filter(Boolean), lk=likeScore(r);
-    return `<button class="rrow" data-openrec="${r.id}"><img class="rthumb" src="${photoSrc(r.id)}" alt="" loading="lazy" decoding="async"><span class="rinfo"><span class="rtitle">${esc(r.nom)}</span>
-      <span class="rmeta">${r.t} min${r.perso?" · recette de famille":""}${lk>0?` · aimé par ${lk}`:""}${days.length?` · au menu ${days.join(", ")}`:""}</span></span><span class="dchev" aria-hidden="true">›</span></button>`}).join("");
+// ---- Onglet Recettes : recherche, filtres, liste complète ----
+let recQ="", recFiltre="toutes", recNouveau=null;
+function renderRecettes(){ const box=$("recipes"); if(!box) return;
+  const tout=[...RECETTES].sort((x,y)=>(y.perso?1:0)-(x.perso?1:0)||x.nom.localeCompare(y.nom,"fr")), fam=tout.filter(r=>r.perso).length;
+  const k=norm(recQ); let list=tout; if(recFiltre==="famille") list=list.filter(r=>r.perso); if(k) list=list.filter(r=>norm(r.nom).includes(k));
+  const f=$("recfilters"); if(f) f.innerHTML=`<button class="chip${recFiltre==="toutes"?" on":""}" type="button" data-recf="toutes" aria-pressed="${recFiltre==="toutes"}">Toutes (${tout.length})</button><button class="chip${recFiltre==="famille"?" on":""}" type="button" data-recf="famille" aria-pressed="${recFiltre==="famille"}">De la famille (${fam})</button>`;
+  const c=$("reccount"); if(c) c.textContent=list.length===tout.length?`${tout.length} recettes. Touchez une recette pour la voir.`:`${list.length} recette${list.length>1?"s":""} sur ${tout.length}.`;
+  box.innerHTML=list.length?list.map(r=>{const days=state.week.map((id,d)=>id===r.id?JOURS[d].slice(0,3):null).filter(Boolean), lk=likeScore(r);
+    return `<button class="rrow${recNouveau===r.id?" nouvelle":""}" data-openrec="${r.id}"><img class="rthumb" src="${photoSrc(r.id)}" alt="" loading="lazy" decoding="async"><span class="rinfo"><span class="rtitle">${esc(r.nom)}</span>
+      <span class="rmeta">${r.t} min${r.perso?" · recette de famille":""}${lk>0?` · aimé par ${lk}`:""}${days.length?` · au menu ${days.join(", ")}`:""}</span></span><span class="dchev" aria-hidden="true">›</span></button>`}).join("")
+    :`<p class="note">${k?"Aucune recette ne correspond à cette recherche.":"Aucune recette de la famille pour l'instant : touchez « Nouvelle recette » pour ajouter la première."}</p>`;
 }
+// Après un enregistrement : la nouvelle recette reste en évidence dans la liste
+function montrerRecette(id){ recNouveau=id; recQ=""; recFiltre="toutes"; const q=$("recq"); if(q) q.value=""; renderRecettes();
+  requestAnimationFrame(()=>{ const el=document.querySelector('#recipes [data-openrec="'+id+'"]'); if(el){ el.scrollIntoView({block:"center",behavior:"smooth"}); el.classList.remove("flash"); void el.offsetWidth; el.classList.add("flash"); } });
+  setTimeout(()=>{ if(recNouveau===id){ recNouveau=null; const el=document.querySelector('#recipes [data-openrec="'+id+'"]'); if(el) el.classList.remove("nouvelle"); } },8000); }
+document.addEventListener("input",e=>{ if(e.target.id==="recq"){ recQ=e.target.value; renderRecettes(); } });
+document.addEventListener("click",e=>{ const f=e.target.closest("[data-recf]"); if(f){ recFiltre=f.dataset.recf; renderRecettes(); } });
 
