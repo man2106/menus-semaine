@@ -7,11 +7,25 @@ const MOTS=["Parfait comme ça","Trop salé","Fade","Trop épicé","Trop gras","
 let RETOURS={}, SEMAINES={}, unsubRetours=null, unsubSemaines=null;
 try{ const loc=JSON.parse(localStorage.getItem(KEY+"-retours")||"{}"); if(loc&&typeof loc==="object") RETOURS=loc; }catch(e){}
 function saveRetoursLocal(){ try{ localStorage.setItem(KEY+"-retours",JSON.stringify(RETOURS)); }catch(e){} }
-const slugNom = n => norm(n).replace(/ /g,"-").slice(0,30)||"x";
+const slugNom = n => norm(n).replace(/ /g,"-").slice(0,30)||"x";   // uniquement a-z, 0-9 et « - » : toujours accepté dans un chemin de la base
+// ---- Identité : chacun ne vote que pour lui-même (le propriétaire peut voter à la place d'un membre sans téléphone) ----
+function identite(){ const a=(typeof window.__acces==="function"&&window.__acces())||null; return {nom:a&&a.nom?String(a.nom).trim():"",proprio:!!(a&&a.role==="proprio")}; }
+const memeNom=(a,b)=>{ const x=norm(a); return !!x&&x===norm(b); };
+// Prénom écrit comme dans la famille (« Anne » même si la base a « anne »), pour que les comptes par personne retombent juste
+const canonNom=n=>{ const f=(typeof state!=="undefined"&&Array.isArray(state.family)?state.family:[]).find(x=>memeNom(x,n)); return f||n; };
+// Sans partage (usage sur cet appareil seulement) tout le monde peut voter ; avec partage : soi-même, ou le propriétaire pour un autre
+function peutNoter(n){ if(!DB) return true; const i=identite(); return i.proprio||(!!i.nom&&memeNom(n,i.nom)); }
+// Prénom envoyé à la base : celui de la connexion (la règle de sécurité le compare au prénom de l'appareil)
+const nomPourEnvoi=n=>{ const i=identite(); return i.nom&&memeNom(n,i.nom)?i.nom:n; };
+// Message clair selon la cause d'un refus
+function messageEchec(e,quoi){ const c=e&&e.code;
+  if(CAN_WRITE===false) return "Cet appareil est en lecture seule : "+quoi+" n'a pas été envoyé.";
+  if(c==="invalid_argument") return (e&&/verrouill/i.test(e.message||"")?"Ce vote est déjà enregistré et verrouillé.":"Le serveur a refusé "+quoi+". Vérifiez que cet appareil est bien rattaché à la famille et que votre prénom est le bon (Plus > Réglages > Accès de la famille).");
+  return "Pas de connexion : "+quoi+" n'a pas été envoyé. Réessayez dès que le réseau revient."; }
 const retourId = (iso,d,n) => `${iso}_${d}_${slugNom(n)}`;
 function cleanRetour(r){ if(!r||typeof r!=="object") return null; const note=+r.note; if(!(note>=1&&note<=5)) return null;
   if(typeof r.plat!=="string"||typeof r.semaine!=="string"||!/^\d{4}-\d\d-\d\d$/.test(r.semaine)) return null;
-  return {semaine:r.semaine,jour:Math.max(0,Math.min(6,+r.jour||0)),plat:r.plat,nom:propre(r.nom,30),note:Math.round(note),
+  return {semaine:r.semaine,jour:Math.max(0,Math.min(6,+r.jour||0)),plat:r.plat,nom:canonNom(propre(r.nom,30)),note:Math.round(note),
     refaire:["oui","peut","non"].includes(r.refaire)?r.refaire:null,mots:Array.isArray(r.mots)?r.mots.filter(m=>MOTS.includes(m)).slice(0,6):[],
     com:String(r.com||"").replace(/[\u0000-\u001f]/g," ").trim().slice(0,200),quand:typeof r.quand==="string"?r.quand.slice(0,40):null,cuisinier:propre(r.cuisinier,30)||null}; }
 function subscribeRetours(){ if(!DB) return; if(unsubRetours) unsubRetours();
@@ -19,7 +33,8 @@ function subscribeRetours(){ if(!DB) return; if(unsubRetours) unsubRetours();
     q.docChanges().forEach(c=>{ if(c.type==="removed"){ delete RETOURS[c.doc.id]; ch=true; return; } const r=cleanRetour(c.doc.data()); if(r){ RETOURS[c.doc.id]=r; ch=true; } });
     // Les avis supprimés dans la base disparaissent aussi du cache local de cet appareil
     if(q.docs){ const vivants=new Set(q.docs.map(d=>d.id)); Object.keys(RETOURS).forEach(k=>{ if(!vivants.has(k)){ delete RETOURS[k]; ch=true; } }); }
-    if(ch){ saveRetoursLocal(); renderRetours(); if(sheetCtx&&(sheetCtx.type==="bilan"||sheetCtx.type==="retour")) renderSheet(); } },()=>{});
+    if(ch){ saveRetoursLocal(); renderRetours(); const ae=document.activeElement, saisie=ae&&ae.dataset&&ae.dataset.rcom!=null; // on ne referme pas le clavier pendant qu'on tape un commentaire
+      if(sheetCtx&&(sheetCtx.type==="bilan"||sheetCtx.type==="retour")&&!saisie) renderSheet(); } },()=>{});
   // toutes les semaines partagées, pour retrouver les repas déjà mangés
   if(unsubSemaines) unsubSemaines();
   unsubSemaines=DB.collection("semaines").onSnapshot(q=>{ q.docChanges().forEach(c=>{ if(c.type==="removed") delete SEMAINES[c.doc.id]; else SEMAINES[c.doc.id]=c.doc.data(); }); renderRetours(); },()=>{});
@@ -37,26 +52,39 @@ function repasPasses(jours=14){
   return out.sort((a,b)=>b.date-a.date);
 }
 const retoursDu = (iso,d) => Object.values(RETOURS).filter(r=>r.semaine===iso&&r.jour===d);
-// Chacun ne note que pour lui-même. Le propriétaire peut noter pour tout le monde.
-function peutNoter(n){ const a=(typeof window.__acces==="function"&&window.__acces())||{}; return !!a.nom && n===a.nom; }
-async function enregistrerRetour(iso,d,nom,patch){
+// ---- Envoi d'un avis sur un repas ----
+// Le brouillon (note, à refaire, mots, commentaire) reste dans cette fenêtre tant que l'avis n'est pas envoyé : un rafraîchissement
+// des données partagées ne peut plus l'effacer. Un clic sur « Envoyer mon avis » écrit UN document par personne et par repas
+// (création seulement) ; une fois envoyé, l'avis est verrouillé (seul le propriétaire peut le réinitialiser).
+let BROUILLON_RETOUR={};
+const brouillonRetour=id=>BROUILLON_RETOUR[id]||(BROUILLON_RETOUR[id]={note:null,refaire:null,mots:[],com:"",envoi:false,erreur:""});
+async function envoyerRetour(iso,d,nom){
+  const id=retourId(iso,d,nom), dr=brouillonRetour(id);
+  if(dr.envoi) return;
+  if(RETOURS[id]&&RETOURS[id].note){ toast("Votre avis est déjà envoyé"); renderSheet(); return; }
   if(!peutNoter(nom)){ toast("Vous ne notez que pour vous"); return; }
-  const id=retourId(iso,d,nom), rp=repasPasses(21).find(x=>x.iso===iso&&x.d===d);
-  if(!rp){ toast("Ce repas n'est pas encore disponible à noter"); return; }
-  const prev=RETOURS[id]||{semaine:iso,jour:d,plat:rp.plat,nom,note:null,refaire:null,mots:[],com:""};
-  const next={...prev,...patch,plat:rp.plat,nom,cuisinier:rp.cuisinier,quand:new Date().toISOString(),par:ME||null};
-  if(!next.note){ RETOURS[id]=next; renderSheet(); return; } // on attend la note avant d'enregistrer
-  const propre_=cleanRetour(next);
-  if(!propre_){ toast("Avis incomplet, il n'a pas été enregistré"); return; }
+  if(!dr.note){ dr.erreur="Choisissez d'abord un visage, puis touchez « Envoyer mon avis »."; renderSheet(); return; }
+  const rp=repasPasses(21).find(x=>x.iso===iso&&x.d===d);
+  if(!rp){ dr.erreur="Ce repas n'est plus dans la liste des repas à noter. Fermez cette fenêtre et rouvrez-la ; votre choix est conservé."; renderSheet(); return; }
+  const doc=cleanRetour({semaine:iso,jour:d,plat:rp.plat,nom:nomPourEnvoi(nom),note:dr.note,refaire:dr.refaire,mots:dr.mots,com:dr.com,quand:new Date().toISOString(),cuisinier:rp.cuisinier});
+  if(!doc){ dr.erreur="Avis incomplet : choisissez un visage."; renderSheet(); return; }
+  dr.erreur=""; dr.envoi=true; renderSheet();
+  if(!DB){ // sans partage : l'avis reste sur cet appareil
+    dr.envoi=false; RETOURS[id]=doc; delete BROUILLON_RETOUR[id]; saveRetoursLocal(); renderRetours(); renderSheet(); toast("Avis gardé sur cet appareil (le partage n'est pas activé)"); return; }
+  if(CAN_WRITE===false){ dr.envoi=false; dr.erreur=messageEchec(null,"l'avis"); renderSheet(); return; }
+  try{ await DB.collection("retours").doc(id).create({...doc,nom:nomPourEnvoi(nom),par:ME||null});
+    // Le serveur a accepté : seulement maintenant l'avis passe en « envoyé »
+    delete BROUILLON_RETOUR[id]; if(!RETOURS[id]) RETOURS[id]=doc; saveRetoursLocal(); renderRetours(); renderSheet(); toast("Avis envoyé, merci !"); }
+  catch(e){ console.warn("[avis] envoi impossible",e); dr.envoi=false;
+    if(e&&e.code==="exists"){ delete BROUILLON_RETOUR[id]; renderRetours(); renderSheet(); toast("Votre avis avait déjà été envoyé depuis un autre appareil : il est conservé tel quel"); return; }
+    dr.erreur=messageEchec(e,"l'avis"); renderRetours(); renderSheet(); }
+}
+// Le propriétaire peut effacer un avis (erreur de saisie) pour qu'il soit redonné
+async function reinitialiserRetour(iso,d,nom){
+  const id=retourId(iso,d,nom); if(!DB||!identite().proprio){ toast("Seul le propriétaire peut réinitialiser un avis"); return; }
   const avant=RETOURS[id];
-  RETOURS[id]=propre_; saveRetoursLocal(); renderRetours(); renderSheet();
-  if(!DB){ toast("Pas de connexion : l'avis n'a pas été enregistré"); return; }
-  try{ await DB.collection("retours").doc(id).set({...propre_,par:ME||null}); }
-  catch(e){ console.warn("[avis] envoi refusé", e);
-    // Pas d'avis fantôme : l'avis refusé disparaît de l'écran, l'utilisateur est prévenu
-    if(avant) RETOURS[id]=avant; else delete RETOURS[id];
-    saveRetoursLocal(); renderRetours(); renderSheet();
-    toast("L'avis n'a pas été enregistré. Vérifiez que cet appareil est bien rattaché à la famille (code famille), puis réessayez."); }
+  try{ await DB.collection("retours").doc(id).delete(); delete RETOURS[id]; delete BROUILLON_RETOUR[id]; saveRetoursLocal(); renderRetours(); renderSheet(); toast("Avis réinitialisé : "+nom+" peut le redonner"); }
+  catch(e){ if(avant) RETOURS[id]=avant; renderSheet(); toast("L'avis n'a pas pu être réinitialisé"); }
 }
 // ---- Calculs du bilan ----
 const moy = a => a.length? a.reduce((s,x)=>s+x,0)/a.length : null;
@@ -132,17 +160,30 @@ function renderRetourSheet(){ const c=sheetCtx;
   const p=repasPasses(21).find(x=>x.iso===c.iso&&x.d===c.d); if(!p){ closeSheet(); return; }
   const r=BYID[p.plat];
   $("seyebrow").textContent=`${JOURS[(p.date.getDay()+6)%7]} ${fmtShort(p.date)}`; $("stitle").textContent=r.nom; $("sextra").innerHTML="";
-  $("sbody").innerHTML=`<p class="note">Chacun note pour lui, sur son téléphone ou ici. Une seule note suffit, le reste est facultatif.</p>
-    ${p.pres.map(n=>{ const v=RETOURS[retourId(p.iso,p.d,n)]||{}, o=c.open===n||(!v.note&&!c.open);
-      if(!peutNoter(n)) return `<section class="rtperson${v.note?" done":""}"><div class="rtname"><b>${esc(n)}</b>${v.note?`<span>${NOTES[v.note-1][1]} ${NOTES[v.note-1][2]}${v.refaire?" · "+REFAIRE.find(x=>x[0]===v.refaire)[1]:""}</span>`:"<span>Pas encore noté</span>"}</div>${v.com?`<p class="note">« ${esc(v.com)} »</p>`:""}<p class="note">Seule cette personne peut noter pour elle-même.</p></section>`;
-      return `<section class="rtperson${v.note?" done":""}">
-        <div class="rtname"><b>${esc(n)}</b>${v.note?`<span>${NOTES[v.note-1][1]} ${NOTES[v.note-1][2]}${v.refaire?" · "+REFAIRE.find(x=>x[0]===v.refaire)[1]:""}</span>`:""}</div>
-        <div class="rtfaces" role="group" aria-label="Note de ${esc(n)}">${NOTES.map(([k,e,l])=>`<button class="rtface${v.note===k?" on":""}" data-rnote="${k}" data-rn="${esc(n)}" aria-label="${l}" title="${l}"><span>${e}</span><small>${l}</small></button>`).join("")}</div>
-        ${v.note?`<div class="rtmore"${o||c.open===n?"":""}>
-          <div class="gfilters">${REFAIRE.map(([k,l])=>`<button class="chip${v.refaire===k?" on":""}" data-rref="${k}" data-rn="${esc(n)}">${l}</button>`).join("")}</div>
-          <div class="gfilters wrapchips">${MOTS.map(w=>`<button class="chip${(v.mots||[]).includes(w)?" on":""}" data-rmot="${esc(w)}" data-rn="${esc(n)}">${w}</button>`).join("")}</div>
-          <div class="addrow"><input type="text" maxlength="200" data-rcom="${esc(n)}" value="${esc(v.com||"")}" placeholder="Un mot pour le cuisinier (facultatif)" aria-label="Commentaire de ${esc(n)}"><button class="btn" data-rcomok="${esc(n)}">OK</button></div>
-        </div>`:""}
+  const lib=v=>`${NOTES[v.note-1][1]} ${NOTES[v.note-1][2]}`;
+  $("sbody").innerHTML=`<p class="note">Chacun note pour lui-même. Choisissez un visage, ajoutez si vous voulez « à refaire », des mots ou un commentaire, puis touchez <b>Envoyer mon avis</b>. Une fois envoyé, l'avis ne peut plus être changé.</p>
+    ${p.pres.map(n=>{ const id=retourId(p.iso,p.d,n), v=RETOURS[id]||{}, e=esc(n);
+      if(v.note){ const proprio=identite().proprio&&DB, arme=c.arm===id;
+        return `<section class="rtperson done sent"><div class="rtname"><b>${e}</b><span class="rtsent">✓ Avis envoyé</span></div>
+          <div class="rtlocked"><span class="rtbig" aria-hidden="true">${NOTES[v.note-1][1]}</span><div><b>${NOTES[v.note-1][2]}</b>
+            ${v.refaire?`<div>${esc(REFAIRE.find(x=>x[0]===v.refaire)[1])}</div>`:""}
+            ${(v.mots||[]).length?`<div class="rtmots">${v.mots.map(w=>`<span class="chip on">${esc(w)}</span>`).join("")}</div>`:""}
+            ${v.com?`<p class="note">« ${esc(v.com)} »</p>`:""}</div></div>
+          <p class="note">Avis enregistré : il ne peut plus être modifié.</p>
+          ${proprio?`<button class="btn small" data-rreset="${e}">${arme?"Confirmer : effacer cet avis":"Réinitialiser cet avis (propriétaire)"}</button>`:""}</section>`; }
+      if(!peutNoter(n)) return `<section class="rtperson"><div class="rtname"><b>${e}</b><span>Pas encore noté</span></div><p class="note">Seule cette personne peut noter pour elle-même.</p></section>`;
+      const dr=brouillonRetour(id), pret=!!dr.note&&!dr.envoi;
+      return `<section class="rtperson">
+        <div class="rtname"><b>${e}</b>${dr.note?`<span>${lib(dr)}</span>`:""}</div>
+        <div class="rtfaces" role="group" aria-label="Note de ${e}">${NOTES.map(([k,em,l])=>`<button class="rtface${dr.note===k?" on":""}" data-rnote="${k}" data-rn="${e}" aria-label="${l}" aria-pressed="${dr.note===k}"${dr.envoi?" disabled":""}><span>${em}</span><small>${l}</small></button>`).join("")}</div>
+        <div class="rtmore">
+          <div class="gfilters wrapchips" role="group" aria-label="À refaire ?">${REFAIRE.map(([k,l])=>`<button class="chip${dr.refaire===k?" on":""}" data-rref="${k}" data-rn="${e}" aria-pressed="${dr.refaire===k}"${dr.envoi?" disabled":""}>${l}</button>`).join("")}</div>
+          <div class="gfilters wrapchips" role="group" aria-label="Quelques mots">${MOTS.map(w=>`<button class="chip${dr.mots.includes(w)?" on":""}" data-rmot="${esc(w)}" data-rn="${e}" aria-pressed="${dr.mots.includes(w)}"${dr.envoi?" disabled":""}>${w}</button>`).join("")}</div>
+          <input type="text" maxlength="200" data-rcom="${e}" value="${esc(dr.com)}" placeholder="Un mot pour le cuisinier (facultatif)" aria-label="Commentaire de ${e}"${dr.envoi?" disabled":""}>
+        </div>
+        ${dr.erreur?`<p class="rterr" role="alert">${esc(dr.erreur)}</p>`:""}
+        <button class="btn primary big rtsend" data-renvoi="${e}"${pret?"":" disabled"}>${dr.envoi?"Envoi en cours…":dr.erreur&&dr.note?"Réessayer l'envoi":"Envoyer mon avis"}</button>
+        ${!dr.note?`<p class="note">Choisissez un visage pour pouvoir envoyer.</p>`:""}
       </section>`; }).join("")}`;
   $("sfoot").innerHTML=`<button class="btn" data-retourslist="1">Autres repas</button><button class="btn primary" data-bilan="1">Voir le bilan</button>`;
 }
@@ -185,18 +226,23 @@ function renderBilan(){ const A=analyse();
     ${A.coms.length?`<section class="rtsec"><h3>Derniers commentaires</h3>${A.coms.map(r=>`<blockquote class="rtcom">« ${esc(r.com)} »<small>${esc(r.nom)} · ${esc(BYID[r.plat].nom)} · ${fmtShort(isoDate(r.semaine))}</small></blockquote>`).join("")}</section>`:""}
     <p class="note">Méthode : la note d'un plat est une moyenne prudente, qui tient compte du nombre d'avis, pour qu'un seul avis ne suffise pas à classer un plat. Les avis ne sont pas regroupés par cuisinier.</p>`;
 }
-document.addEventListener("click",e=>{ const b=e.target.closest("[data-retour],[data-bilan],[data-retourslist],[data-rnote],[data-rref],[data-rmot],[data-rcomok]"); if(!b) return; const D=b.dataset;
+document.addEventListener("click",e=>{ const b=e.target.closest("[data-retour],[data-bilan],[data-retourslist],[data-rnote],[data-rref],[data-rmot],[data-renvoi],[data-rreset]"); if(!b) return; const D=b.dataset;
   if(D.retour){ const [iso,d]=D.retour.split("|"); const ctx={type:"retour",iso,d:+d}; sheetCtx?(sheetCtx=ctx,renderSheet(),$("sbody").scrollTop=0):openSheet(ctx); return; }
   if(D.bilan){ const ctx={type:"bilan"}; sheetCtx?(sheetCtx=ctx,renderSheet(),$("sbody").scrollTop=0):openSheet(ctx); return; }
   if(D.retourslist){ const ctx={type:"retour",list:true}; sheetCtx?(sheetCtx=ctx,renderSheet(),$("sbody").scrollTop=0):openSheet(ctx); return; }
-  const c=sheetCtx; if(!c||c.type!=="retour"||c.list) return; const n=D.rn;
-  if((D.rnote||D.rref||D.rmot||D.rcomok!=null) && !peutNoter(n)){ toast("Vous ne notez que pour vous"); return; }
-  if(D.rnote){ enregistrerRetour(c.iso,c.d,n,{note:+D.rnote}); return; }
-  const v=RETOURS[retourId(c.iso,c.d,n)]||{};
-  if(D.rref){ enregistrerRetour(c.iso,c.d,n,{refaire:v.refaire===D.rref?null:D.rref}); return; }
-  if(D.rmot){ const s=new Set(v.mots||[]); s.has(D.rmot)?s.delete(D.rmot):s.add(D.rmot); enregistrerRetour(c.iso,c.d,n,{mots:[...s]}); return; }
-  if(D.rcomok!=null){ const inp=[...document.querySelectorAll("[data-rcom]")].find(x=>x.dataset.rcom===n); if(inp){ enregistrerRetour(c.iso,c.d,n,{com:inp.value.trim()}); toast("Commentaire enregistré"); } }
+  const c=sheetCtx; if(!c||c.type!=="retour"||c.list) return; const n=D.rn||D.renvoi||D.rreset, id=retourId(c.iso,c.d,n);
+  if(D.rreset){ if(c.arm!==id){ c.arm=id; renderSheet(); return; } c.arm=null; reinitialiserRetour(c.iso,c.d,n); return; }
+  if(RETOURS[id]&&RETOURS[id].note){ toast("Avis déjà envoyé : il ne peut plus être modifié"); return; }
+  if(!peutNoter(n)){ toast("Vous ne notez que pour vous"); return; }
+  if(D.renvoi){ envoyerRetour(c.iso,c.d,n); return; }
+  const dr=brouillonRetour(id); if(dr.envoi) return; dr.erreur="";
+  if(D.rnote){ dr.note=+D.rnote; renderSheet(); return; }
+  if(D.rref){ dr.refaire=dr.refaire===D.rref?null:D.rref; renderSheet(); return; }
+  if(D.rmot){ const m=new Set(dr.mots); m.has(D.rmot)?m.delete(D.rmot):m.add(D.rmot); dr.mots=[...m]; renderSheet(); }
 });
+// Le commentaire tapé est gardé dans le brouillon à chaque lettre (un rafraîchissement de l'écran ne l'efface pas)
+document.addEventListener("input",e=>{ const i=e.target; if(!i||!i.dataset||i.dataset.rcom==null||!sheetCtx||sheetCtx.type!=="retour") return;
+  brouillonRetour(retourId(sheetCtx.iso,sheetCtx.d,i.dataset.rcom)).com=i.value.slice(0,200); });
 
 
 
@@ -545,14 +591,56 @@ function cleanSondage(x){ if(!x||typeof x!=="object"||typeof x.nom!=="string") r
   return {nom:propre(x.nom,30),envies:env,quand:typeof x.quand==="string"?x.quand:null,
     prefs:{cuisines:Array.isArray(p.cuisines)?p.cuisines.filter(c=>CUISINES[c]):[],vege:[0,1,2].includes(p.vege)?p.vege:null,
       nouveautes:PREF_NEW.some(([k])=>k===p.nouveautes)?p.nouveautes:null,piquant:PREF_PIQ.some(([k])=>k===p.piquant)?p.piquant:null}}; }
+// Les réponses « envie / bof / non merci » sont des votes : un document par personne et par plat (envies/<plat>_<prénom>), créé une seule fois.
+// Les anciennes réponses (dans le document « sondage/<prénom> », champ envies) sont conservées et lues avec les nouvelles.
+let ENVIES={}, ENV_IDX=null, unsubEnvies=null, envArm=null, envDernier=null, envOuvert=false; const ENV_ENCOURS=new Set();
+try{ const loc=JSON.parse(localStorage.getItem(KEY+"-envies")||"{}"); if(loc&&typeof loc==="object") ENVIES=loc; }catch(e){}
+const saveEnviesLocal=()=>{ try{ localStorage.setItem(KEY+"-envies",JSON.stringify(ENVIES)); }catch(e){} };
+const envieId=(rec,n)=>rec+"_"+slugNom(n);
+function cleanVote(x,valeurs){ if(!x||typeof x!=="object"||typeof x.rec!=="string"||typeof x.nom!=="string"||!valeurs.includes(x.v)) return null;
+  return {rec:x.rec.slice(0,40),nom:canonNom(propre(x.nom,30)),v:x.v,quand:typeof x.quand==="string"?x.quand.slice(0,40):null}; }
 function subscribeSondage(){ if(!DB) return; if(unsubSondage) unsubSondage();
-  unsubSondage=DB.collection("sondage").onSnapshot(q=>{ q.docChanges().forEach(c=>{ if(c.type==="removed") delete SONDAGE[c.doc.id]; else { const v=cleanSondage(c.doc.data()); if(v) SONDAGE[c.doc.id]=v; } });
-    saveSondageLocal(); if(state.tab==="envies") renderEnvies(); },()=>{}); }
-const sondageDe = n => SONDAGE[slugNom(n)] || {nom:n,envies:{},prefs:{cuisines:[],vege:null,nouveautes:null,piquant:null},quand:null};
+  unsubSondage=DB.collection("sondage").onSnapshot(q=>{ q.docChanges().forEach(c=>{ if(c.type==="removed") delete SONDAGE[c.doc.id];
+      else if(envWrite[c.doc.id]) return;   // une modification de cet appareil attend d'être envoyée : elle ne doit pas être écrasée par une copie plus ancienne
+      else { const v=cleanSondage(c.doc.data()); if(v) SONDAGE[c.doc.id]=v; } });
+    saveSondageLocal(); if(state.tab==="envies") renderEnvies(); },()=>{});
+  if(unsubEnvies) unsubEnvies();
+  unsubEnvies=DB.collection("envies").onSnapshot(q=>{ q.docChanges().forEach(c=>{ if(c.type==="removed"){ delete ENVIES[c.doc.id]; return; } const v=cleanVote(c.doc.data(),[1,0,-1]); if(v) ENVIES[c.doc.id]=v; });
+    if(q.docs){ const vivants=new Set(q.docs.map(d=>d.id)); Object.keys(ENVIES).forEach(k=>{ if(!vivants.has(k)) delete ENVIES[k]; }); }
+    ENV_IDX=null; PLANS={}; saveEnviesLocal(); if(state.tab==="envies") renderEnvies(); },()=>{}); }
+// Réponses d'une personne : anciennes (sondage/…) + nouvelles (envies/…, prioritaires)
+function enviesDe(n){ const base=(SONDAGE[slugNom(n)]||{}).envies||{};
+  if(!ENV_IDX){ ENV_IDX={}; Object.values(ENVIES).forEach(x=>{ const k=slugNom(x.nom); (ENV_IDX[k]=ENV_IDX[k]||{})[x.rec]=x.v; }); }
+  const m={...base,...(ENV_IDX[slugNom(n)]||{})}; Object.keys(m).forEach(k=>{ if(!BYID[k]) delete m[k]; }); return m; }
+const sondageDe = n => { const s=SONDAGE[slugNom(n)]||{nom:n,envies:{},prefs:{cuisines:[],vege:null,nouveautes:null,piquant:null},quand:null}; return {...s,envies:enviesDe(n)}; };
 let envWrite={};
-function majSondage(n,fn){ const cur=JSON.parse(JSON.stringify(sondageDe(n))); fn(cur); cur.nom=n; cur.quand=new Date().toISOString();
-  const id=slugNom(n); SONDAGE[id]=cleanSondage(cur); saveSondageLocal(); renderEnvies();
-  if(DB){ clearTimeout(envWrite[id]); envWrite[id]=setTimeout(()=>{ DB.collection("sondage").doc(id).set(SONDAGE[id]).catch(()=>toast("Réponse gardée sur cet appareil : le partage a échoué")); },600); } }
+// Réponses aux préférences (cuisines, soirs sans viande…) : elles se changent librement ; le document ne contient plus que les anciennes envies, laissées telles quelles
+function majSondage(n,fn){ const id=slugNom(n), cur=JSON.parse(JSON.stringify(SONDAGE[id]||{nom:n,envies:{},prefs:{cuisines:[],vege:null,nouveautes:null,piquant:null},quand:null})); fn(cur); cur.nom=n; cur.quand=new Date().toISOString();
+  SONDAGE[id]=cleanSondage(cur); saveSondageLocal(); renderEnvies();
+  if(DB){ clearTimeout(envWrite[id]); envWrite[id]=setTimeout(async()=>{ const doc=SONDAGE[id]; try{ await DB.collection("sondage").doc(id).set(doc); } catch(e){ toast("Réponse gardée sur cet appareil : le partage a échoué"); } finally{ envWrite[id]=null; } },600); } }
+async function voterEnvie(rec,n,v){
+  if(!BYID[rec]||![1,0,-1].includes(v)) return;
+  if(enviesDe(n)[rec]!=null){ toast("Votre réponse est enregistrée : elle ne peut plus être modifiée"); renderEnvies(); return; }
+  if(!peutNoter(n)){ toast("Vous répondez seulement pour vous"); return; }
+  const k=envieId(rec,n); if(ENV_ENCOURS.has(k)) return;
+  const quand=new Date().toISOString();
+  if(!DB){ ENVIES[k]={rec,nom:n,v,quand}; ENV_IDX=null; envDernier=rec; saveEnviesLocal(); PLANS={}; renderEnvies(); return; }
+  if(CAN_WRITE===false){ toast(messageEchec(null,"la réponse")); return; }
+  ENV_ENCOURS.add(k); renderEnvies();
+  try{ await DB.collection("envies").doc(k).create({rec,nom:nomPourEnvoi(n),v,quand,par:ME||null});
+    ENV_IDX=null; PLANS={}; envDernier=rec; }
+  catch(e){ console.warn("[envies] envoi impossible",e); if(e&&e.code==="exists") toast("Votre réponse existait déjà (autre appareil) : elle est conservée"); else toast(messageEchec(e,"la réponse")); }
+  finally{ ENV_ENCOURS.delete(k); renderEnvies(); }
+}
+// Le propriétaire peut effacer une réponse (erreur de saisie) pour qu'elle soit redonnée
+async function effacerEnvie(rec,n){
+  if(!DB||!identite().proprio){ toast("Seul le propriétaire peut effacer une réponse"); return; }
+  const id=slugNom(n), k=envieId(rec,n);
+  try{ if(ENVIES[k]) await DB.collection("envies").doc(k).delete();
+    const raw=SONDAGE[id]; if(raw&&raw.envies&&raw.envies[rec]!=null){ const cur=JSON.parse(JSON.stringify(raw)); delete cur.envies[rec]; SONDAGE[id]=cleanSondage(cur); saveSondageLocal(); await DB.collection("sondage").doc(id).set(SONDAGE[id]); }
+    delete ENVIES[k]; ENV_IDX=null; PLANS={}; saveEnviesLocal(); renderEnvies(); toast("Réponse effacée : "+n+" peut la redonner"); }
+  catch(e){ renderEnvies(); toast("La réponse n'a pas pu être effacée"); }
+}
 // ---- Ce que l'on sait des goûts de chacun ----
 function servisIds(){ const s=new Set(); Object.values({...state.weeks,...SEMAINES}).forEach(w=>{ if(w&&Array.isArray(w.menu)) w.menu.forEach(id=>s.add(id)); }); Object.values(RETOURS).forEach(r=>s.add(r.plat)); return s; }
 function profil(n){ const sd=sondageDe(n), mine=Object.values(RETOURS).filter(r=>r.nom===n&&r.note&&BYID[r.plat]);
@@ -610,16 +698,23 @@ function renderEnvies(){ const box=$("view-envies"); if(!box) return;
       <div class="envq"><b>Les cuisines que vous aimez</b><div class="gfilters wrapchips">${Object.entries(CUISINES).map(([k,l])=>`<button class="chip${p.cuisines.includes(k)?" on":""}" data-envcuis="${k}">${l}</button>`).join("")}</div></div>
       ${q("Soirs sans viande par semaine","vege",PREF_VEGE,p.vege)}${q("Nouveautés","nouveautes",PREF_NEW,p.nouveautes)}${q("Épicé","piquant",PREF_PIQ,p.piquant)}`;
     // 8 plats à la fois : d'abord ceux sur lesquels on ne sait encore rien
-    const P=profil(envQui), servis=servisIds();
+    const P=profil(envQui), servis=servisIds(), mien=peutNoter(envQui);
     const inconnus=RECETTES.filter(r=>sd.envies[r.id]==null&&!(state.avis[r.id]||{})[envQui]&&!P.mine.some(x=>x.plat===r.id));
     const tri=inconnus.map(r=>({r,s:(servis.has(r.id)?0:1)+(r.c&&p.cuisines.includes(r.c)?0.5:0)+((r.id.charCodeAt(0)*7+r.id.length*13+(envCible))%10)/10})).sort((a,b)=>b.s-a.s).slice(0,8).map(x=>x.r);
     const nbRep=Object.keys(sd.envies).length;
+    const carte=(r,verrou)=>{ const k=envieId(r.id,envQui), enc=ENV_ENCOURS.has(k), choix=sd.envies[r.id];
+      return `<div class="envcard${verrou?" locked":""}"><img src="${photoSrc(r.id)}" alt="" loading="lazy" data-cache-err="1" decoding="async"><div class="envtxt"><b>${esc(r.nom)}</b><small><span class="bdg b-${budgetOf(r)}">${BUDGETS[budgetOf(r)].court}</span> ${r.t} min${r.c?" · "+CUISINES[r.c]:""}${servis.has(r.id)?"":" · jamais servi"}</small></div>
+        <div class="envbtns">${ENVIE.map(([v,e,l])=>`<button class="envbtn${verrou&&choix===v?" on":""}" data-envie="${r.id}" data-v="${v}" title="${l}" aria-label="${l} : ${esc(r.nom)}" aria-pressed="${verrou?choix===v:false}"${verrou||enc?" disabled":""}><span>${e}</span><small>${l}</small></button>`).join("")}</div>
+        ${verrou?`<p class="envlock">🔒 Réponse enregistrée</p>`:enc?`<p class="envlock">Enregistrement…</p>`:""}</div>`; };
+    const dernier=envDernier&&BYID[envDernier]&&sd.envies[envDernier]!=null?BYID[envDernier]:null;
     html+=`<h3 class="shopray">Ces plats vous font-ils envie ? <span class="badge">${nbRep} réponse${nbRep>1?"s":""}</span></h3>
-      ${tri.length?`<div class="envgrid">${tri.map(r=>`<div class="envcard"><img src="${photoSrc(r.id)}" alt="" loading="lazy" data-cache-err="1" decoding="async"><div class="envtxt"><b>${esc(r.nom)}</b><small><span class="bdg b-${budgetOf(r)}">${BUDGETS[budgetOf(r)].court}</span> ${r.t} min${r.c?" · "+CUISINES[r.c]:""}${servis.has(r.id)?"":" · jamais servi"}</small></div>
-        <div class="envbtns">${ENVIE.map(([v,e,l])=>`<button class="envbtn" data-envie="${r.id}" data-v="${v}" title="${l}" aria-label="${l} : ${esc(r.nom)}"><span>${e}</span><small>${l}</small></button>`).join("")}</div></div>`).join("")}</div>
+      <p class="note">Une réponse est définitive : une fois enregistrée, elle ne se change plus.</p>
+      ${!mien?`<p class="note">Seule ${esc(envQui)} peut répondre pour elle-même. Touchez votre prénom ci-dessus pour répondre.</p>`
+      :tri.length||dernier?`<div class="envgrid">${dernier?carte(dernier,true):""}${tri.map(r=>carte(r,false)).join("")}</div>
         <p class="note">Chaque réponse fait apparaître un nouveau plat. Revenez quand vous voulez : les nouvelles recettes de la bibliothèque s'ajoutent ici.</p>`
       :`<p class="note">Vous avez donné votre avis sur toutes les recettes. Merci !</p>`}
-      ${nbRep?`<details class="homeadv"><summary>Revoir mes réponses (${nbRep})</summary><div class="envmine">${Object.entries(sd.envies).map(([id,v])=>`<span class="chip on" data-envreset="${id}">${ENVIE.find(x=>x[0]===v)[1]} ${esc(BYID[id].nom)} ×</span>`).join("")}</div><p class="note">Touchez une réponse pour l'effacer.</p></details>`:""}`;
+      ${nbRep?`<details class="homeadv"${envOuvert?" open":""}><summary>Mes réponses (${nbRep})</summary><div class="envmine">${Object.entries(sd.envies).map(([id,v])=>{ const t=`${ENVIE.find(x=>x[0]===v)[1]} ${esc(BYID[id].nom)}`; const proprio=identite().proprio&&DB;
+        return proprio?`<button class="chip on" type="button" data-envreset="${id}">${envArm===id?"Effacer ? ":""}${t} ×</button>`:`<span class="chip on avlock">🔒 ${t}</span>`; }).join("")}</div><p class="note">Les réponses enregistrées ne se changent plus${identite().proprio&&DB?" (le propriétaire peut en effacer une par erreur)":""}.</p></details>`:""}`;
   } else html+=`<p class="note">Choisissez votre prénom pour répondre.</p>`;
   html+=`</div>`;
   html+=htmlSuggestions();
@@ -656,12 +751,14 @@ function renderEnvies(){ const box=$("view-envies"); if(!box) return;
         <div class="actions"><button class="btn primary edit-only" data-envuse="${i}">Utiliser pour la semaine du ${fmtShort(lundi(envCible))}</button></div></article>`; }).join("")}</div></div>`;
   box.innerHTML=html;
 }
+// La liste « Mes réponses » reste ouverte quand l'écran se redessine
+document.addEventListener("toggle",e=>{ const t=e.target; if(t&&t.classList&&t.classList.contains("homeadv")&&t.closest("#view-envies")) envOuvert=t.open; },true);
 document.addEventListener("click",e=>{ const b=e.target.closest("[data-envqui],[data-envpref],[data-envcuis],[data-envie],[data-envreset],[data-envweek],#envregen,[data-envuse],#envinvite"); if(!b) return; const D=b.dataset;
   if(D.envqui){ envQui=D.envqui; try{ localStorage.setItem(KEY+"-moi",envQui); }catch(err){} renderEnvies(); return; }
   if(D.envpref){ const k=D.envpref, v=k==="vege"?+D.v:D.v; majSondage(envQui,s=>{ s.prefs[k]=s.prefs[k]===v?null:v; }); PLANS={}; return; }
   if(D.envcuis){ majSondage(envQui,s=>{ const c=new Set(s.prefs.cuisines); c.has(D.envcuis)?c.delete(D.envcuis):c.add(D.envcuis); s.prefs.cuisines=[...c]; }); PLANS={}; return; }
-  if(D.envie){ majSondage(envQui,s=>{ s.envies[D.envie]=+D.v; }); PLANS={}; return; }
-  if(D.envreset){ majSondage(envQui,s=>{ delete s.envies[D.envreset]; }); PLANS={}; return; }
+  if(D.envie){ voterEnvie(D.envie,envQui,+D.v); return; }
+  if(D.envreset){ if(envArm!==D.envreset){ envArm=D.envreset; renderEnvies(); return; } envArm=null; effacerEnvie(D.envreset,envQui); return; }
   if(D.envweek){ envCible=+D.envweek; renderEnvies(); return; }
   if(b.id==="envregen"){ PLANS={}; renderEnvies(); toast("Nouvelles suggestions"); return; }
   if(b.id==="envinvite"){ const t=`Petit sondage pour les menus : dites quels plats vous font envie (2 minutes) !\n${(window.INVITE_URL||APP_URL).replace(/#.*$/,"")}#envies`;

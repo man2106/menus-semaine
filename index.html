@@ -578,9 +578,25 @@ details.sum>div{display:grid;gap:12px}
 .rphoto img{width:120px;height:90px;object-fit:cover;border-radius:10px}
 .ringr{border:1px solid var(--line);border-radius:12px;padding:10px;display:grid;gap:8px;margin:0}
 .ringr legend{font-size:13px;font-weight:600;color:var(--muted);padding:0 6px}
-.ingrow{display:grid;grid-template-columns:2fr 0.8fr 1fr 1.2fr 36px;gap:6px;align-items:center}
-.ingrow input,.ingrow select{min-width:0;padding:9px 8px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);font:inherit;font-size:15px}
-@media (max-width:560px){.ingrow{grid-template-columns:1fr 70px 36px}.ingrow select{grid-row:2}.ingrow select[data-rf="u"]{grid-column:1/2}.ingrow select[data-rf="ray"]{grid-column:2/4}}
+.ingrow{display:grid;grid-template-columns:minmax(0,1fr) 44px;gap:6px;align-items:center;padding:8px 0;border-top:1px dashed var(--line)}
+.ingrow:first-of-type{border-top:0}
+.ingrow input,.ingrow select{min-width:0;box-sizing:border-box;min-height:44px;padding:9px 8px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);font:inherit;font-size:16px}
+.ingrow .mdel{width:44px;height:44px;border:1px solid var(--line);background:var(--bg)}
+.ingsub{grid-column:1/-1;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr) minmax(0,1.6fr);gap:6px}
+.rform input[type=text],.rform input[type=number],.rform input[type=url],.rform textarea{width:100%;box-sizing:border-box;min-height:44px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);font:inherit;font-size:16px}
+.rform input[aria-invalid="true"]{border-color:var(--warm);box-shadow:0 0 0 2px var(--warm-soft)}
+.req{font-style:normal;font-size:12px;font-weight:600;color:var(--warm);margin-left:6px}
+.rpers{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-weight:600}.rpers>span:first-child{flex-basis:100%}
+.rpers input{width:64px!important;text-align:center}
+.rstep{width:44px;height:44px;border-radius:999px;border:1px solid var(--line);background:var(--bg);font-size:22px;line-height:1;cursor:pointer;color:var(--ink)}
+.rstep:disabled{opacity:.4}
+.rfadd{width:100%;justify-content:center;border-style:dashed;border-color:var(--accent);color:var(--accent)}
+.rcoller,.ropt{border:1px solid var(--line);border-radius:12px;padding:4px 12px;background:var(--bg)}
+.rcoller summary,.ropt summary{cursor:pointer;font-weight:700;min-height:44px;display:flex;align-items:center}
+.rcoller[open],.ropt[open]{padding-bottom:12px}.rcoller[open]>*:not(summary){margin-top:8px}.rcoller textarea{display:block}
+.rlien{display:flex;gap:8px}.rlien input{flex:1;min-width:0}
+.rferr{border:2px solid var(--warm);background:var(--warm-soft);border-radius:12px;padding:10px 14px;color:var(--ink)}
+.rferr ul{margin:6px 0 0;padding-left:20px;display:grid;gap:4px}
 /* ---- Ordre des magasins et export ---- */
 .sorder{list-style:none;margin:0;padding:0;display:grid;gap:6px}
 .sitem{display:grid;grid-template-columns:30px 1fr auto;gap:10px;align-items:center;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:8px 8px 8px 10px}
@@ -893,6 +909,97 @@ body.verrou .dgrip,body.readonly .dgrip{display:none}
   nav button[aria-selected="true"] svg{stroke-width:2.4}
 }
 </style>
+<style id="style-votes-mobile">
+/* ===== Votes verrouillés ===== */
+.avname{display:grid;gap:2px;min-width:0;overflow:visible!important}
+.avlock{color:var(--muted);font-size:13px;font-weight:600;font-style:normal}
+.avreset,.rtperson .btn.small{font:inherit;font-size:13px;cursor:pointer}
+.avreset{background:none;border:0;padding:0;color:var(--accent);text-decoration:underline}
+.avb:disabled{cursor:default}
+.avb:disabled:not([aria-pressed="true"]){opacity:.45}
+.rtface:disabled,.envbtn:disabled{cursor:default}
+.envbtn:disabled:not(.on){opacity:.45}
+.envbtn.on{background:var(--accent-soft);border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.envcard.locked{border-color:var(--accent)}
+.envlock{grid-column:1/-1;margin:0;padding:0 10px 10px;font-size:13px;font-weight:600;color:var(--accent)}
+.envmine .avlock{border:1px solid var(--line);border-radius:999px;padding:6px 12px;background:var(--accent-soft);color:var(--ink)}
+.rtsent{color:var(--accent)!important;font-weight:700}
+.rtperson.sent{background:var(--accent-soft)}
+.rtlocked{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center}
+.rtbig{font-size:40px;line-height:1}
+.rtmots{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.rterr{margin:0;padding:10px 12px;border:2px solid var(--warm);background:var(--warm-soft);border-radius:12px;font-weight:600}
+.rtsend{width:100%}
+.btn:disabled{opacity:.5;cursor:default}
+.btn:disabled:hover{border-color:var(--line);color:inherit}
+.btn.primary:disabled:hover{color:var(--accent-ink);filter:none}
+.rtperson input[data-rcom]{width:100%;box-sizing:border-box;min-height:44px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);font:inherit;font-size:16px}
+</style>
+<style id="style-mobile">
+/* ===== Téléphone (480 px et moins) : zones de touche d'au moins 44 px, champs à 16 px (pas de zoom sur iPhone),
+   textes lisibles, fenêtres plein écran avec boutons en bas. Rien ne change sur grand écran. ===== */
+@media (max-width:480px){
+  html{-webkit-text-size-adjust:100%}
+  body{overflow-x:hidden}
+  input:not([type=checkbox]):not([type=radio]):not([type=file]),select,textarea{font-size:16px!important}
+  select,input:not([type=checkbox]):not([type=radio]):not([type=file]){min-height:44px;box-sizing:border-box}
+  .cmp input{min-height:40px}
+  select[data-add]{min-height:44px;min-width:44px}
+  button,.btn,.chip,summary,.link{touch-action:manipulation}
+  .btn,.btn.small,.chip,button.chip,.qtbtn,.mgouts,.avb,.sbtn,.mdel,.plusitem,.pres{min-height:44px}
+  .btn.small{padding:8px 14px}
+  .chip,button.chip{padding:8px 14px;font-size:14px}
+  .chip[data-ensf]{min-width:44px;justify-content:center}
+  .pres{min-width:44px;height:44px}
+  select[data-inv]{min-width:44px;min-height:44px}
+  .qtbtn{min-width:44px}
+  .mgouts{min-height:44px}
+  summary{min-height:44px;display:flex;align-items:center;gap:6px}
+  details.sum>summary,details>summary{padding-top:6px;padding-bottom:6px}
+  button.link{min-height:44px;display:inline-flex;align-items:center;text-align:left}
+  /* Boutons des votes : grands et clairs */
+  .avisrow{grid-template-columns:1fr 1fr;gap:8px;padding:10px 0;border-top:1px solid var(--line)}
+  .avisrow:first-child{border-top:0}
+  .avisrow>.avname{grid-column:1/-1;font-size:16px}
+  .avb{padding:10px 8px;font-size:15px;border-radius:14px;min-height:48px;display:flex;align-items:center;justify-content:center}
+  .rtfaces{gap:4px}
+  .rtface{min-height:76px;padding:8px 0}.rtface span{font-size:30px}.rtface small{font-size:12px;line-height:1.1;hyphens:auto}
+  .envbtns{gap:4px;padding:8px 8px 10px}.envbtn{min-height:56px}.envbtn small{font-size:12px}
+  .envgrid{grid-template-columns:1fr}
+  .envcard{grid-template-columns:84px 1fr}.envcard img{width:84px}
+  .rtsend{min-height:52px;font-size:16px}
+  /* Textes importants : jamais en dessous de 12 px */
+  nav button span:not(.badge){font-size:12px}
+  .meyebrow,.stopno,.stitlebox small,.cmp th,.cmp td:first-child small,.bdg,.jstat,.st,.gtag,.ptag,.dday,.sumtitle,.jwhen,figcaption,.promo,.hpmv,.rtbar small,.srank{font-size:12px!important}
+  .badge,.mnav small{font-size:12px!important}
+  #ccount.badge{font-size:12px}
+  .cmp th{letter-spacing:.03em}
+  /* Aucun débordement : les tableaux défilent dans leur cadre, les longs mots se coupent */
+  .panel,.modal,.sbody,.mbody,.day,.dcard{min-width:0;overflow-wrap:anywhere}
+  table{max-width:100%}
+  .prtable,.cmp{font-size:13px}
+  /* Fenêtre du repas : plein écran sous la barre d'état, bouton de fermeture sous le pouce */
+  .overlay{padding-top:env(safe-area-inset-top,0px)}
+  .modal{max-height:100%;height:100%;border-radius:0;padding-bottom:calc(24px + env(safe-area-inset-bottom,0px))}
+  .mhead h2{font-size:21px}
+  .mclose{width:44px;height:44px}
+  /* Fenêtres plein écran : pied collé en bas, boutons larges */
+  .sheet{height:100vh;height:100dvh}
+  .sbody{padding:14px max(14px,env(safe-area-inset-right,0px)) 20px max(14px,env(safe-area-inset-left,0px));overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+  .sfoot{position:sticky;bottom:0;gap:8px;box-shadow:0 -4px 12px rgba(0,0,0,.06)}
+  .sfoot .btn.big{flex:1 1 120px;min-height:52px;font-size:16px}
+  .shead{padding-top:8px;padding-bottom:8px}
+  /* Cartes des jours : plus d'air */
+  .day{padding:14px 12px}
+  .dcard,.day .btn{margin-top:2px}
+  .ingsub{grid-template-columns:minmax(0,.9fr) 90px minmax(0,1.3fr)}
+  @media (max-width:360px){.ingsub{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.ingsub select[data-rf="ray"]{grid-column:1/-1}}
+  .rpers{gap:6px}
+  .rlien{flex-direction:column}
+  .rgrid2{grid-template-columns:1fr}
+  nav{padding-left:max(4px,env(safe-area-inset-left,0px));padding-right:max(4px,env(safe-area-inset-right,0px))}
+}
+</style>
 </head>
 <body>
 
@@ -903,7 +1010,7 @@ body.verrou .dgrip,body.readonly .dgrip{display:none}
       <div>
         <h1>Menus de la semaine</h1>
         <p class="sub">Repas du soir · moins de 30 minutes · petit budget</p>
-        <p class="appver" data-appver="74" data-appdate="26/11/2026 à 09:03">Version 74 · mise à jour le 26/11/2026 à 09:03</p>
+        <p class="appver" data-appver="75" data-appdate="28/11/2026 à 10:22">Version 75 · mise à jour le 28/11/2026 à 10:22</p>
       </div>
       <div class="comptehaut" id="comptehaut" hidden></div>
     </div>
@@ -1159,10 +1266,10 @@ body.verrou .dgrip,body.readonly .dgrip{display:none}
   <div class="sfoot" id="sfoot"></div>
 </div>
 
-<script src="vendor/supabase-js-2.45.4.js?v=74"></script>
-<script src="js/partage.js?v=74"></script>
+<script src="vendor/supabase-js-2.45.4.js?v=75"></script>
+<script src="js/partage.js?v=75"></script>
 <!-- Les scripts de data-scripts sont chargés dans cet ordre par js/demarrage.js, une fois donnees/recettes-base.json arrivé (jsPDF n'est chargé qu'à l'export PDF) -->
-<script src="js/demarrage.js?v=74" defer data-scripts="js/donnees.js js/menus.js js/courses.js js/promos.js js/vues.js js/fenetres.js js/pdf.js js/famille.js js/photoplat.js js/app.js"></script>
+<script src="js/demarrage.js?v=75" defer data-scripts="js/donnees.js js/menus.js js/courses.js js/promos.js js/vues.js js/fenetres.js js/pdf.js js/famille.js js/photoplat.js js/app.js"></script>
 
 </body>
 </html>

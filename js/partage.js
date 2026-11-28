@@ -30,22 +30,42 @@
     return { id: lastSeg(path), exists: CACHE.has(path), data: () => clone(CACHE.get(path)),
              metadata: { hasPendingWrites: !!pending, fromCache: false } };
   }
-  function qsnap(changes){
+  // « docs » donne TOUS les documents de la rubrique à cet instant (comme Firestore), pas seulement ceux qui viennent de changer :
+  // le code qui nettoie son cache avec cette liste ne doit pas croire que les autres documents ont disparu.
+  const dansRubrique = (prefix, p) => p.startsWith(prefix + "/") && p.split("/").length === prefix.split("/").length + 1;
+  function qsnap(changes, prefix){
     return { docChanges: () => changes.map(c => ({ type: c.type, doc: { id: lastSeg(c.path), data: () => clone(c.data) } })),
-             docs: changes.filter(c => c.type !== "removed").map(c => ({ id: lastSeg(c.path), data: () => clone(c.data) })) };
+             get docs(){ return [...CACHE.keys()].filter(p => dansRubrique(prefix, p)).map(p => ({ id: lastSeg(p), data: () => clone(CACHE.get(p)) })); } };
   }
   function emit(path, type, pending){
     const set = docListeners.get(path); if (set) set.forEach(cb => { try { cb(snap(path, pending)); } catch(e){ console.error(e); } });
-    colListeners.forEach(l => { if (path.startsWith(l.prefix + "/") && path.split("/").length === l.prefix.split("/").length + 1) {
-      try { l.cb(qsnap([{ type, path, data: CACHE.get(path) }])); } catch(e){ console.error(e); } } });
+    colListeners.forEach(l => { if (dansRubrique(l.prefix, path)) {
+      try { l.cb(qsnap([{ type, path, data: CACHE.get(path) }], l.prefix)); } catch(e){ console.error(e); } } });
+  }
+  // Écritures en cours, par document. Tant qu'une écriture de CET appareil n'est pas terminée, les copies reçues du serveur
+  // (écho d'une écriture précédente, rechargement) n'écrasent pas ce qui est affiché : sinon un choix récent revenait en arrière
+  // et le choix suivant était construit sur l'ancienne version (c'est ainsi que des réponses se perdaient).
+  const PEND = new Map();      // path -> nombre d'écritures en cours
+  const CHAINE = new Map();    // path -> promesse de la dernière écriture (les écritures d'un même document partent dans l'ordre)
+  const SAUTE = new Set();     // documents dont une copie du serveur a été ignorée pendant une écriture : à relire ensuite
+  const enCours = path => (PEND.get(path) || 0) > 0;
+  const canon = v => JSON.stringify(v, (k, x) => (x && typeof x === "object" && !Array.isArray(x)) ? Object.fromEntries(Object.keys(x).sort().map(c => [c, x[c]])) : x);  // même texte quel que soit l'ordre des clés (jsonb les réordonne)
+  const fini = path => { if (!enCours(path) && SAUTE.delete(path)) rafraichir(path); };
+  const pend = (path, n) => { const v = (PEND.get(path) || 0) + n; if (v > 0) PEND.set(path, v); else PEND.delete(path); };
+  async function rafraichir(path){      // relit un seul document après nos écritures, pour récupérer ce qu'un autre appareil aurait écrit entre-temps
+    try { const { data, error } = await sb.from("docs").select("path,data").eq("path", path).limit(1); if (error || enCours(path)) return;
+      const r = data && data[0]; const had = CACHE.has(path);
+      if (r) { if (canon(CACHE.get(path)) !== canon(r.data)) { CACHE.set(path, r.data); emit(path, had ? "modified" : "added", false); } }
+      else if (had) { CACHE.delete(path); emit(path, "removed", false); }
+    } catch(e){}
   }
   async function loadAll(){
     const { data, error } = await sb.from("docs").select("path,data");
     if (error) throw error;
     const seen = new Set();
-    data.forEach(r => { seen.add(r.path); const had = CACHE.has(r.path), same = had && JSON.stringify(CACHE.get(r.path)) === JSON.stringify(r.data);
+    data.forEach(r => { seen.add(r.path); if (enCours(r.path)) { SAUTE.add(r.path); return; } const had = CACHE.has(r.path), same = had && canon(CACHE.get(r.path)) === canon(r.data);
       CACHE.set(r.path, r.data); if (!same) emit(r.path, had ? "modified" : "added", false); });
-    [...CACHE.keys()].forEach(p => { if (!seen.has(p)) { CACHE.delete(p); emit(p, "removed", false); } });
+    [...CACHE.keys()].forEach(p => { if (!seen.has(p) && !enCours(p)) { CACHE.delete(p); emit(p, "removed", false); } });
   }
   let channel = null, firstSub = true;
   async function startDb(){
@@ -53,6 +73,7 @@
     channel = sb.channel("docs-temps-reel")
       .on("postgres_changes", { event: "*", schema: "public", table: "docs" }, p => {
         const path = (p.new && p.new.path) || (p.old && p.old.path); if (!path) return;
+        if (enCours(path)) { SAUTE.add(path); return; }   // une écriture de cet appareil est en cours : on relira ce document à la fin
         if (p.eventType === "DELETE") { if (CACHE.has(path)) { CACHE.delete(path); emit(path, "removed", false); } return; }
         const had = CACHE.has(path); CACHE.set(path, p.new.data); emit(path, had ? "modified" : "added", false);
       })
@@ -72,16 +93,39 @@
         docListeners.get(path).add(cb); setTimeout(() => cb(snap(path, false)), 0);
         return () => docListeners.get(path).delete(cb);
       },
+      // Écriture : affichée tout de suite, envoyée dans l'ordre des appels. Si le serveur refuse, l'ancien contenu est rétabli et l'erreur remonte.
       async set(data){
         const prev = CACHE.get(path); CACHE.set(path, clone(data)); emit(path, prev === undefined ? "added" : "modified", true);
-        const { error } = await sb.from("docs").upsert({ path, data, updated_at: new Date().toISOString() });
-        if (error) { if (prev === undefined) CACHE.delete(path); else CACHE.set(path, prev); emit(path, "modified", false); throw refused(error); }
+        pend(path, 1);
+        const avant = CHAINE.get(path) || Promise.resolve();
+        const cette = avant.catch(() => {}).then(() => sb.from("docs").upsert({ path, data, updated_at: new Date().toISOString() }));
+        CHAINE.set(path, cette);
+        let res; try { res = await cette; } catch(e){ res = { error: e }; }
+        pend(path, -1); if (CHAINE.get(path) === cette) CHAINE.delete(path);
+        if (res.error) {
+          // Refusé : on retire la copie qui n'a pas pu partir. Un document NOUVEAU n'est pas annoncé comme « supprimé » (l'application garde sa copie locale,
+          // par exemple une recette qui n'a pas pu être partagée) ; un document existant revient à son contenu précédent.
+          if (!enCours(path)) { if (prev === undefined) CACHE.delete(path); else { CACHE.set(path, prev); emit(path, "modified", false); } }
+          fini(path); throw refused(res.error); }
+        fini(path);
+      },
+      // Création seule (jamais de remplacement) : sert aux votes, qui ne se modifient plus une fois envoyés.
+      // Rien n'est affiché avant la réponse du serveur ; si le document existe déjà (envoyé depuis un autre appareil), on le reprend et l'erreur « existe » remonte.
+      async create(data){
+        pend(path, 1); let res;
+        try { res = await sb.from("docs").insert({ path, data, updated_at: new Date().toISOString() }); } catch(e){ res = { error: e }; }
+        pend(path, -1); fini(path);
+        if (res.error) {
+          if (res.error.code === "23505" || /duplicate key/i.test(res.error.message || "")) { await rafraichir(path); const e = new Error("existe"); e.code = "exists"; throw e; }
+          throw refused(res.error); }
+        const had = CACHE.has(path); CACHE.set(path, clone(data)); emit(path, had ? "modified" : "added", false);
       },
       async update(fields){ return this.set({ ...(CACHE.get(path) || {}), ...fields }); },
       async delete(){
-        const prev = CACHE.get(path); CACHE.delete(path); emit(path, "removed", true);
-        const { error } = await sb.from("docs").delete().eq("path", path);
-        if (error) { CACHE.set(path, prev); emit(path, "added", false); throw refused(error); }
+        const prev = CACHE.get(path); pend(path, 1); CACHE.delete(path); emit(path, "removed", true);
+        let res; try { res = await sb.from("docs").delete().eq("path", path); } catch(e){ res = { error: e }; }
+        pend(path, -1); fini(path);
+        if (res.error) { if (prev !== undefined) CACHE.set(path, prev); emit(path, "added", false); throw refused(res.error); }
       }
     };
   }
@@ -91,7 +135,7 @@
       doc: id => docRef(prefix + "/" + id),
       onSnapshot(cb){
         const l = { prefix, cb }; colListeners.add(l);
-        setTimeout(() => { const all = [...CACHE.keys()].filter(p => p.startsWith(prefix + "/") && p.split("/").length === prefix.split("/").length + 1).map(p => ({ type: "added", path: p, data: CACHE.get(p) })); cb(qsnap(all)); }, 0);
+        setTimeout(() => { const all = [...CACHE.keys()].filter(p => dansRubrique(prefix, p)).map(p => ({ type: "added", path: p, data: CACHE.get(p) })); cb(qsnap(all, prefix)); }, 0);
         return () => colListeners.delete(l);
       }
     })
