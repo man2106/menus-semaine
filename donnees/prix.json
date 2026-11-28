@@ -1,5 +1,5 @@
 {
- "maj": "2026-11-22",
+ "maj": "2026-11-28",
  "releves": [
   {
    "ing": "Biscuits",
@@ -609,7 +609,7 @@
    "prix": 3.99,
    "quantite": 2,
    "unite": "u",
-   "prixUnitaire": 2.0,
+   "prixUnitaire": 2,
    "date": "2026-11-21"
   },
   {
@@ -661,6 +661,96 @@
    "unite": "kg",
    "prixUnitaire": 1.5,
    "date": "2026-11-22"
+  },
+  {
+   "ing": "Mozzarella",
+   "produit": "BONI mozzarella 125 g",
+   "mag": "okay",
+   "prix": 1.35,
+   "quantite": 1,
+   "unite": "u",
+   "prixUnitaire": 1.35,
+   "date": "2026-11-28"
+  },
+  {
+   "ing": "Jambon cuit",
+   "produit": "BONI allumettes de jambon 200 g",
+   "mag": "okay",
+   "prix": 3.28,
+   "quantite": 0.2,
+   "unite": "kg",
+   "prixUnitaire": 16.4,
+   "date": "2026-11-28"
+  },
+  {
+   "ing": "Jambon cuit",
+   "produit": "EVERYDAY jambon art. couenne tranches 200 g",
+   "mag": "okay",
+   "prix": 2.6,
+   "quantite": 0.2,
+   "unite": "kg",
+   "prixUnitaire": 13,
+   "date": "2026-11-28"
+  },
+  {
+   "ing": "Carottes",
+   "produit": "BONI BIO carottes 1,5 kg",
+   "mag": "okay",
+   "prix": 2.78,
+   "quantite": 1.5,
+   "unite": "kg",
+   "prixUnitaire": 1.85,
+   "date": "2026-11-28"
+  },
+  {
+   "ing": "Carottes",
+   "produit": "BONI carottes en rondelles 1 kg",
+   "mag": "okay",
+   "prix": 1.25,
+   "quantite": 1,
+   "unite": "kg",
+   "prixUnitaire": 1.25,
+   "date": "2026-11-28"
+  },
+  {
+   "ing": "Laitue",
+   "produit": "Laitue feuille de chêne rouge",
+   "mag": "okay",
+   "prix": 1.52,
+   "quantite": 1,
+   "unite": "u",
+   "prixUnitaire": 1.52,
+   "date": "2026-11-28"
+  },
+  {
+   "ing": "Roquette",
+   "produit": "BONI roquette 50 g",
+   "mag": "okay",
+   "prix": 0.87,
+   "quantite": 0.05,
+   "unite": "kg",
+   "prixUnitaire": 17.4,
+   "date": "2026-11-28"
+  },
+  {
+   "ing": "Haricots verts",
+   "produit": "BONI haricots verts 1 kg",
+   "mag": "okay",
+   "prix": 1.65,
+   "quantite": 1,
+   "unite": "kg",
+   "prixUnitaire": 1.65,
+   "date": "2026-11-28"
+  },
+  {
+   "ing": "Sauce soja",
+   "produit": "BONI sauce soja 145 ml",
+   "mag": "okay",
+   "prix": 0.87,
+   "quantite": 1,
+   "unite": "u",
+   "prixUnitaire": 0.87,
+   "date": "2026-11-28"
   }
  ]
 }

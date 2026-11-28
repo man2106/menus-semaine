@@ -1,5 +1,5 @@
 {
-  "maj": "2026-11-23",
+  "maj": "2026-11-28",
   "note": "Descriptions rédigées pour l'application ; photos libres de Wikimedia Commons ; prix par enseigne relevés sur tickets, folders et sources citées.",
   "produits": [
     {
@@ -3114,6 +3114,20 @@
       "desc": "Fromage frais italien très crémeux, idéal pour lier un gratin ou une sauce sans crème, ou pour un dessert.",
       "format": "Pot de 250 g",
       "conserver": "Au frigo, bien fermé, à consommer dans les 3 à 4 jours après ouverture"
+    },
+    {
+      "n": "Cidre",
+      "ray": "boi",
+      "desc": "Boisson fermentée à base de pommes. Il sert à déglacer et à relever les sauces ; choisissez-le brut, car le cidre doux sucre la sauce à la cuisson.",
+      "format": "Bouteille de 75 cl",
+      "conserver": "Au frais et à l'abri de la lumière ; à finir rapidement une fois ouvert"
+    },
+    {
+      "n": "Calvados",
+      "ray": "boi",
+      "desc": "Eau-de-vie de cidre de Normandie, qui parfume les sauces et les flambages. Une petite quantité suffit pour donner du goût.",
+      "format": "Bouteille de 70 cl",
+      "conserver": "À l'abri de la lumière, à température ambiante"
     }
   ]
 }

@@ -1,5 +1,5 @@
 {
-  "maj": "2026-11-25",
+  "maj": "2026-11-28",
   "recettes": [
     {
       "id": "pechesthon",
@@ -1464,6 +1464,178 @@
         "url": "https://www.marmiton.org/recettes/recette_choux-de-bruxelles-et-carottes-poeles_67023.aspx"
       },
       "ajoute": "2026-11-25"
+    },
+    {
+      "id": "gratindauphinoisexpress",
+      "nom": "Gratin dauphinois express au lait",
+      "acc": "Salade verte",
+      "t": 25,
+      "b": "eco",
+      "p": "vege",
+      "f": "pdt",
+      "c": "francaise",
+      "astuce": "Au micro-ondes, comptez 2 à 4 minutes de plus pour 5 personnes ; le lait doit être bien réduit avant le gratin.",
+      "ing": [
+        [
+          "Pommes de terre",
+          1000,
+          "g",
+          "fl"
+        ],
+        [
+          "Lait",
+          30,
+          "cl",
+          "cre"
+        ],
+        [
+          "Fromage râpé",
+          60,
+          "g",
+          "cre"
+        ],
+        [
+          "Beurre",
+          10,
+          "g",
+          "cre"
+        ]
+      ],
+      "etapes": [
+        "Épluchez les pommes de terre et coupez-les en tranches fines, d'environ 5 mm.",
+        "Frottez un plat à gratin allant au micro-ondes avec un peu de beurre, puis disposez les tranches en couches en poivrant chaque couche.",
+        "Faites bouillir le lait et versez-le sur les pommes de terre pour les couvrir à moitié.",
+        "Couvrez et cuisez au micro-ondes à puissance maximale environ 12 minutes, jusqu'à ce que le lait soit bien réduit.",
+        "Parsemez de fromage râpé et passez quelques minutes sous le grill du four, jusqu'à ce que le dessus soit doré."
+      ],
+      "source": {
+        "titre": "Marmiton",
+        "url": "https://www.marmiton.org/recettes/recette_gratin-dauphinois-express-au-lait_18873.aspx"
+      },
+      "ajoute": "2026-11-28"
+    },
+    {
+      "id": "croquettesviande",
+      "nom": "Croquettes de viande hachée au parmesan",
+      "acc": "Salade verte",
+      "t": 25,
+      "b": "eco",
+      "p": "porc",
+      "f": "pain",
+      "c": "italienne",
+      "astuce": "Mélangez à la main pour garder les croquettes tendres ; elles se mangent aussi froides le lendemain.",
+      "ing": [
+        [
+          "Haché porc-bœuf",
+          300,
+          "g",
+          "bou"
+        ],
+        [
+          "Œufs",
+          2,
+          "",
+          "cre"
+        ],
+        [
+          "Parmesan",
+          90,
+          "g",
+          "cre"
+        ],
+        [
+          "Chapelure",
+          60,
+          "g",
+          "epi"
+        ],
+        [
+          "Oignons",
+          1,
+          "",
+          "fl"
+        ],
+        [
+          "Persil",
+          1,
+          "",
+          "fl"
+        ]
+      ],
+      "etapes": [
+        "Hachez finement l'oignon et le persil.",
+        "Dans un grand bol, mélangez la viande hachée, les œufs battus, le parmesan râpé, la chapelure, l'oignon et le persil.",
+        "Assaisonnez et mélangez à la main jusqu'à obtenir une pâte homogène.",
+        "Formez environ 8 croquettes plates et farinez-les légèrement.",
+        "Faites-les dorer dans un fond d'huile bien chaude, retournez-les, puis poursuivez la cuisson à feu doux et à couvert quelques minutes.",
+        "Égouttez-les sur du papier absorbant avant de servir."
+      ],
+      "source": {
+        "titre": "Marmiton",
+        "url": "https://www.marmiton.org/recettes/recette_croquettes-a-la-viande-hachee_392446.aspx"
+      },
+      "ajoute": "2026-11-28"
+    },
+    {
+      "id": "dindenormande",
+      "nom": "Escalopes de dinde à la normande",
+      "acc": "Riz ou pommes de terre",
+      "t": 25,
+      "b": "moyen",
+      "p": "volaille",
+      "f": "riz",
+      "c": "francaise",
+      "astuce": "Flambez les escalopes au calvados hors du feu, en couvrant la poêle un instant pour éviter de vous brûler.",
+      "ing": [
+        [
+          "Escalopes de dinde",
+          600,
+          "g",
+          "bou"
+        ],
+        [
+          "Calvados",
+          5,
+          "cl",
+          "boi"
+        ],
+        [
+          "Cidre",
+          25,
+          "cl",
+          "boi"
+        ],
+        [
+          "Bouillon de volaille",
+          1,
+          "",
+          "epi"
+        ],
+        [
+          "Champignons",
+          625,
+          "g",
+          "fl"
+        ],
+        [
+          "Crème fraîche",
+          50,
+          "cl",
+          "cre"
+        ]
+      ],
+      "etapes": [
+        "Faites cuire les escalopes de dinde dans une poêle, puis flambez-les au calvados hors du feu et réservez-les.",
+        "Dans une casserole, faites bouillir le cidre avec le bouillon émietté et laissez réduire de moitié.",
+        "Faites revenir les champignons émincés dans une poêle jusqu'à ce qu'ils dorent.",
+        "Ajoutez la crème et la réduction de cidre aux champignons, puis laissez épaissir quelques minutes.",
+        "Remettez les escalopes dans la sauce, laissez réduire 5 minutes et servez avec du riz ou des pommes de terre."
+      ],
+      "source": {
+        "titre": "Marmiton",
+        "url": "https://www.marmiton.org/recettes/recette_escalope-a-la-normande_51732.aspx"
+      },
+      "ajoute": "2026-11-28"
     }
   ],
   "prix": {
@@ -1510,6 +1682,14 @@
     "Mascarpone": [
       8,
       "kg"
+    ],
+    "Cidre": [
+      2.5,
+      "L"
+    ],
+    "Calvados": [
+      30,
+      "L"
     ]
   }
 }
