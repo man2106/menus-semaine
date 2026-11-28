@@ -38,7 +38,7 @@ grant execute on function public.mon_nom() to authenticated;
 -- 1. Rubriques acceptées dans la base (toutes celles déjà utilisées, plus « avis » et « envies »)
 alter table public.docs drop constraint if exists docs_chemin_valide;
 alter table public.docs add constraint docs_chemin_valide
-  check (length(path) <= 160 and path ~ '^(famille|semaines|validations|recettes|retours|sondage|suggestions|tickets|platsphotos|avis|envies)(/[A-Za-z0-9_-][A-Za-z0-9_.-]{0,99}){1,2}$');
+  check (length(path) <= 160 and path ~ '^(famille|semaines|validations|recettes|retours|sondage|suggestions|tickets|platsphotos|avis|envies)(/[A-Za-z0-9_-][A-Za-z0-9_.-]{0,99}){1,2}$') not valid;  -- not valid : les documents déjà présents ne sont pas revérifiés
 
 -- 2. Un vote ne peut être créé que sous son propre prénom, sauf par le propriétaire
 drop policy if exists docs_creer on public.docs;
